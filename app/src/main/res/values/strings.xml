@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_mod_summary">Set generic configurations on a per-app basis:
+DPI; Override loaded resouces; Locale; Fullscreen;
+Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
+
+
+    <!-- Main screen -->
+    <string name="app_loading">Loading apps, please wait</string>
+    <string name="app_searchhint">name or package</string>
+    <string name="app_about">An <a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> module by
+ <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> and <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
+ \nSupport for the module on Android 8.0+ by Blue cat <a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>.
+ \nYou can use <a href="http://forum.xda-developers.com/showthread.php?t=2437377">this thread</a> for questions or suggestions.</string>
+    <string name="app_description">This mod allows certain generic configurations to be changed on a per-app basis, without needing to edit APKs:
+\n- allow or deny screenshot
+\n- density / dpi
+\n- font scale
+\n- fake screen size for resources loading
+\n- locale (language)
+\n- fullscreen mode
+\n- hide title bar
+\n- keep screen on while app is visible
+\n- show app above lockscreen
+\n- disable fullscreen keyboard input
+\n- force orientation (portrait/landscape/auto)
+\n- mute audio (for most apps)
+\n- insistent notifications (loop the sound / reboot required)
+\n- force or prevent ongoing notifications (reboot required)
+\n- mute notifications (reboot required)
+\n- stay resident in memory (reboot required)
+\n- force or exclude app from recents (reboot required)
+\n- revoke permissions (double reboot required)
+\n- notifications priority (not available on OS 8.0+)
+\n- force using legacy (navbar) menu button (not available on OS 6.0+)
+\n- disable big (expanded) notifications (not available on OS 6.0+)</string>
+    <string name="app_version">Version: %s</string>
+    <string name="app_translation">Translator: %s</string>
+    <string name="xposed_not_activated">Module not enabled or Xposed not working</string>
+    <string name="app_notactive_warning">Note: Although the configuration panels can be used as-is,
+they will only affect the apps if the Xposed framework is installed and if this module
+is enabled in its configuration!</string>
+
+
+    <!-- main menu -->
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_recents">Recent apps</string>
+    <string name="menu_export">Export</string>
+    <string name="menu_import">Import</string>
+    <string name="menu_about">About</string>
+
+    <!-- Import / Export -->
+    <string name="imp_exp_file_doesnt_exist">File does not exist: %s</string>
+    <string name="imp_exp_confirm">Replace all settings with the ones that are about to be imported?</string>
+    <string name="imp_exp_exported">Settings exported to file: %s</string>
+    <string name="imp_exp_export_error">Export failed: %s</string>
+    <string name="imp_exp_import_error">Import failed: %s</string>
+    <string name="imp_exp_invalid_import_file">Invalid or empty file to import: %s</string>
+    <string name="imp_exp_imported">Import successful; settings replaced</string>
+    <string name="imp_exp_permission_not_granted_storage">Permission not granted: Action could not be performed</string>
+
+    <!-- app-specific menu -->
+    <string name="menu_save">Save</string>
+    <string name="menu_launch">Launch</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_playstore">Play Store</string>
+    <string name="menu_reboot">Reboot</string>
+
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_dpi">DPI</string>
+    <string name="settings_fontscale">Font scale</string>
+    <string name="settings_listres">List res.</string>
+    <string name="settings_screen">Screen (dp)</string>
+    <string name="settings_xlargeres">xlarge res.</string>
+    <string name="settings_screenshot">Screenshot</string>
+    <string name="settings_locale">Locale</string>
+    <string name="settings_fullscreen">Fullscreen</string>
+    <string name="settings_notitle">No title</string>
+    <string name="settings_screenon">Keep screen on</string>
+    <string name="settings_showwhenlocked">Show when locked</string>
+    <string name="settings_resident">Resident</string>
+    <string name="settings_nofullscreenime">No Fullscreen IME</string>
+    <string name="settings_orientation">Orientation</string>
+    <string name="settings_insistentnotif">Insistent notifications</string>
+    <string name="settings_nobignotif">No big notifications</string>
+    <string name="settings_ongoingnotif">Ongoing notifications</string>
+    <string name="settings_notifpriority">Notifications priority</string>
+    <string name="settings_mute">Mute audio</string>
+    <string name="settings_legacy_menu">Legacy menu button</string>
+    <string name="settings_permissions">Permissions</string>
+    <string name="settings_recents_mode">Show in recents</string>
+
+    <string name="settings_default">(default)</string>
+
+    <string name="settings_force">Force</string>
+    <string name="settings_prevent">Prevent</string>
+    <string name="settings_immersive">Immersive</string>
+    <string name="settings_allow">Allow</string>
+
+    <string name="settings_ori_normal">Normal rotation</string>
+    <string name="settings_ori_portrait">Always portrait</string>
+    <string name="settings_ori_landscape">Always landscape</string>
+    <string name="settings_ori_forceauto">Force auto-rotation</string>
+    <string name="settings_ori_portrait_sensor">Always portrait (sensor)</string>
+    <string name="settings_ori_landscape_sensor">Always landscape (sensor)</string>
+    <string name="settings_ori_portrait_reverse">Always portrait (reverse)</string>
+    <string name="settings_ori_landscape_reverse">Always landscape (reverse)</string>
+    <string name="settings_ori_forceauto_4way">Force auto-rotation (4-way)</string>
+    <string name="settings_ori_portrait_user">Always portrait (user setting)</string>
+    <string name="settings_ori_landscape_user">Always landscape (user setting)</string>
+    <string name="settings_ori_user_4way">4-way rotation (user setting)</string>
+
+    <string name="settings_npri_max">Max</string>
+    <string name="settings_npri_high">High</string>
+    <string name="settings_npri_normal">Normal</string>
+    <string name="settings_npri_low">Low</string>
+    <string name="settings_npri_min">Min</string>
+
+    <!-- Recent apps -->
+    <string name="recents_title">Recent Applications</string>
+
+    <!-- List resources -->
+    <string name="res_title">Resources</string>
+    <string name="res_noentries">No resources found</string>
+    <string name="res_failedtoload">Failed to load APK contents</string>
+
+    <!-- Show / search / revoke permissions -->
+    <string name="perms_title">Permissions</string>
+    <string name="perms_revoke">Revoke Permissions</string>
+    <string name="perms_shared_warning">WARNING: Shared package!</string>
+    <string name="perms_searchhint">name or description</string>
+    <string name="perms_nodescription">( no description provided )</string>
+    <string name="perms_filter_title">Select permission to filter for, or Cancel to show all</string>
+
+    <!-- Saving settings -->
+    <string name="settings_unsaved_title">Warning</string>
+    <string name="settings_unsaved_detail">You didn\'t save the configuration.
+Really go back and discard changes?</string>
+    <string name="settings_apply_title">Apply settings</string>
+    <string name="settings_apply_detail">Also kill the application so when it\'s relaunched it uses the new settings?</string>
+    <string name="permissions_error">Permission Error: %s</string>
+    <string name="broadcast_permission">Force Stop</string>
+    <string name="broadcast_permission_desc">forced stop access through Xposed</string>
+    <string name="permission_not_granted_broadcast">Permission not granted: Settings could not be saved</string>
+
+
+    <!-- Filter dialog -->
+    <string name="filter_title">Filter</string>
+    <string name="filter_all">All</string>
+    <string name="filter_overridden">Overridden</string>
+    <string name="filter_unchanged">Unchanged</string>
+    <string name="filter_type">Type</string>
+    <string name="filter_user">User</string>
+    <string name="filter_system">System</string>
+    <string name="filter_state">State</string>
+    <string name="filter_enabled">Enabled</string>
+    <string name="filter_disabled">Disabled</string>
+    <string name="filter_settingsactive">Settings active</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_notactive">Not active</string>
+    <string name="filter_resources">Resource loading</string>
+    <string name="filter_cancel">Cancel</string>
+    <string name="filter_clear">Clear</string>
+    <string name="filter_apply">Apply</string>
+
+
+    <string name="translator"></string>
+</resources>

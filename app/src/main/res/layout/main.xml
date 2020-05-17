@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageButton
+        android:id="@+id/btnFilter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="@string/filter_title"
+        android:src="@android:drawable/ic_menu_view" />
+
+    <ImageButton
+        android:id="@+id/btnPermsFilter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@id/btnFilter"
+        android:contentDescription="@string/perms_title"
+        android:src="@android:drawable/ic_lock_idle_lock" />
+
+    <SearchView
+        android:id="@+id/searchApp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/btnPermsFilter"
+        android:focusable="false"
+        android:iconifiedByDefault="false"
+        android:imeOptions="actionSearch|flagNoEnterAction|flagNoExtractUi"
+        android:inputType="textFilter"
+        android:queryHint="@string/app_searchhint" />
+
+    <ListView
+        android:id="@+id/lstApps"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/searchApp"
+        android:divider="@android:color/holo_blue_dark"
+        android:dividerHeight="1dp"
+        android:fadingEdge="vertical"
+        android:fastScrollEnabled="true"
+        android:scrollbars="vertical"
+        android:textFilterEnabled="true" />
+
+</RelativeLayout>

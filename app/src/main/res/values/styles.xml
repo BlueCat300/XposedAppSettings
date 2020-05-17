@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="android:Theme.DeviceDefault">
+        <item name="android:actionBarStyle">@style/AppActionBar</item>
+    </style>
+    <style name="AppActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/blue_gray</item>
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.TitleTextStyle</item>
+    </style>
+    <style name="AppTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.StatusBar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="de.robv.android.xposed.mods.appsettings">
+
+    <permission-tree android:name="de.robv.android.xposed.mods.appsettings" />
+
+    <permission
+        android:name="de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION"
+        android:label="@string/broadcast_permission"
+        android:description="@string/broadcast_permission_desc"
+        android:protectionLevel="dangerous">
+    </permission>
+
+    <uses-permission android:name="de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
+    <application
+        android:requestLegacyExternalStorage="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:allowBackup="false"
+        tools:targetApi="q">
+        <activity
+            android:name=".XposedModActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".settings.ApplicationSettings"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/settings_title"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden" >
+        </activity>
+
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="@string/app_mod_summary" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="52+" />
+    </application>
+
+</manifest>

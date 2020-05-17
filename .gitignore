@@ -1,0 +1,12 @@
+# Project exclude paths
+/.gradle/
+/.idea/
+/build
+/release/
+/local.properties
+/XposedAppSettings.iml
+/app/build/
+/app/app.iml
+/app/gradle.properties
+/app/debug/
+/app/release/
