@@ -7,9 +7,7 @@
 
     <permission
         android:name="de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION"
-        android:label="@string/broadcast_permission"
-        android:description="@string/broadcast_permission_desc"
-        android:protectionLevel="dangerous">
+        android:protectionLevel="signature">
     </permission>
 
     <uses-permission android:name="de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION" />

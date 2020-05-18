@@ -140,9 +140,6 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="settings_apply_title">Применить</string>
     <string name="settings_apply_detail">Так же, убить приложение, чтобы оно подхватило новые настройки?</string>
     <string name="permissions_error">Ошибка выставления разрешений: %s</string>
-    <string name="broadcast_permission">Остановка приложений</string>
-    <string name="broadcast_permission_desc">доступ к принудительной остановке через Xposed</string>
-    <string name="permission_not_granted_broadcast">Разрешение не получено: Настройки не могут быть сохранены</string>
 
 
     <!-- Filter dialog -->

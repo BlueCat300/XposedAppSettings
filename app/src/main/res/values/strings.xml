@@ -141,9 +141,6 @@ Really go back and discard changes?</string>
     <string name="settings_apply_title">Apply settings</string>
     <string name="settings_apply_detail">Also kill the application so when it\'s relaunched it uses the new settings?</string>
     <string name="permissions_error">Permission Error: %s</string>
-    <string name="broadcast_permission">Force Stop</string>
-    <string name="broadcast_permission_desc">forced stop access through Xposed</string>
-    <string name="permission_not_granted_broadcast">Permission not granted: Settings could not be saved</string>
 
 
     <!-- Filter dialog -->
@@ -166,5 +163,5 @@ Really go back and discard changes?</string>
     <string name="filter_apply">Apply</string>
 
 
-    <string name="translator"></string>
+    <string name="translator"> </string>
 </resources>

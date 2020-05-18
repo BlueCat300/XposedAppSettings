@@ -46,15 +46,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-
 import com.topjohnwu.superuser.Shell;
 
 import de.robv.android.xposed.mods.appsettings.Common;
 import de.robv.android.xposed.mods.appsettings.R;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static de.robv.android.xposed.mods.appsettings.Common.BROADCAST_PERMISSION;
 import static de.robv.android.xposed.mods.appsettings.XposedModActivity.dirPrefsFile;
 import static de.robv.android.xposed.mods.appsettings.XposedModActivity.prefsFile;
 
@@ -597,30 +594,9 @@ public class ApplicationSettings extends Activity {
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode,
-										   String permissions[], int[] grantResults) {
-		if (requestCode == 3) {
-			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				saveSettings();
-			} else {
-				Toast.makeText(this, getString(R.string.permission_not_granted_broadcast),
-						Toast.LENGTH_LONG).show();
-			}
-		}
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_save) {
-			if (SDK_INT >= 23) {
-				if(checkSelfPermission(BROADCAST_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
-					saveSettings();
-				} else {
-					ActivityCompat.requestPermissions(this, new String[]{BROADCAST_PERMISSION},3);
-				}
-			} else {
-				saveSettings();
-			}
+			saveSettings();
 		} else if (item.getItemId() == R.id.menu_app_launch) {
 			Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(pkgName);
 			startActivity(LaunchIntent);
