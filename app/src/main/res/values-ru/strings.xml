@@ -140,7 +140,6 @@ DPI; Замена ресурсов; Язык; Полный экран;
 Вы действительно хотите отменить их?</string>
     <string name="settings_apply_title">Применить</string>
     <string name="settings_apply_detail">Так же, убить приложение, чтобы оно подхватило новые настройки?</string>
-    <string name="permissions_error">Ошибка выставления разрешений: %s</string>
 
 
     <!-- Filter dialog -->

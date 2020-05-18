@@ -1,5 +1,8 @@
 package de.robv.android.xposed.mods.appsettings;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
@@ -14,14 +17,10 @@ import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
 import static android.os.Build.VERSION.SDK_INT;
 
-import android.annotation.SuppressLint;
-import android.app.Notification;
-
 public class Common {
 
 	public static final String TAG = "AppSettings";
 	public static final String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
-	public static final String BROADCAST_PERMISSION = "de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION";
 	static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 	static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
 

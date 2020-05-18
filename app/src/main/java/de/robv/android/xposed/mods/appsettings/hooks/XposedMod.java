@@ -1,18 +1,6 @@
 package de.robv.android.xposed.mods.appsettings.hooks;
 
 
-import static android.os.Build.VERSION.SDK_INT;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.removeAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.setFloatField;
-import static de.robv.android.xposed.XposedHelpers.setIntField;
-import static de.robv.android.xposed.XposedHelpers.setObjectField;
-
-import java.util.Locale;
-
 import android.annotation.TargetApi;
 import android.app.AndroidAppHelper;
 import android.app.Notification;
@@ -27,12 +15,16 @@ import android.media.JetPlayer;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.ViewConfiguration;
+
+import java.io.File;
+import java.util.Locale;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -43,6 +35,16 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import de.robv.android.xposed.mods.appsettings.Common;
+
+import static android.os.Build.VERSION.SDK_INT;
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
+import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.removeAdditionalInstanceField;
+import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
+import static de.robv.android.xposed.XposedHelpers.setFloatField;
+import static de.robv.android.xposed.XposedHelpers.setIntField;
+import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
@@ -406,7 +408,12 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 	}
 
 	private void loadPrefs () {
-		prefs = new XSharedPreferences(Common.MY_PACKAGE_NAME, Common.PREFS);
+		String dataDir = "data/";
+		if (SDK_INT > 23) {
+			dataDir = "user_de/0/";
+		}
+		File f = new File(Environment.getDataDirectory(), dataDir + Common.MY_PACKAGE_NAME + "/shared_prefs/" + Common.PREFS + ".xml");
+		prefs = new XSharedPreferences(f);
 	}
 
 	static boolean isActive(String packageName) {

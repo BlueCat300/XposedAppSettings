@@ -1,21 +1,5 @@
 package de.robv.android.xposed.mods.appsettings.settings;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -46,14 +30,30 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import com.topjohnwu.superuser.Shell;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.robv.android.xposed.mods.appsettings.Common;
+import de.robv.android.xposed.mods.appsettings.PrefFileManager;
 import de.robv.android.xposed.mods.appsettings.R;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static de.robv.android.xposed.mods.appsettings.XposedModActivity.dirPrefsFile;
-import static de.robv.android.xposed.mods.appsettings.XposedModActivity.prefsFile;
 
 public class ApplicationSettings extends Activity {
 
@@ -66,9 +66,28 @@ public class ApplicationSettings extends Activity {
 	private Set<String> disabledPermissions;
 	private boolean allowRevoking;
 	private Intent parentIntent;
-
 	private LocaleList localeList;
+    private PrefFileManager prefFileManager;
 
+    @Override
+    public void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+        prefFileManager = PrefFileManager.getInstance(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Setting permission for reading xposed settings
+        prefFileManager.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        //Setting permission for reading xposed settings
+        prefFileManager.onPause();
+        super.onStop();
+    }
 
 	/** Called when the activity is first created. */
 	@SuppressLint({"SetTextI18n", "DefaultLocale"})
@@ -85,7 +104,14 @@ public class ApplicationSettings extends Activity {
 		Intent i = getIntent();
 		parentIntent = i;
 
-		prefs = getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+        //Setting permission for reading xposed settings
+        prefFileManager.fixFolderPermissionsAsync();
+
+        Context ctx = ContextCompat.createDeviceProtectedStorageContext(this);
+        if (ctx == null) {
+            ctx = this;
+        }
+        prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 
 		ApplicationInfo app;
 		try {
@@ -652,9 +678,6 @@ public class ApplicationSettings extends Activity {
 		// Update saved settings to detect modifications later
 		initialSettings = newSettings;
 
-        //Setting permission for reading xposed settings
-        getRootShell(this);
-
 		// Check if in addition to saving the settings, the app should also be killed
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.settings_apply_title);
@@ -679,31 +702,4 @@ public class ApplicationSettings extends Activity {
 		});
 		builder.create().show();
 	}
-
-	public static void getRootShell(Context context) {
-        Shell cachedShell = Shell.getCachedShell();
-        if(cachedShell != null && cachedShell.isRoot()) {
-            setSharedPreferencesPermissions(context);
-        } else if (cachedShell != null) {
-            try {
-                cachedShell.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(context, context.getString(R.string.permissions_error, e),
-                        Toast.LENGTH_LONG).show();
-            }
-            setSharedPreferencesPermissions(context);
-        } else {
-            setSharedPreferencesPermissions(context);
-        }
-    }
-
-	private static void setSharedPreferencesPermissions(Context context) {
-        Shell.su("chmod 701 " + dirPrefsFile, "chmod 664 " + prefsFile).submit(result -> {
-            if(!result.isSuccess() && Shell.rootAccess()) {
-                Toast.makeText(context, context.getString(R.string.permissions_error, result.getErr()),
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 }

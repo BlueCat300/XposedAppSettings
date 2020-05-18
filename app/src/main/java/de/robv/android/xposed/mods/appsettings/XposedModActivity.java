@@ -1,25 +1,5 @@
 package de.robv.android.xposed.mods.appsettings;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -66,8 +46,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-import com.topjohnwu.superuser.Shell;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import de.robv.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
 import de.robv.android.xposed.mods.appsettings.settings.ApplicationSettings;
@@ -97,10 +96,6 @@ public class XposedModActivity extends Activity {
 
 	private static File backupPrefsFile = new File(Environment.getExternalStorageDirectory(),
 			"AppSettings-Backup.xml");
-	public static File prefsFile = new File(Environment.getDataDirectory(),
-			"data/" + Common.MY_PACKAGE_NAME + "/shared_prefs/" + Common.PREFS + ".xml");
-	public static File dirPrefsFile = new File(Environment.getDataDirectory(),
-			"data/" + Common.MY_PACKAGE_NAME);
 	private SharedPreferences prefs;
 
     @Override
@@ -108,7 +103,11 @@ public class XposedModActivity extends Activity {
 		setTitle(R.string.app_name);
 		super.onCreate(savedInstanceState);
 
-		prefs = getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+		Context ctx = ContextCompat.createDeviceProtectedStorageContext(this);
+		if (ctx == null) {
+			ctx = this;
+		}
+		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 
 		loadSettings();
 		setContentView(R.layout.main);
@@ -122,18 +121,6 @@ public class XposedModActivity extends Activity {
 			startActivityForResult(i, position);
 		});
 		refreshApps();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		try {
-			Shell cachedShell = Shell.getCachedShell();
-			if (cachedShell != null)
-				cachedShell.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void loadSettings() {
@@ -361,7 +348,12 @@ public class XposedModActivity extends Activity {
             String error = null;
             try {
                 output = new ObjectOutputStream(new FileOutputStream(outFile));
-                SharedPreferences pref = getSharedPreferences(Common.PREFS, MODE_PRIVATE);
+				Context context = getApplicationContext();
+				Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+				if (ctx == null) {
+					ctx = context;
+				}
+				SharedPreferences pref = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
                 output.writeObject(pref.getAll());
                 exportSuccessful = true;
             } catch (FileNotFoundException e) {
@@ -408,7 +400,12 @@ public class XposedModActivity extends Activity {
             String error = null;
             try {
                 input = new ObjectInputStream(new FileInputStream(inFile));
-                SharedPreferences.Editor prefEdit = getSharedPreferences(Common.PREFS, MODE_PRIVATE).edit();
+				Context context = getApplicationContext();
+				Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+				if (ctx == null) {
+					ctx = context;
+				}
+				SharedPreferences.Editor prefEdit = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE).edit();
                 prefEdit.clear();
                 Map<String, ?> entries = (Map<String, ?>) input.readObject();
                 for (Map.Entry<String, ?> entry : entries.entrySet()) {
@@ -459,7 +456,12 @@ public class XposedModActivity extends Activity {
 		protected void onPostExecute(String result) {
 			if (importSuccessful) {
 				// Refresh preferences
-				prefs = getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE | Context.MODE_MULTI_PROCESS);
+				Context context = getApplicationContext();
+				Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+				if (ctx == null) {
+					ctx = context;
+				}
+				prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 				// Refresh listed apps (account for filters)
 				AppListAdapter appListAdapter = (AppListAdapter) ((ListView) findViewById(R.id.lstApps)).getAdapter();
 				appListAdapter.getFilter().filter(nameFilter);
@@ -828,7 +830,12 @@ public class XposedModActivity extends Activity {
 				items.addAll(appList);
 			}
 
-			SharedPreferences prefs = getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+			Context context = getApplicationContext();
+			Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+			if (ctx == null) {
+				ctx = context;
+			}
+			SharedPreferences prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.length() > 0) {

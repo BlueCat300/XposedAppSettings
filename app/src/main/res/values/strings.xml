@@ -141,7 +141,6 @@ is enabled in its configuration!</string>
 Really go back and discard changes?</string>
     <string name="settings_apply_title">Apply settings</string>
     <string name="settings_apply_detail">Also kill the application so when it\'s relaunched it uses the new settings?</string>
-    <string name="permissions_error">Permission Error: %s</string>
 
 
     <!-- Filter dialog -->
