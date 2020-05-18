@@ -65,6 +65,8 @@ is enabled in its configuration!</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_playstore">Play Store</string>
     <string name="menu_reboot">Reboot</string>
+    <string name="menu_reboot_confirm">Confirmation</string>
+    <string name="menu_reboot_confirm_desc">The device will reboot. Continue?</string>
 
 
     <!-- Settings screen -->

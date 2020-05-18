@@ -64,6 +64,8 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="menu_settings">Настройки</string>
     <string name="menu_playstore">Play Store</string>
     <string name="menu_reboot">Перезагрузка</string>
+    <string name="menu_reboot_confirm">Подтверждение</string>
+    <string name="menu_reboot_confirm_desc">Устройство будет перезагружено. Продолжить?</string>
 
 
     <!-- Settings screen -->

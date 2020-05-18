@@ -606,9 +606,19 @@ public class ApplicationSettings extends Activity {
 		} else if (item.getItemId() == R.id.menu_app_store) {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
 		} else if (item.getItemId() == R.id.menu_reboot) {
-            Shell.su("reboot").submit();
+            confirmReboot();
         }
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void confirmReboot () {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.menu_reboot_confirm);
+		builder.setMessage(R.string.menu_reboot_confirm_desc);
+		builder.setPositiveButton(android.R.string.yes, (dialog, which) ->
+			Shell.su("reboot").submit());
+		builder.setNegativeButton(android.R.string.no, (null));
+		builder.create().show();
 	}
 
 	public void saveSettings () {
