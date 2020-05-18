@@ -54,7 +54,6 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="imp_exp_exported">Настройки экспортированы в файл: %s</string>
     <string name="imp_exp_export_error">Ошибка экспорта: %s</string>
     <string name="imp_exp_import_error">Ошибка импорта: %s</string>
-    <string name="imp_exp_invalid_import_file">Неверный или пустой файл для импорта: %s</string>
     <string name="imp_exp_imported">Импорт успешен; настройки заменены</string>
     <string name="imp_exp_permission_not_granted_storage">Разрешение не получено: Действие не может быть выполнено</string>
 

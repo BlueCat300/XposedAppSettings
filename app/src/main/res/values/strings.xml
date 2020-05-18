@@ -55,7 +55,6 @@ is enabled in its configuration!</string>
     <string name="imp_exp_exported">Settings exported to file: %s</string>
     <string name="imp_exp_export_error">Export failed: %s</string>
     <string name="imp_exp_import_error">Import failed: %s</string>
-    <string name="imp_exp_invalid_import_file">Invalid or empty file to import: %s</string>
     <string name="imp_exp_imported">Import successful; settings replaced</string>
     <string name="imp_exp_permission_not_granted_storage">Permission not granted: Action could not be performed</string>
 

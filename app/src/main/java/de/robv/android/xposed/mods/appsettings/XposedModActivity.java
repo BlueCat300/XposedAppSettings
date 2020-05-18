@@ -2,10 +2,11 @@ package de.robv.android.xposed.mods.appsettings;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,7 +77,6 @@ import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.mods.appsettings.Common.READ_EXTERNAL_STORAGE;
 import static de.robv.android.xposed.mods.appsettings.Common.WRITE_EXTERNAL_STORAGE;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class XposedModActivity extends Activity {
 
 	private ArrayList<ApplicationInfo> appList = new ArrayList<>();
@@ -351,15 +351,42 @@ public class XposedModActivity extends Activity {
 
 	@SuppressLint("StaticFieldLeak")
 	private class ExportTask extends AsyncTask<File, String, String> {
-		@Override
+
+        @Override
 		protected String doInBackground(File... params) {
+            boolean exportSuccessful = false;
+
 			File outFile = params[0];
-			try {
-				copyFile(prefsFile, outFile);
-				return getString(R.string.imp_exp_exported, outFile.getAbsolutePath());
-			} catch (Exception ex) {
-				return getString(R.string.imp_exp_export_error, ex.getMessage());
-			}
+            ObjectOutputStream output = null;
+            String error = null;
+            try {
+                output = new ObjectOutputStream(new FileOutputStream(outFile));
+                SharedPreferences pref = getSharedPreferences(Common.PREFS, MODE_PRIVATE);
+                output.writeObject(pref.getAll());
+                exportSuccessful = true;
+            } catch (FileNotFoundException e) {
+                error = e.getMessage();
+                e.printStackTrace();
+            } catch (IOException e) {
+                error = e.getMessage();
+                e.printStackTrace();
+            }finally {
+                try {
+                    if (output != null) {
+                        output.flush();
+                        output.close();
+                    }
+                } catch (IOException e) {
+                    error = e.getMessage();
+                    e.printStackTrace();
+                }
+            }
+
+            if(exportSuccessful) {
+                return getString(R.string.imp_exp_exported, outFile.getAbsolutePath());
+            } else {
+                return getString(R.string.imp_exp_export_error, error);
+            }
 		}
 
 		@Override
@@ -372,38 +399,60 @@ public class XposedModActivity extends Activity {
 	private class ImportTask extends AsyncTask<File, String, String> {
 		private boolean importSuccessful;
 
-		@SuppressWarnings("ResultOfMethodCallIgnored")
 		@Override
 		protected String doInBackground(File... params) {
 			importSuccessful = false;
 
 			File inFile = params[0];
-			String tempFilename = Common.PREFS + "-new";
-			File newPrefsFile = new File(prefsFile.getParent(), tempFilename + ".xml");
-			try {
-				copyFile(inFile, newPrefsFile);
-				// Make sure the shared_prefs folder exists, with the proper permissions
-				ApplicationSettings.getRootShell(getApplicationContext());
-			} catch (Exception ex) {
-				return getString(R.string.imp_exp_import_error, ex.getMessage());
-			}
+            ObjectInputStream input = null;
+            String error = null;
+            try {
+                input = new ObjectInputStream(new FileInputStream(inFile));
+                SharedPreferences.Editor prefEdit = getSharedPreferences(Common.PREFS, MODE_PRIVATE).edit();
+                prefEdit.clear();
+                Map<String, ?> entries = (Map<String, ?>) input.readObject();
+                for (Map.Entry<String, ?> entry : entries.entrySet()) {
+                    Object v = entry.getValue();
+                    String key = entry.getKey();
 
-			SharedPreferences newPrefs = getSharedPreferences(tempFilename, Context.MODE_PRIVATE | Context.MODE_MULTI_PROCESS);
-			if (newPrefs.getAll().size() == 0) {
-				// No entries in imported file, discard it
-				newPrefsFile.delete();
-				return getString(R.string.imp_exp_invalid_import_file, inFile.getAbsoluteFile());
-			} else {
-				if (newPrefsFile.renameTo(prefsFile)) {
-					importSuccessful = true;
-				} else {
-					prefsFile.delete();
-					if (newPrefsFile.renameTo(prefsFile))
-						importSuccessful = true;
-				}
+                    if (v instanceof Boolean)
+                        prefEdit.putBoolean(key, (Boolean) v);
+                    else if (v instanceof Float)
+                        prefEdit.putFloat(key, (Float) v);
+                    else if (v instanceof Integer)
+                        prefEdit.putInt(key, (Integer) v);
+                    else if (v instanceof Long)
+                        prefEdit.putLong(key, (Long) v);
+                    else if (v instanceof String)
+                        prefEdit.putString(key, ((String) v));
+                }
+                prefEdit.apply();
+                importSuccessful = true;
+            } catch (FileNotFoundException e) {
+                error = e.getMessage();
+                e.printStackTrace();
+            } catch (IOException e) {
+                error = e.getMessage();
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                error = e.getMessage();
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (input != null) {
+                        input.close();
+                    }
+                } catch (IOException e) {
+                    error = e.getMessage();
+                    e.printStackTrace();
+                }
+            }
 
-				return getString(R.string.imp_exp_imported);
-			}
+            if(importSuccessful) {
+                return getString(R.string.imp_exp_imported);
+            } else {
+                return getString(R.string.imp_exp_import_error, error);
+            }
 		}
 
 		@Override
@@ -419,44 +468,6 @@ public class XposedModActivity extends Activity {
 			Toast.makeText(XposedModActivity.this, result, Toast.LENGTH_LONG).show();
 		}
 	}
-
-	private static void copyFile(File source, File dest) throws IOException {
-		InputStream in = null;
-		OutputStream out = null;
-		boolean success = false;
-		try {
-			in = new FileInputStream(source);
-			out = new FileOutputStream(dest);
-			byte[] buf = new byte[10 * 1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			out.flush();
-			out.close();
-			out = null;
-			success = true;
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			if (out != null) {
-				try {
-					out.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			if (!success) {
-				dest.delete();
-			}
-		}
-	}
-
 
 	@SuppressLint("InflateParams")
 	private void showAboutDialog() {
@@ -1083,5 +1094,4 @@ public class XposedModActivity extends Activity {
 			return filter;
 		}
 	}
-
 }
