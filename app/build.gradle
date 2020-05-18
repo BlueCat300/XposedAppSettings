@@ -8,8 +8,8 @@ android {
         applicationId "de.robv.android.xposed.mods.appsettings"
         minSdkVersion 15
         targetSdkVersion 29
-        versionName "1.17"
-        versionCode 35
+        versionName "1.18"
+        versionCode 37
         archivesBaseName = "App Settings v${versionName}"
     }
 
