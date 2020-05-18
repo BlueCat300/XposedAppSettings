@@ -16,6 +16,8 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
-
-import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
 import de.robv.android.xposed.mods.appsettings.Common;
 import de.robv.android.xposed.mods.appsettings.PrefFileManager;
 import de.robv.android.xposed.mods.appsettings.R;
+import de.robv.android.xposed.mods.appsettings.XposedModActivity;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -632,7 +633,12 @@ public class ApplicationSettings extends Activity {
 		} else if (item.getItemId() == R.id.menu_app_store) {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
 		} else if (item.getItemId() == R.id.menu_reboot) {
-            confirmReboot();
+			if (XposedModActivity.isModActive()) {
+				confirmReboot();
+			} else {
+				Toast.makeText(this, getString(R.string.xposed_not_activated),
+						Toast.LENGTH_LONG).show();
+			}
         }
 		return super.onOptionsItemSelected(item);
 	}
@@ -641,8 +647,15 @@ public class ApplicationSettings extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.menu_reboot_confirm);
 		builder.setMessage(R.string.menu_reboot_confirm_desc);
-		builder.setPositiveButton(android.R.string.yes, (dialog, which) ->
-			Shell.su("reboot").submit());
+		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+			try {
+				((PowerManager) Objects.requireNonNull(this.
+						getSystemService(Context.POWER_SERVICE))).reboot(null);
+			} catch (Exception e) {
+				Log.e(Common.TAG, e.toString());
+				e.printStackTrace();
+			}
+		});
 		builder.setNegativeButton(android.R.string.no, (null));
 		builder.create().show();
 	}

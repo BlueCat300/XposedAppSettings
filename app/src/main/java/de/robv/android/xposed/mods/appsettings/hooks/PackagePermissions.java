@@ -1,5 +1,21 @@
 package de.robv.android.xposed.mods.appsettings.hooks;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import de.robv.android.xposed.mods.appsettings.Common;
+
 import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
@@ -7,21 +23,6 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
-import android.util.Log;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import de.robv.android.xposed.mods.appsettings.Common;
 
 public class PackagePermissions extends BroadcastReceiver {
 	private Object pmSvc;
@@ -111,6 +112,9 @@ public class PackagePermissions extends BroadcastReceiver {
 					if (origRequestedPermissions != null) {
 						setObjectField(param.args[0], "requestedPermissions", origRequestedPermissions);
 					}
+					if (Common.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
+						grantRebootPermission(param);
+					}
 				}
 			};
 			if (SDK_INT < 21) {
@@ -123,6 +127,22 @@ public class PackagePermissions extends BroadcastReceiver {
 			} else {
 				findAndHookMethod(clsManagerService, "restorePermissionState", "android.content.pm.PackageParser$Package", boolean.class, String.class,
 						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
+			}
+		} catch (Throwable e) {
+			XposedBridge.log(e);
+		}
+	}
+
+	// https://github.com/Firefds/FirefdsKit
+	private static void grantRebootPermission(XC_MethodHook.MethodHookParam param) {
+		try {
+			Object extras = getObjectField(param.args[0], "mExtras");
+			Object ps = callMethod(extras, "getPermissionsState");
+			Object settings = getObjectField(param.thisObject, "mSettings");
+			Object permissions = getObjectField(settings, "mPermissions");
+			if (!(Boolean) callMethod(ps, "hasInstallPermission", Common.REBOOT)) {
+				Object pAccess = callMethod(permissions, "get", Common.REBOOT);
+				callMethod(ps, "grantInstallPermission", pAccess);
 			}
 		} catch (Throwable e) {
 			XposedBridge.log(e);

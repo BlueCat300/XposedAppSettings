@@ -21,6 +21,7 @@ public class Common {
 
 	public static final String TAG = "AppSettings";
 	public static final String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
+	public static String REBOOT = "android.permission.REBOOT";
 	static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 	static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
 
