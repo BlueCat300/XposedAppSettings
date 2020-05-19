@@ -95,7 +95,7 @@ public class XposedModActivity extends Activity {
 	private List<SettingInfo> settings;
 
 	private static File backupPrefsFile = new File(Environment.getExternalStorageDirectory(),
-			"AppSettings-Backup.xml");
+			"AppSettings.backup");
 	private SharedPreferences prefs;
 
     @Override
