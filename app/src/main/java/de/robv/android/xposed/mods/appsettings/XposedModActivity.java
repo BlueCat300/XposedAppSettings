@@ -1,6 +1,5 @@
 package de.robv.android.xposed.mods.appsettings;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RecentTaskInfo;
@@ -45,6 +44,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -55,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,25 +79,26 @@ import static de.robv.android.xposed.mods.appsettings.Common.WRITE_EXTERNAL_STOR
 
 public class XposedModActivity extends Activity {
 
-	private ArrayList<ApplicationInfo> appList = new ArrayList<>();
-	private ArrayList<ApplicationInfo> filteredAppList = new ArrayList<>();
+	private static ArrayList<ApplicationInfo> appList = new ArrayList<>();
+	private static ArrayList<ApplicationInfo> filteredAppList = new ArrayList<>();
 
-	private Map<String, Set<String>> permUsage = new HashMap<>();
-	private Map<String, Set<String>> sharedUsers = new HashMap<>();
+	private static Map<String, Set<String>> permUsage = new HashMap<>();
+	private static Map<String, Set<String>> sharedUsers = new HashMap<>();
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-	private Map<String, String> pkgSharedUsers = new HashMap<>();
+	private static Map<String, String> pkgSharedUsers = new HashMap<>();
 
-	private String nameFilter;
-	private FilterState filterAppType;
-	private FilterState filterAppState;
-	private FilterState filterActive;
-	private String filterPermissionUsage;
+	private static FilterState filterAppType;
+	private static FilterState filterAppState;
+	private static FilterState filterActive;
+	private static String nameFilter;
+	private static String filterPermissionUsage;
 
-	private List<SettingInfo> settings;
+	private static List<SettingInfo> settings;
 
-	private static File backupPrefsFile = new File(Environment.getExternalStorageDirectory(),
+	private static SharedPreferences prefs;
+
+	private File backupPrefsFile = new File(Environment.getExternalStorageDirectory(),
 			"AppSettings.backup");
-	private SharedPreferences prefs;
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -211,7 +213,7 @@ public class XposedModActivity extends Activity {
 	private void refreshApps() {
 		appList.clear();
 		// (re)load the list of apps in the background
-		new PrepareAppsAdapter().execute();
+		new PrepareAppsAdapter(this).execute();
 	}
 
 	private void showRecents() {
@@ -265,11 +267,11 @@ public class XposedModActivity extends Activity {
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode,
-										   String permissions[], int[] grantResults) {
+										   @NonNull String[] permissions, @NonNull int[] grantResults) {
 		switch (requestCode) {
 			case 1: {
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					new ExportTask().execute(backupPrefsFile);
+					new ExportTask(this).execute(backupPrefsFile);
 				} else {
 					Toast.makeText(this, getString(R.string.imp_exp_permission_not_granted_storage),
 							Toast.LENGTH_LONG).show();
@@ -291,13 +293,13 @@ public class XposedModActivity extends Activity {
 	private void doExport() {
 		if (SDK_INT >= 23) {
 			if(checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-				new ExportTask().execute(backupPrefsFile);
+				new ExportTask(this).execute(backupPrefsFile);
 			} else {
 				ActivityCompat.requestPermissions(this, new String[]
 						{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},1);
 			}
 		} else {
-			new ExportTask().execute(backupPrefsFile);
+			new ExportTask(this).execute(backupPrefsFile);
 		}
 	}
 
@@ -326,7 +328,7 @@ public class XposedModActivity extends Activity {
 		builder.setMessage(R.string.imp_exp_confirm);
 		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
 			dialog.dismiss();
-			new ImportTask().execute(backupPrefsFile);
+			new ImportTask(this).execute(backupPrefsFile);
 		});
 		builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
 			// Do nothing
@@ -336,22 +338,28 @@ public class XposedModActivity extends Activity {
 		alert.show();
 	}
 
-	@SuppressLint("StaticFieldLeak")
-	private class ExportTask extends AsyncTask<File, String, String> {
+
+	private static class ExportTask extends AsyncTask<File, String, String> {
+
+		private WeakReference<XposedModActivity> activityReference;
+
+		ExportTask(XposedModActivity context) {
+			activityReference = new WeakReference<>(context);
+		}
 
         @Override
 		protected String doInBackground(File... params) {
             boolean exportSuccessful = false;
+			XposedModActivity activity = activityReference.get();
 
 			File outFile = params[0];
             ObjectOutputStream output = null;
             String error = null;
             try {
                 output = new ObjectOutputStream(new FileOutputStream(outFile));
-				Context context = getApplicationContext();
-				Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+				Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
 				if (ctx == null) {
-					ctx = context;
+					ctx = activity;
 				}
 				SharedPreferences pref = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
                 output.writeObject(pref.getAll());
@@ -375,38 +383,43 @@ public class XposedModActivity extends Activity {
             }
 
             if(exportSuccessful) {
-                return getString(R.string.imp_exp_exported, outFile.getAbsolutePath());
+                return activity.getResources().getString(R.string.imp_exp_exported, outFile.getAbsolutePath());
             } else {
-                return getString(R.string.imp_exp_export_error, error);
+                return activity.getResources().getString(R.string.imp_exp_export_error, error);
             }
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
-			Toast.makeText(XposedModActivity.this, result, Toast.LENGTH_LONG).show();
+			Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
 		}
 	}
 
-	@SuppressLint("StaticFieldLeak")
-	private class ImportTask extends AsyncTask<File, String, String> {
+	private static class ImportTask extends AsyncTask<File, String, String> {
 		private boolean importSuccessful;
+		private WeakReference<XposedModActivity> activityReference;
+
+		ImportTask(XposedModActivity context) {
+			activityReference = new WeakReference<>(context);
+		}
 
 		@Override
 		protected String doInBackground(File... params) {
 			importSuccessful = false;
+			XposedModActivity activity = activityReference.get();
 
 			File inFile = params[0];
             ObjectInputStream input = null;
             String error = null;
             try {
                 input = new ObjectInputStream(new FileInputStream(inFile));
-				Context context = getApplicationContext();
-				Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+				Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
 				if (ctx == null) {
-					ctx = context;
+					ctx = activity;
 				}
 				SharedPreferences.Editor prefEdit = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE).edit();
                 prefEdit.clear();
+				@SuppressWarnings("unchecked")
                 Map<String, ?> entries = (Map<String, ?>) input.readObject();
                 for (Map.Entry<String, ?> entry : entries.entrySet()) {
                     Object v = entry.getValue();
@@ -446,35 +459,34 @@ public class XposedModActivity extends Activity {
             }
 
             if(importSuccessful) {
-                return getString(R.string.imp_exp_imported);
+                return activity.getResources().getString(R.string.imp_exp_imported);
             } else {
-                return getString(R.string.imp_exp_import_error, error);
+                return activity.getResources().getString(R.string.imp_exp_import_error, error);
             }
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
+			XposedModActivity activity = activityReference.get();
 			if (importSuccessful) {
 				// Refresh preferences
-				Context context = getApplicationContext();
-				Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+				Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
 				if (ctx == null) {
-					ctx = context;
+					ctx = activity;
 				}
 				prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 				// Refresh listed apps (account for filters)
-				AppListAdapter appListAdapter = (AppListAdapter) ((ListView) findViewById(R.id.lstApps)).getAdapter();
+				AppListAdapter appListAdapter = (AppListAdapter) ((ListView) activity.findViewById(R.id.lstApps)).getAdapter();
 				appListAdapter.getFilter().filter(nameFilter);
 			}
 
-			Toast.makeText(XposedModActivity.this, result, Toast.LENGTH_LONG).show();
+			Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
 		}
 	}
 
-	@SuppressLint("InflateParams")
 	private void showAboutDialog() {
 		View vAbout;
-		vAbout = getLayoutInflater().inflate(R.layout.about, null);
+		vAbout = View.inflate(this, R.layout.about, null);
 
 		// Warn if the module is not active
 		if (!isModActive())
@@ -561,16 +573,15 @@ public class XposedModActivity extends Activity {
 	}
 
 
-	@SuppressLint("DefaultLocale")
-	private void loadApps(ProgressDialog dialog) {
+	private static void loadApps(ProgressDialog dialog, XposedModActivity activity) {
 
 		appList.clear();
 		permUsage.clear();
 		sharedUsers.clear();
 		pkgSharedUsers.clear();
 
-		PackageManager pm = getPackageManager();
-		List<PackageInfo> pkgs = getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
+		PackageManager pm = activity.getPackageManager();
+		List<PackageInfo> pkgs = activity.getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS);
 		dialog.setMax(pkgs.size());
 		int i = 1;
 		for (PackageInfo pkgInfo : pkgs) {
@@ -617,18 +628,18 @@ public class XposedModActivity extends Activity {
 		});
 	}
 
-	private void prepareAppList() {
-		final AppListAdapter appListAdapter = new AppListAdapter(XposedModActivity.this, appList);
+	private static void prepareAppList(XposedModActivity activity) {
+		final AppListAdapter appListAdapter = new AppListAdapter(activity, appList);
 
-		((ListView) findViewById(R.id.lstApps)).setAdapter(appListAdapter);
+		((ListView) activity.findViewById(R.id.lstApps)).setAdapter(appListAdapter);
 		appListAdapter.getFilter().filter(nameFilter);
-		((SearchView) findViewById(R.id.searchApp)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+		((SearchView) activity.findViewById(R.id.searchApp)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				nameFilter = query;
 				appListAdapter.getFilter().filter(nameFilter);
-				findViewById(R.id.searchApp).clearFocus();
+				activity.findViewById(R.id.searchApp).clearFocus();
 				return false;
 			}
 
@@ -641,23 +652,23 @@ public class XposedModActivity extends Activity {
 
 		});
 
-		findViewById(R.id.btnFilter).setOnClickListener(new View.OnClickListener() {
+		activity.findViewById(R.id.btnFilter).setOnClickListener(new View.OnClickListener() {
 			Dialog filterDialog;
 			Map<String, FilterItemComponent> filterComponents;
 
 			@Override
 			public void onClick(View v) {
 				// set up dialog
-				filterDialog = new Dialog(XposedModActivity.this);
+				filterDialog = new Dialog(activity);
 				filterDialog.setContentView(R.layout.filter_dialog);
 				filterDialog.setTitle(R.string.filter_title);
 				filterDialog.setCancelable(true);
-				filterDialog.setOwnerActivity(XposedModActivity.this);
+				filterDialog.setOwnerActivity(activity);
 
 				LinearLayout entriesView = filterDialog.findViewById(R.id.filter_entries);
 				filterComponents = new HashMap<>();
 				for (SettingInfo setting : settings) {
-					FilterItemComponent component = new FilterItemComponent(XposedModActivity.this, setting.label, null, null, null);
+					FilterItemComponent component = new FilterItemComponent(activity, setting.label, null, null, null);
 					component.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 					component.setFilterState(setting.filter);
 					entriesView.addView(component);
@@ -705,16 +716,16 @@ public class XposedModActivity extends Activity {
 			}
 		});
 
-		findViewById(R.id.btnPermsFilter).setOnClickListener(v -> {
+		activity.findViewById(R.id.btnPermsFilter).setOnClickListener(v -> {
 
-			Builder bld = new Builder(XposedModActivity.this);
+			Builder bld = new Builder(activity);
 			bld.setCancelable(true);
 			bld.setTitle(R.string.perms_filter_title);
 
 			List<String> perms = new LinkedList<>(permUsage.keySet());
 			Collections.sort(perms);
 			List<PermissionInfo> items = new ArrayList<>();
-			PackageManager pm = getPackageManager();
+			PackageManager pm = activity.getPackageManager();
 			for (String perm : perms) {
 				try {
 					items.add(pm.getPermissionInfo(perm, 0));
@@ -724,14 +735,13 @@ public class XposedModActivity extends Activity {
 					items.add(unknownPerm);
 				}
 			}
-			final PermissionsListAdapter adapter = new PermissionsListAdapter(XposedModActivity.this, items, new HashSet<>(), false);
+			PermissionsListAdapter adapter = new PermissionsListAdapter(activity, items, new HashSet<>(), false);
 			bld.setAdapter(adapter, (dialog, which) -> {
 				filterPermissionUsage = Objects.requireNonNull(adapter.getItem(which)).name;
 				appListAdapter.getFilter().filter(nameFilter);
 			});
 
-			@SuppressLint("InflateParams")
-			final View permsView = getLayoutInflater().inflate(R.layout.permission_search, null);
+			View permsView = View.inflate(activity, R.layout.permission_search, null);
 			((SearchView) permsView.findViewById(R.id.searchPermission)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 				@Override
@@ -763,14 +773,19 @@ public class XposedModActivity extends Activity {
 	}
 
 	// Handle background loading of apps
-	@SuppressLint("StaticFieldLeak")
-	private class PrepareAppsAdapter extends AsyncTask<Void,Void,AppListAdapter> {
+	private static class PrepareAppsAdapter extends AsyncTask<Void,Void,AppListAdapter> {
 		ProgressDialog dialog;
+		private WeakReference<XposedModActivity> activityReference;
+
+		PrepareAppsAdapter(XposedModActivity context) {
+			activityReference = new WeakReference<>(context);
+		}
 
 		@Override
 		protected void onPreExecute() {
-			dialog = new ProgressDialog(findViewById(R.id.lstApps).getContext());
-			dialog.setMessage(getString(R.string.app_loading));
+			XposedModActivity activity = activityReference.get();
+			dialog = new ProgressDialog(activity.findViewById(R.id.lstApps).getContext());
+			dialog.setMessage(activity.getResources().getString(R.string.app_loading));
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			dialog.setCancelable(false);
 			dialog.show();
@@ -779,14 +794,14 @@ public class XposedModActivity extends Activity {
 		@Override
 		protected AppListAdapter doInBackground(Void... params) {
 			if (appList.size() == 0) {
-				loadApps(dialog);
+				loadApps(dialog, activityReference.get());
 			}
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(final AppListAdapter result) {
-			prepareAppList();
+			prepareAppList(activityReference.get());
 
 			try {
 				dialog.dismiss();
@@ -811,13 +826,15 @@ public class XposedModActivity extends Activity {
 	}
 
 
-	private class AppListFilter extends Filter {
+	private static class AppListFilter extends Filter {
 
 		private AppListAdapter adapter;
+		private Activity activityReference;
 
-		AppListFilter(AppListAdapter adapter) {
+		AppListFilter(AppListAdapter adapter, Activity context) {
 			super();
 			this.adapter = adapter;
+			activityReference = context;
 		}
 
 		@Override
@@ -825,15 +842,14 @@ public class XposedModActivity extends Activity {
 			// NOTE: this function is *always* called from a background thread, and
 			// not the UI thread.
 
-			ArrayList<ApplicationInfo> items = new ArrayList<>();
+			ArrayList<ApplicationInfo> items;
 			synchronized (this) {
-				items.addAll(appList);
+				items = new ArrayList<>(appList);
 			}
 
-			Context context = getApplicationContext();
-			Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+			Context ctx = ContextCompat.createDeviceProtectedStorageContext(activityReference);
 			if (ctx == null) {
-				ctx = context;
+				ctx = activityReference;
 			}
 			SharedPreferences prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 
@@ -885,7 +901,7 @@ public class XposedModActivity extends Activity {
 
 			if (filterPermissionUsage != null) {
 				Set<String> pkgsForPerm = permUsage.get(filterPermissionUsage);
-				return !pkgsForPerm.contains(packageName);
+				return !Objects.requireNonNull(pkgsForPerm).contains(packageName);
 			}
 
 			return false;
@@ -927,23 +943,24 @@ public class XposedModActivity extends Activity {
 		AsyncTask<AppListViewHolder, Void, Drawable> imageLoader;
 	}
 
-	class AppListAdapter extends ArrayAdapter<ApplicationInfo> implements SectionIndexer {
+	static class AppListAdapter extends ArrayAdapter<ApplicationInfo> implements SectionIndexer {
 
 		private Map<String, Integer> alphaIndexer;
 		private String[] sections;
 		private Filter filter;
 		private LayoutInflater inflater;
 		private Drawable defaultIcon;
+		private XposedModActivity mContext;
 
-		@SuppressLint("DefaultLocale")
-		AppListAdapter(Context context, List<ApplicationInfo> items) {
+		AppListAdapter(XposedModActivity context, List<ApplicationInfo> items) {
 			super(context, R.layout.app_list_item, new ArrayList<>(items));
+			mContext = context;
 
 			filteredAppList.addAll(items);
 
-			filter = new AppListFilter(this);
-			inflater = getLayoutInflater();
-			defaultIcon = getResources().getDrawable(android.R.drawable.sym_def_app_icon);
+			filter = new AppListFilter(this, mContext);
+			inflater = mContext.getLayoutInflater();
+			defaultIcon = mContext.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
 
 			alphaIndexer = new HashMap<>();
 			for (int i = filteredAppList.size() - 1; i >= 0; i--) {
@@ -973,9 +990,9 @@ public class XposedModActivity extends Activity {
 			sectionList.toArray(sections);
 		}
 
-		@SuppressLint("StaticFieldLeak")
+		@NonNull
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 			// Load or reuse the view for this row
 			View row = convertView;
 			AppListViewHolder holder;
@@ -1007,25 +1024,33 @@ public class XposedModActivity extends Activity {
 				holder.app_package.setPaintFlags(holder.app_package.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 			}
 
-			holder.imageLoader = new AsyncTask<AppListViewHolder, Void, Drawable>() {
-				private AppListViewHolder v;
-
-				@Override
-				protected Drawable doInBackground(AppListViewHolder... params) {
-					v = params[0];
-					return app.loadIcon(getPackageManager());
-				}
-
-				@Override
-				protected void onPostExecute(Drawable result) {
-					v.app_icon.setImageDrawable(result);
-				}
-			}.execute(holder);
+			holder.imageLoader = new ImageLoadTask(app, mContext).execute(holder);
 
 			return row;
 		}
 
-		@SuppressLint("DefaultLocale")
+		private static class ImageLoadTask extends AsyncTask<AppListViewHolder, Void, Drawable> {
+			private AppListViewHolder v;
+			private ApplicationInfo app;
+			private WeakReference<XposedModActivity> activityReference;
+
+			private ImageLoadTask(ApplicationInfo appInfo, XposedModActivity activity) {
+				app = appInfo;
+				activityReference = new WeakReference<>(activity);
+			}
+
+			@Override
+			protected Drawable doInBackground(AppListViewHolder... params) {
+				v = params[0];
+				return app.loadIcon(activityReference.get().getPackageManager());
+			}
+
+			@Override
+			protected void onPostExecute(Drawable result) {
+				v.app_icon.setImageDrawable(result);
+			}
+		}
+
 		@Override
 		public void notifyDataSetInvalidated() {
 			alphaIndexer.clear();
@@ -1062,6 +1087,7 @@ public class XposedModActivity extends Activity {
 			if (section >= sections.length)
 				return filteredAppList.size() - 1;
 
+			//noinspection ConstantConditions
 			return alphaIndexer.get(sections[section]);
 		}
 
@@ -1074,6 +1100,7 @@ public class XposedModActivity extends Activity {
 			int latestDelta = Integer.MAX_VALUE;
 
 			for (int i = 0; i < sections.length; i++) {
+				//noinspection ConstantConditions
 				int current = alphaIndexer.get(sections[i]);
 				if (current == position) {
 					// If position matches an index, return it immediately
@@ -1096,6 +1123,7 @@ public class XposedModActivity extends Activity {
 			return sections;
 		}
 
+		@NonNull
 		@Override
 		public Filter getFilter() {
 			return filter;

@@ -19,46 +19,46 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class Common {
 
-	public static final String TAG = "AppSettings";
-	public static final String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
+	public static String TAG = "AppSettings";
+	public static String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
 	public static String REBOOT = "android.permission.REBOOT";
-	static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
-	static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
+	static String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
+	static String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
 
-	public static final String ACTION_PERMISSIONS = "update_permissions";
+	public static String ACTION_PERMISSIONS = "update_permissions";
 
 
-	public static final String PREFS = "ModSettings";
+	public static String PREFS = "ModSettings";
 
-	public static final String PREF_DEFAULT = "default";
+	public static String PREF_DEFAULT = "default";
 
-	public static final String PREF_ACTIVE = "/active";
-	public static final String PREF_DPI = "/dpi";
-	public static final String PREF_FONT_SCALE = "/font-scale";
-	public static final String PREF_LOCALE = "/locale";
-	public static final String PREF_SCREEN = "/screen";
-	public static final String PREF_XLARGE = "/tablet";
-	public static final String PREF_SCREENSHOT = "/screenshot";
-	public static final String PREF_RESIDENT = "/resident";
-	public static final String PREF_NO_FULLSCREEN_IME = "/no-fullscreen-ime";
-	public static final String PREF_NO_BIG_NOTIFICATIONS = "/no-big-notifications";
-	public static final String PREF_INSISTENT_NOTIF = "/insistent-notif";
-	public static final String PREF_ONGOING_NOTIF = "/ongoing-notif";
-	public static final String PREF_NOTIF_PRIORITY = "/notif-priority";
-	public static final String PREF_REVOKEPERMS = "/revoke-perms";
-	public static final String PREF_REVOKELIST = "/revoke-list";
-	public static final String PREF_FULLSCREEN = "/fullscreen";
-	public static final String PREF_NO_TITLE = "/no-title";
-	public static final String PREF_ALLOW_ON_LOCKSCREEN = "/allow-on-lockscreen";
-	public static final String PREF_SCREEN_ON = "/screen-on";
-	public static final String PREF_ORIENTATION = "/orientation";
-	public static final String PREF_RECENTS_MODE = "/recents-mode";
-	public static final String PREF_MUTE = "/mute";
-	public static final String PREF_LEGACY_MENU = "/legacy-menu";
+	public static String PREF_ACTIVE = "/active";
+	public static String PREF_DPI = "/dpi";
+	public static String PREF_FONT_SCALE = "/font-scale";
+	public static String PREF_LOCALE = "/locale";
+	public static String PREF_SCREEN = "/screen";
+	public static String PREF_XLARGE = "/tablet";
+	public static String PREF_SCREENSHOT = "/screenshot";
+	public static String PREF_RESIDENT = "/resident";
+	public static String PREF_NO_FULLSCREEN_IME = "/no-fullscreen-ime";
+	public static String PREF_NO_BIG_NOTIFICATIONS = "/no-big-notifications";
+	public static String PREF_INSISTENT_NOTIF = "/insistent-notif";
+	public static String PREF_ONGOING_NOTIF = "/ongoing-notif";
+	public static String PREF_NOTIF_PRIORITY = "/notif-priority";
+	public static String PREF_REVOKEPERMS = "/revoke-perms";
+	public static String PREF_REVOKELIST = "/revoke-list";
+	public static String PREF_FULLSCREEN = "/fullscreen";
+	public static String PREF_NO_TITLE = "/no-title";
+	public static String PREF_ALLOW_ON_LOCKSCREEN = "/allow-on-lockscreen";
+	public static String PREF_SCREEN_ON = "/screen-on";
+	public static String PREF_ORIENTATION = "/orientation";
+	public static String PREF_RECENTS_MODE = "/recents-mode";
+	public static String PREF_MUTE = "/mute";
+	public static String PREF_LEGACY_MENU = "/legacy-menu";
 
-	public static final int[] swdp = { 0, 320, 480, 600, 800, 1000, 1080, 1440 };
-	public static final int[] wdp = { 0, 320, 480, 600, 800, 1000, 1080, 1440 };
-	public static final int[] hdp = { 0, 480, 854, 1024, 1280, 1600, 1920, 2560 };
+	public static int[] swdp = { 0, 320, 480, 600, 800, 1000, 1080, 1440 };
+	public static int[] wdp = { 0, 320, 480, 600, 800, 1000, 1080, 1440 };
+	public static int[] hdp = { 0, 480, 854, 1024, 1280, 1600, 1920, 2560 };
 
 	@SuppressLint("InlinedApi")
 	public static int[] orientationCodes = { Integer.MIN_VALUE,
@@ -99,31 +99,31 @@ public class Common {
 	}
 
 	@SuppressLint("InlinedApi")
-	public static final int[] notifPriCodes = { Integer.MIN_VALUE,
+	public static int[] notifPriCodes = { Integer.MIN_VALUE,
 		Notification.PRIORITY_MAX, Notification.PRIORITY_HIGH,
 		Notification.PRIORITY_DEFAULT,
 		Notification.PRIORITY_LOW, Notification.PRIORITY_MIN };
-	public static final int[] notifPriLabels = { R.string.settings_default,
+	public static int[] notifPriLabels = { R.string.settings_default,
 		R.string.settings_npri_max, R.string.settings_npri_high,
 		R.string.settings_npri_normal,
 		R.string.settings_npri_low,
 		R.string.settings_npri_min };
 
-	public static final int FULLSCREEN_DEFAULT = 0;
-	public static final int FULLSCREEN_FORCE = 1;
-	public static final int FULLSCREEN_PREVENT = 2;
-	public static final int FULLSCREEN_IMMERSIVE = 3;
+	public static int FULLSCREEN_DEFAULT = 0;
+	public static int FULLSCREEN_FORCE = 1;
+	public static int FULLSCREEN_PREVENT = 2;
+	public static int FULLSCREEN_IMMERSIVE = 3;
 
-	public static final int ONGOING_NOTIF_DEFAULT = 0;
-	public static final int ONGOING_NOTIF_FORCE = 1;
-	public static final int ONGOING_NOTIF_PREVENT = 2;
+	public static int ONGOING_NOTIF_DEFAULT = 0;
+	public static int ONGOING_NOTIF_FORCE = 1;
+	public static int ONGOING_NOTIF_PREVENT = 2;
 
-	public static final int PREF_RECENTS_DEFAULT = 0;
-	public static final int PREF_RECENTS_FORCE = 1;
-	public static final int PREF_RECENTS_PREVENT = 2;
+	public static int PREF_RECENTS_DEFAULT = 0;
+	public static int PREF_RECENTS_FORCE = 1;
+	public static int PREF_RECENTS_PREVENT = 2;
 
-    public static final int PREF_SCREENSHOT_DEFAULT = 0;
-    public static final int PREF_SCREENSHOT_ALLOW = 1;
-    public static final int PREF_SCREENSHOT_PREVENT = 2;
+    public static int PREF_SCREENSHOT_DEFAULT = 0;
+    public static int PREF_SCREENSHOT_ALLOW = 1;
+    public static int PREF_SCREENSHOT_PREVENT = 2;
 
 }

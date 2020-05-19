@@ -45,7 +45,6 @@ ativado nas configurações!</string>
     <string name="imp_exp_exported">Configurações exportadas para o arquivo: %s</string>
     <string name="imp_exp_export_error">Falha na exportação: %s</string>
     <string name="imp_exp_import_error">Falha na importação: %s</string>
-    <string name="imp_exp_invalid_import_file">Arquivo de importação vazio ou inválido: %s</string>
     <string name="imp_exp_imported">Importação concluída; configurações substituídas</string>
 
 

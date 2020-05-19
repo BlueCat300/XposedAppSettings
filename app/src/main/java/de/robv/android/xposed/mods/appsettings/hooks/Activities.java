@@ -1,5 +1,24 @@
 package de.robv.android.xposed.mods.appsettings.hooks;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.inputmethodservice.InputMethodService;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
+
+import java.lang.reflect.Method;
+
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import de.robv.android.xposed.mods.appsettings.Common;
+
 import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedBridge.hookMethod;
@@ -13,25 +32,6 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.setIntField;
-
-import java.lang.reflect.Method;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.inputmethodservice.InputMethodService;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import de.robv.android.xposed.mods.appsettings.Common;
 
 
 class Activities {
@@ -59,7 +59,6 @@ class Activities {
 			findAndHookMethod(CLASS_PHONEWINDOW, null, "generateLayout",
 					CLASS_PHONEWINDOW_DECORVIEW, new XC_MethodHook() {
 
-				@SuppressLint("InlinedApi")
 				protected void beforeHookedMethod(MethodHookParam param) {
 					Window window = (Window) param.thisObject;
 					View decorView = (View) param.args[0];

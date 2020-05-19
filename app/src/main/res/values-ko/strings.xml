@@ -46,7 +46,6 @@ Xposed 프레임워크가 설치되어 있고 이 모듈을 활성화해야만 �
     <string name="imp_exp_exported">설정이 파일로 내보내짐 : %s</string>
     <string name="imp_exp_export_error">내보내기 실패 : %s</string>
     <string name="imp_exp_import_error">가져오기 실패 : %s</string>
-    <string name="imp_exp_invalid_import_file">파일이 잘못됬거나 비어있음 : %s</string>
     <string name="imp_exp_imported">가져오기가 완료되었습니다. 설정이 교체됩니다.</string>
 
 

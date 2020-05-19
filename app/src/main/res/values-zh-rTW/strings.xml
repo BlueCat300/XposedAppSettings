@@ -48,7 +48,6 @@
     <string name="imp_exp_exported">設定已匯出至：%s</string>
     <string name="imp_exp_export_error">匯出失敗：%s</string>
     <string name="imp_exp_import_error">匯入失敗：%s</string>
-    <string name="imp_exp_invalid_import_file">無效或空白設定檔： %s</string>
     <string name="imp_exp_imported">匯入成功，設定已變更。</string>
 
 

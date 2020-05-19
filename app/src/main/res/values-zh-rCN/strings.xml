@@ -44,7 +44,6 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="imp_exp_exported">设置已导出到：%s</string>
     <string name="imp_exp_export_error">导出失败：%s</string>
     <string name="imp_exp_import_error">导入失败：%s</string>
-    <string name="imp_exp_invalid_import_file">导入文件无效或为空：%s</string>
     <string name="imp_exp_imported">导入成功，设置已覆盖！</string>
 
 

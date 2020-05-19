@@ -43,7 +43,6 @@ DPI, Μέγεθος γραμματοσειράς, Αλλαγή φορτωμέν�
     <string name="imp_exp_exported">Οι ρυθμίσεις εξάχθηκαν στο αρχείο: %s</string>
     <string name="imp_exp_export_error">Εξαγωγή απέτυχε: %s</string>
     <string name="imp_exp_import_error">Εισαγωγή απέτυχε: %s</string>
-    <string name="imp_exp_invalid_import_file">Άκυρο ή άδειο αρχείο για εισαγωγή: %s</string>
     <string name="imp_exp_imported">Εισαγωγή επιτυχής. Οι ρυθμίσεις αντικαταστάθηκαν.</string>
 
 

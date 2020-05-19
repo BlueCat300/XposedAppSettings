@@ -45,7 +45,6 @@ DPI; フォントスケール; 言語;全画面; タイトル非表示; 画面�
     <string name="imp_exp_exported">設定の保存先: %s</string>
     <string name="imp_exp_export_error">保存失敗: %s</string>
     <string name="imp_exp_import_error">読み込み失敗: %s</string>
-    <string name="imp_exp_invalid_import_file">不正か壊れたファイルです: %s</string>
     <string name="imp_exp_imported">読み込み成功; 設定を置換しました。</string>
 
 

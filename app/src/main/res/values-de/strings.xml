@@ -43,7 +43,6 @@ Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende
     <string name="imp_exp_exported">Einstellungen in Datei exportiert: %s</string>
     <string name="imp_exp_export_error">Export fehlgeschlagen: %s</string>
     <string name="imp_exp_import_error">Import fehlgeschlagen: %s</string>
-    <string name="imp_exp_invalid_import_file">Ungültige oder leere Datei zum importieren: %s</string>
     <string name="imp_exp_imported">Import vollständig, Einstellungen überschrieben</string>
 
 

@@ -46,7 +46,6 @@ DPI, veľkosť písma, jazyk, načítať zdroje, zobraziť na celú obrazovku, b
     <string name="imp_exp_exported">Nastavenia exportované do súboru: %s</string>
     <string name="imp_exp_export_error">Export zlyhal: %s</string>
     <string name="imp_exp_import_error">Import zlyhal: %s</string>
-    <string name="imp_exp_invalid_import_file">Neplatný, alebo prázdny súbor importu: %s</string>
     <string name="imp_exp_imported">Import úspešný; nastavenia prepísané</string>
 
 

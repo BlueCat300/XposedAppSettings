@@ -45,7 +45,6 @@ module est activé dans sa configuration!</string>
     <string name="imp_exp_exported">Réglages exportés vers: %s</string>
     <string name="imp_exp_export_error">Exportation échouée: %s</string>
     <string name="imp_exp_import_error">Importation échouée: %s</string>
-    <string name="imp_exp_invalid_import_file">Fichier vide ou non-valide: %s</string>
     <string name="imp_exp_imported">Importation réussie; réglages replacés</string>
 
 

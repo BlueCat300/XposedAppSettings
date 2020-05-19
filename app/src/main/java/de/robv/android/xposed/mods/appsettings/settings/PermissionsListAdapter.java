@@ -1,9 +1,5 @@
 package de.robv.android.xposed.mods.appsettings.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
@@ -15,6 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import de.robv.android.xposed.mods.appsettings.R;
 
 /*
@@ -47,7 +51,8 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 		TextView tvDescription;
 	}
 
-	public View getView(int position, View convertView, ViewGroup parent) {
+	@NonNull
+	public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 		View row = convertView;
 		ViewHolder vHolder;
 		if (row == null) {
@@ -63,7 +68,7 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 		PermissionInfo perm = getItem(position);
 		PackageManager pm = context.getPackageManager();
 
-		CharSequence label = perm.loadLabel(pm);
+		CharSequence label = Objects.requireNonNull(perm).loadLabel(pm);
 		if (!label.equals(perm.name)) {
 			label = perm.name + " (" + label + ")";
 		}
@@ -105,6 +110,7 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 
 				TextView tv = v.findViewById(R.id.perm_name);
 				if ((tv.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) != 0) {
+					//noinspection SuspiciousMethodCalls
 					disabledPerms.remove(tv.getTag());
 					tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
 					tv.setTextColor(Color.WHITE);
@@ -119,6 +125,7 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 		return row;
 	}
 
+	@NonNull
 	@Override
 	public Filter getFilter() {
 		if (mFilter == null) {
@@ -154,6 +161,7 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 			return result;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
 			clear();

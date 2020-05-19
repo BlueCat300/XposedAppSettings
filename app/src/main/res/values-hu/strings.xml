@@ -44,7 +44,6 @@
     <string name="imp_exp_exported">Beállítások exportálása fájlba: %s</string>
     <string name="imp_exp_export_error">Exportálás sikertelen: %s</string>
     <string name="imp_exp_import_error">Importálás sikertelen: %s</string>
-    <string name="imp_exp_invalid_import_file">Érvénytelen, vagy üres fájlt akar importálni: %s</string>
     <string name="imp_exp_imported">Importálása sikeres; beállítások lecserélve</string>
 
 

@@ -660,6 +660,7 @@ public class ApplicationSettings extends Activity {
 		builder.create().show();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void saveSettings () {
 		Editor prefsEditor = prefs.edit();
 		Map<String, Object> newSettings = getSettings();

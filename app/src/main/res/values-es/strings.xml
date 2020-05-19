@@ -46,7 +46,6 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
     <string name="imp_exp_exported">Configuración exportada al archivo: %s</string>
     <string name="imp_exp_export_error">Falló la exportación: %s</string>
     <string name="imp_exp_import_error">Falló la importación: %s</string>
-    <string name="imp_exp_invalid_import_file">Archivo a importar no válido o vacío: %s</string>
     <string name="imp_exp_imported">Importación exitosa; valores reemplazados</string>
 
 
