@@ -112,7 +112,8 @@ public class PackagePermissions extends BroadcastReceiver {
 					if (origRequestedPermissions != null) {
 						setObjectField(param.args[0], "requestedPermissions", origRequestedPermissions);
 					}
-					if (Common.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
+					String pkgName = (String) getObjectField(param.args[0], "packageName");
+					if (Common.MY_PACKAGE_NAME.equals(pkgName)) {
 						grantRebootPermission(param);
 					}
 				}
