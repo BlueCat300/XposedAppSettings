@@ -62,14 +62,21 @@ public class PackagePermissions extends BroadcastReceiver {
 			});
 
 			if (SDK_INT >= 28) {
-				clsManagerService = findClass("com.android.server.pm.permission.PermissionManagerService", classLoader);
-
-				findAndHookConstructor(clsManagerService, Context.class, Object.class, new XC_MethodHook() {
+				XC_MethodHook hookClassInstance = new XC_MethodHook() {
 					@Override
 					protected void afterHookedMethod(MethodHookParam param) {
 						permissionSvc = param.thisObject;
 					}
-				});
+				};
+
+				clsManagerService = findClass("com.android.server.pm.permission.PermissionManagerService", classLoader);
+				if(SDK_INT == 28) {
+					findAndHookConstructor(clsManagerService, Context.class,
+							"com.android.server.pm.permission.DefaultPermissionGrantPolicy$DefaultPermissionGrantedCallback",
+							Object.class, hookClassInstance);
+				} else {
+					findAndHookConstructor(clsManagerService, Context.class, Object.class, hookClassInstance);
+				}
 			}
 
 			// if the user has disabled certain permissions for an app, do as if the hadn't requested them
@@ -124,7 +131,7 @@ public class PackagePermissions extends BroadcastReceiver {
 				findAndHookMethod(clsManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, String.class, hookGrantPermissions);
 			} else if (SDK_INT == 28){
 				findAndHookMethod(clsManagerService, "grantPermissions", "android.content.pm.PackageParser$Package", boolean.class, String.class,
-						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
+						"com.android.server.pm.permission.PermissionManagerInternal$PermissionCallback", hookGrantPermissions);
 			} else {
 				findAndHookMethod(clsManagerService, "restorePermissionState", "android.content.pm.PackageParser$Package", boolean.class, String.class,
 						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
