@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,6 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -593,7 +594,7 @@ public class ApplicationSettings extends Activity {
 		if (context.getPackageManager().getLaunchIntentForPackage(pkgName) == null) {
 			menu.findItem(R.id.menu_app_launch).setEnabled(false);
 			Drawable icon = menu.findItem(R.id.menu_app_launch).getIcon().mutate();
-			icon.setColorFilter(Color.GRAY, Mode.SRC_IN);
+			icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
 			menu.findItem(R.id.menu_app_launch).setIcon(icon);
 		}
 
@@ -613,7 +614,7 @@ public class ApplicationSettings extends Activity {
 			Drawable icon = res.getDrawable(id);
 			if (!hasMarketLink) {
 				icon = icon.mutate();
-				icon.setColorFilter(Color.GRAY, Mode.SRC_IN);
+				icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
 			}
 			menu.findItem(R.id.menu_app_store).setIcon(icon);
 		} catch (Exception ignored) {
