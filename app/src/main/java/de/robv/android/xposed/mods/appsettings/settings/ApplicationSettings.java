@@ -379,7 +379,7 @@ public class ApplicationSettings extends Activity {
 		((CheckBox) findViewById(R.id.chkMute)).setChecked(prefs.getBoolean(pkgName + Common.PREF_MUTE, false));
 
 		// Update Legacy Menu field
-		if (SDK_INT < 23) {
+		if (SDK_INT < 29) {
 			((CheckBox) findViewById(R.id.chkLegacyMenu)).setChecked(prefs.getBoolean(pkgName + Common.PREF_LEGACY_MENU, false));
 		} else {
 			findViewById(R.id.chkLegacyMenu).setVisibility(View.GONE);
@@ -448,7 +448,7 @@ public class ApplicationSettings extends Activity {
 		}
 		settingKeys.add(pkgName + Common.PREF_RECENTS_MODE);
 		settingKeys.add(pkgName + Common.PREF_MUTE);
-		if (SDK_INT < 23) {
+		if (SDK_INT < 29) {
 			settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
 		}
 		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
@@ -543,7 +543,7 @@ public class ApplicationSettings extends Activity {
 			if (((CheckBox) findViewById(R.id.chkMute)).isChecked())
 				settings.put(pkgName + Common.PREF_MUTE, true);
 
-			if (SDK_INT < 23) {
+			if (SDK_INT < 29) {
 				if (((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
 					settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
 			}

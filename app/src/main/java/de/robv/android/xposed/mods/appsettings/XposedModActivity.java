@@ -151,7 +151,7 @@ public class XposedModActivity extends Activity {
 		}
 		settings.add(new SettingInfo(Common.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
 		settings.add(new SettingInfo(Common.PREF_MUTE, getString(R.string.settings_mute)));
-		if (SDK_INT < 23) {
+		if (SDK_INT < 29) {
 			settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
 		}
 		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));

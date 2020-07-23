@@ -31,8 +31,8 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 \n- stay resident in memory (reboot required)
 \n- force or exclude app from recents (reboot required)
 \n- revoke permissions (double reboot required)
+\n- force using legacy (navbar) menu button (not available on OS 10.0+)
 \n- notifications priority (not available on OS 8.0+)
-\n- force using legacy (navbar) menu button (not available on OS 6.0+)
 \n- disable big (expanded) notifications (not available on OS 6.0+)</string>
     <string name="app_version">Version: %s</string>
     <string name="app_translation">Translator: %s</string>
