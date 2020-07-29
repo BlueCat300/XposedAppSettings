@@ -175,7 +175,14 @@ public class XposedModActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+		updateMainMenuEntries(menu);
 		return true;
+	}
+
+	private static void updateMainMenuEntries(Menu menu) {
+		if(SDK_INT > 21 && !isModActive()) {
+			menu.findItem(R.id.menu_recents).setEnabled(false);
+		}
 	}
 
 	@Override
@@ -185,16 +192,7 @@ public class XposedModActivity extends Activity {
 			refreshApps();
 			return true;
 		case R.id.menu_recents:
-			if(SDK_INT > 21) {
-				if (isModActive()) {
-					showRecents();
-				} else {
-					Toast.makeText(this, getString(R.string.xposed_not_activated),
-							Toast.LENGTH_LONG).show();
-				}
-			} else {
-				showRecents();
-			}
+			showRecents();
 			return true;
 		case R.id.menu_export:
 			doExport();

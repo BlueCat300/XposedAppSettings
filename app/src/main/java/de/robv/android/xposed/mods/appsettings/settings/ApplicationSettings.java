@@ -619,6 +619,10 @@ public class ApplicationSettings extends Activity {
 			menu.findItem(R.id.menu_app_store).setIcon(icon);
 		} catch (Exception ignored) {
 		}
+
+		if (!XposedModActivity.isModActive()) {
+			menu.findItem(R.id.menu_reboot).setEnabled(false);
+		}
 	}
 
 	@Override
@@ -634,12 +638,7 @@ public class ApplicationSettings extends Activity {
 		} else if (item.getItemId() == R.id.menu_app_store) {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
 		} else if (item.getItemId() == R.id.menu_reboot) {
-			if (XposedModActivity.isModActive()) {
-				confirmReboot();
-			} else {
-				Toast.makeText(this, getString(R.string.xposed_not_activated),
-						Toast.LENGTH_LONG).show();
-			}
+			confirmReboot();
         }
 		return super.onOptionsItemSelected(item);
 	}

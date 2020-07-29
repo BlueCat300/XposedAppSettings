@@ -36,7 +36,6 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 \n- disable big (expanded) notifications (not available on OS 6.0+)</string>
     <string name="app_version">Version: %s</string>
     <string name="app_translation">Translator: %s</string>
-    <string name="xposed_not_activated">Module not enabled or Xposed not working</string>
     <string name="app_notactive_warning">Note: Although the configuration panels can be used as-is,
 they will only affect the apps if the Xposed framework is installed and if this module
 is enabled in its configuration!</string>
