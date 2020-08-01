@@ -5,13 +5,14 @@ App Settings Reborn
 
 **Original developers:** rovo89 and Tungstwenty.
 
-**Original module:** https://repo.xposed.info/module/de.robv.android.xposed.mods.appsettings
+**Original module:** [Repository](https://repo.xposed.info/module/de.robv.android.xposed.mods.appsettings)
 
 The restored version of the application for working on Android 8.0+
 
 Using the function revoke/restore permissions: select the permissions and click ok + save, reboot, return to the submenu of the target application and click save again, reboot.
 
 **Compatibility:**
+
 The application is tested only on Android 10 (Samsung firmware), but has theoretical support for earlier versions of the OS. I do not guarantee work on other firmware. I also note that not all applications will work with all functions.
 If you do not see errors in edxposed logs from this module, then your firmware requires additional hooks. I cannot provide development for such devices.
 
