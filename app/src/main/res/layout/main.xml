@@ -15,6 +15,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_toRightOf="@id/btnFilter"
+        android:layout_toEndOf="@id/btnFilter"
         android:contentDescription="@string/perms_title"
         android:src="@android:drawable/ic_lock_idle_lock" />
 
@@ -23,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/btnPermsFilter"
+        android:layout_toEndOf="@id/btnPermsFilter"
         android:focusable="false"
         android:iconifiedByDefault="false"
         android:imeOptions="actionSearch|flagNoEnterAction|flagNoExtractUi"
