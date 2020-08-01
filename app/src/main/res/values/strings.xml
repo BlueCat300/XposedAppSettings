@@ -8,12 +8,12 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <!-- Main screen -->
     <string name="app_loading">Loading apps, please wait</string>
     <string name="app_searchhint">name or package</string>
-    <string name="app_about">An <a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> module by
- <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> and <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
+    <string name="app_about">An <a href="https://forum.xda-developers.com/xposed">Xposed</a> module by
+ <a href="https://forum.xda-developers.com/member.php?u=4419114">rovo89</a> and <a href="https://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
  \nSupport for the module on Android 8.0+ by Blue cat <a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>.
- \nYou can use <a href="http://forum.xda-developers.com/showthread.php?t=2437377">this thread</a> for questions or suggestions.</string>
+ \nYou can use <a href="https://forum.xda-developers.com/xposed/modules/mod-app-settings-reborn-t4141339">this thread</a> for questions or suggestions.</string>
     <string name="app_description">This mod allows certain generic configurations to be changed on a per-app basis, without needing to edit APKs:
-\n- allow or deny screenshot
+\n- Screenshot control
 \n- density / dpi
 \n- font scale
 \n- fake screen size for resources loading
@@ -35,6 +35,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 \n- force using legacy (navbar) menu button (not available on OS 10.0+)
 \n- notifications priority (not available on OS 8.0+)
 \n- disable big (expanded) notifications (not available on OS 6.0+)</string>
+    <string name="app_name">App Settings Reborn</string>
     <string name="app_version">Version: %s</string>
     <string name="app_translation">Translator: %s</string>
     <string name="app_notactive_warning">Note: Although the configuration panels can be used as-is,

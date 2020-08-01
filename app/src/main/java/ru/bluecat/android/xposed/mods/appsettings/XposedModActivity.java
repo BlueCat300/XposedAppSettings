@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -69,13 +69,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import de.robv.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
-import de.robv.android.xposed.mods.appsettings.settings.ApplicationSettings;
-import de.robv.android.xposed.mods.appsettings.settings.PermissionsListAdapter;
+import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
+import ru.bluecat.android.xposed.mods.appsettings.settings.ApplicationSettings;
+import ru.bluecat.android.xposed.mods.appsettings.settings.PermissionsListAdapter;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static de.robv.android.xposed.mods.appsettings.Common.READ_EXTERNAL_STORAGE;
-import static de.robv.android.xposed.mods.appsettings.Common.WRITE_EXTERNAL_STORAGE;
+import static ru.bluecat.android.xposed.mods.appsettings.Common.READ_EXTERNAL_STORAGE;
+import static ru.bluecat.android.xposed.mods.appsettings.Common.WRITE_EXTERNAL_STORAGE;
 
 public class XposedModActivity extends Activity {
 

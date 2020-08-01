@@ -1,10 +1,4 @@
-package de.robv.android.xposed.mods.appsettings.settings;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+package ru.bluecat.android.xposed.mods.appsettings.settings;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,7 +10,14 @@ import android.content.pm.PermissionInfo;
 import android.graphics.Color;
 import android.widget.ListView;
 import android.widget.Switch;
-import de.robv.android.xposed.mods.appsettings.R;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import ru.bluecat.android.xposed.mods.appsettings.R;
 
 
 /**
@@ -71,12 +72,12 @@ public class PermissionSettings {
 
 		dialog.findViewById(R.id.btnPermsCancel).setOnClickListener(v -> {
 			if (onCancelListener != null)
-				onCancelListener.onDismiss(PermissionSettings.this);
+				onCancelListener.onDismiss(this);
 			dialog.dismiss();
 		});
 		dialog.findViewById(R.id.btnPermsOk).setOnClickListener(v -> {
 			if (onOkListener != null)
-				onOkListener.onDismiss(PermissionSettings.this);
+				onOkListener.onDismiss(this);
 			dialog.dismiss();
 		});
 	}

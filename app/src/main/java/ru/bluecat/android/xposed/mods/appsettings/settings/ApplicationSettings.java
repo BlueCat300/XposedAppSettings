@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings.settings;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -50,10 +50,10 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.robv.android.xposed.mods.appsettings.Common;
-import de.robv.android.xposed.mods.appsettings.PrefFileManager;
-import de.robv.android.xposed.mods.appsettings.R;
-import de.robv.android.xposed.mods.appsettings.XposedModActivity;
+import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.PrefFileManager;
+import ru.bluecat.android.xposed.mods.appsettings.R;
+import ru.bluecat.android.xposed.mods.appsettings.XposedModActivity;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -218,10 +218,10 @@ public class ApplicationSettings extends Activity {
 
 		// Helper to list all apk folders under /res
 		findViewById(R.id.btnListRes).setOnClickListener(v -> {
-			AlertDialog.Builder builder = new AlertDialog.Builder(ApplicationSettings.this);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-			ScrollView scrollPane = new ScrollView(ApplicationSettings.this);
-			TextView txtPane = new TextView(ApplicationSettings.this);
+			ScrollView scrollPane = new ScrollView(this);
+			TextView txtPane = new TextView(this);
 			StringBuilder contents = new StringBuilder();
 			JarFile jar = null;
 			TreeSet<String> resEntries = new TreeSet<>();
@@ -415,7 +415,7 @@ public class ApplicationSettings extends Activity {
 		btnPermissions.setOnClickListener(v -> {
 			// set up permissions editor
 			try {
-				final PermissionSettings permsDlg = new PermissionSettings(ApplicationSettings.this, pkgName, allowRevoking, disabledPermissions);
+				final PermissionSettings permsDlg = new PermissionSettings(this, pkgName, allowRevoking, disabledPermissions);
 				permsDlg.setOnOkListener(obj -> {
 					allowRevoking = permsDlg.getRevokeActive();
 					disabledPermissions.clear();
@@ -582,7 +582,7 @@ public class ApplicationSettings extends Activity {
 		builder.setTitle(R.string.settings_unsaved_title);
 		builder.setIconAttribute(android.R.attr.alertDialogIcon);
 		builder.setMessage(R.string.settings_unsaved_detail);
-		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> ApplicationSettings.this.finish());
+		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> this.finish());
 		builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
 		});
 		builder.show();

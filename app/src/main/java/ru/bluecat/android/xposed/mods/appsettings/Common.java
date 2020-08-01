@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -19,7 +19,7 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class Common {
 
-	public static String TAG = "AppSettings";
+	public static String TAG = "AppSettingsReborn";
 	public static String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
 	public static String REBOOT = "android.permission.REBOOT";
 	static String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";

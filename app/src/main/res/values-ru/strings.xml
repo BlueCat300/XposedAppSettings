@@ -8,12 +8,12 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <!-- Main screen -->
     <string name="app_loading">Загрузка приложений, подождите</string>
     <string name="app_searchhint">имя или пакет</string>
-    <string name="app_about"><a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> модуль от
- <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> и <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
+    <string name="app_about"><a href="https://forum.xda-developers.com/xposed">Xposed</a> модуль от
+ <a href="https://forum.xda-developers.com/member.php?u=4419114">rovo89</a> и <a href="https://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
  \nПоддержка модуля на Android 8.0+ от Blue cat <a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>.
- \nВы можете открыть <a href="http://forum.xda-developers.com/showthread.php?t=2437377">этот топик</a> для вопросов и предложений (на английском).</string>
+ \nВы можете открыть <a href="https://forum.xda-developers.com/xposed/modules/mod-app-settings-reborn-t4141339">этот топик</a> для вопросов и предложений (на английском).</string>
     <string name="app_description">Этот модуль позволяет изменить некоторые общие настройки без необходимости редактирования APK, для каждого приложения:
-\n- разрешать или запрещать скриншот
+\n- Контроль скриншота
 \n- плотность / dpi
 \n- масштаб шрифта
 \n- подделка размера экрана

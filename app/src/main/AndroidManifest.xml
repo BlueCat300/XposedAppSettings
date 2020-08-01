@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="de.robv.android.xposed.mods.appsettings">
+    package="ru.bluecat.android.xposed.mods.appsettings">
 
-    <permission-tree android:name="de.robv.android.xposed.mods.appsettings" />
+    <permission-tree android:name="ru.bluecat.android.xposed.mods.appsettings" />
 
     <permission
-        android:name="de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION"
+        android:name="ru.bluecat.android.xposed.mods.appsettings.BROADCAST_PERMISSION"
         android:protectionLevel="signature">
     </permission>
 
-    <uses-permission android:name="de.robv.android.xposed.mods.appsettings.BROADCAST_PERMISSION" />
+    <uses-permission android:name="ru.bluecat.android.xposed.mods.appsettings.BROADCAST_PERMISSION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_TASKS" />

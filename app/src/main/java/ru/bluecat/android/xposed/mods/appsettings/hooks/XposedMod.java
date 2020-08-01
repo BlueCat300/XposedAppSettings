@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings.hooks;
+package ru.bluecat.android.xposed.mods.appsettings.hooks;
 
 
 import android.annotation.TargetApi;
@@ -32,9 +32,8 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
-import de.robv.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.Common;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -73,7 +72,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 		prefs.reload();
 
 		if (Common.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
-			findAndHookMethod("de.robv.android.xposed.mods.appsettings.XposedModActivity",
+			findAndHookMethod("ru.bluecat.android.xposed.mods.appsettings.XposedModActivity",
 					lpparam.classLoader, "isModActive", XC_MethodReplacement.returnConstant(true));
 		}
 
@@ -177,7 +176,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 		if (isActive(lpparam.packageName)) {
 			// Override settings used when loading resources
 			try {
-				XposedHelpers.findAndHookMethod(ContextWrapper.class, "attachBaseContext", Context.class, new XC_MethodHook() {
+				findAndHookMethod(ContextWrapper.class, "attachBaseContext", Context.class, new XC_MethodHook() {
 					@Override
 					protected void beforeHookedMethod(MethodHookParam param) {
 						if (param.args[0] != null && (param.args[0] instanceof Context)) {

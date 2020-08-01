@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings.settings;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import de.robv.android.xposed.mods.appsettings.R;
+import ru.bluecat.android.xposed.mods.appsettings.R;
 
 /*
  * Adapter to feed the list of permission entries

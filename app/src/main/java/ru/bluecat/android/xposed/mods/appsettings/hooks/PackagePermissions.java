@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings.hooks;
+package ru.bluecat.android.xposed.mods.appsettings.hooks;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,7 +14,7 @@ import java.util.Set;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import de.robv.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.Common;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedHelpers.callMethod;

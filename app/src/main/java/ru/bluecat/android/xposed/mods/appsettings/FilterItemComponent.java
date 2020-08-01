@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -55,13 +55,13 @@ public class FilterItemComponent extends LinearLayout {
 			if (listener != null) {
 				switch (checkedId) {
 				case R.id.radOverridden:
-					listener.onFilterChanged(FilterItemComponent.this, FilterState.OVERRIDDEN);
+					listener.onFilterChanged(this, FilterState.OVERRIDDEN);
 					break;
 				case R.id.radUnchanged:
-					listener.onFilterChanged(FilterItemComponent.this, FilterState.UNCHANGED);
+					listener.onFilterChanged(this, FilterState.UNCHANGED);
 					break;
 				default:
-					listener.onFilterChanged(FilterItemComponent.this, FilterState.ALL);
+					listener.onFilterChanged(this, FilterState.ALL);
 					break;
 				}
 			}

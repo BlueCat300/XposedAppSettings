@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

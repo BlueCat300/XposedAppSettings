@@ -1,4 +1,4 @@
-package de.robv.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings.settings;
 
 import android.content.res.Resources;
 
