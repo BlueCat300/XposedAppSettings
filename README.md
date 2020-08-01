@@ -4,6 +4,7 @@ App Settings Reborn
 ### Download: [Repository](https://repo.xposed.info/module/ru.bluecat.android.xposed.mods.appsettings)
 
 **Original developers:** rovo89 and Tungstwenty.
+
 **Original module:** https://repo.xposed.info/module/de.robv.android.xposed.mods.appsettings
 
 The restored version of the application for working on Android 8.0+
