@@ -30,6 +30,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 \n- mute notifications (reboot required)
 \n- stay resident in memory (reboot required)
 \n- force or exclude app from recents (reboot required)
+\n- access to recent tasks (reboot required)
 \n- revoke permissions (double reboot required)
 \n- force using legacy (navbar) menu button (not available on OS 10.0+)
 \n- notifications priority (not available on OS 8.0+)
@@ -37,8 +38,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="app_version">Version: %s</string>
     <string name="app_translation">Translator: %s</string>
     <string name="app_notactive_warning">Note: Although the configuration panels can be used as-is,
-they will only affect the apps if the Xposed framework is installed and if this module
-is enabled in its configuration!</string>
+they will only affect the apps if the Xposed framework is installed and if this module is enabled in its configuration!</string>
 
 
     <!-- main menu -->
@@ -89,6 +89,7 @@ is enabled in its configuration!</string>
     <string name="settings_notifpriority">Notifications priority</string>
     <string name="settings_mute">Mute audio</string>
     <string name="settings_legacy_menu">Legacy menu button</string>
+    <string name="settings_recent_tasks">Access to recent tasks</string>
     <string name="settings_permissions">Permissions</string>
     <string name="settings_recents_mode">Show in recents</string>
 

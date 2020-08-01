@@ -386,6 +386,13 @@ public class ApplicationSettings extends Activity {
 			findViewById(R.id.chkLegacyMenu).setVisibility(View.GONE);
 		}
 
+		// Update Recent Tasks field
+		if (SDK_INT >= 21) {
+			((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName + Common.PREF_RECENT_TASKS, false));
+		} else {
+			findViewById(R.id.chkRecentTasks).setVisibility(View.GONE);
+		}
+
 		// Setting for permissions revoking
 		allowRevoking = prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false);
 		disabledPermissions = prefs.getStringSet(pkgName + Common.PREF_REVOKELIST, new HashSet<>());
@@ -451,6 +458,9 @@ public class ApplicationSettings extends Activity {
 		settingKeys.add(pkgName + Common.PREF_MUTE);
 		if (SDK_INT < 29) {
 			settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
+		}
+		if (SDK_INT >= 21) {
+			settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
 		}
 		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
 		settingKeys.add(pkgName + Common.PREF_REVOKELIST);
@@ -544,10 +554,11 @@ public class ApplicationSettings extends Activity {
 			if (((CheckBox) findViewById(R.id.chkMute)).isChecked())
 				settings.put(pkgName + Common.PREF_MUTE, true);
 
-			if (SDK_INT < 29) {
-				if (((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
-					settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
-			}
+			if (SDK_INT < 29 && ((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
+				settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
+
+			if (SDK_INT >= 21 && ((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
+				settings.put(pkgName + Common.PREF_RECENT_TASKS, true);
 
 			if (allowRevoking)
 				settings.put(pkgName + Common.PREF_REVOKEPERMS, true);

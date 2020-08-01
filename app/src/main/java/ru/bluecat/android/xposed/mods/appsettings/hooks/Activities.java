@@ -14,7 +14,6 @@ import android.view.inputmethod.InputConnection;
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import de.robv.android.xposed.mods.appsettings.Common;
@@ -321,14 +320,22 @@ class Activities {
 
             //Disable restricting Android API to get recent tasks in Lollipop and newer.
             //https://github.com/pylerSM/UnrestrictedGetTasks
-            if(SDK_INT > 21) {
-                if (SDK_INT <= 28) {
-                    findAndHookMethod("com.android.server.am.ActivityManagerService", classLoader, "isGetTasksAllowed",
-                            String.class, int.class, int.class, XC_MethodReplacement.returnConstant(true));
-                } else {
-                    findAndHookMethod("com.android.server.wm.ActivityTaskManagerService", classLoader, "isGetTasksAllowed",
-                            String.class, int.class, int.class, XC_MethodReplacement.returnConstant(true));
-                }
+            if(SDK_INT >= 21) {
+				String recentTasksClass = "com.android.server.am.ActivityManagerService";
+				if (SDK_INT >= 29) {
+					recentTasksClass = "com.android.server.wm.ActivityTaskManagerService";
+				}
+				findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",
+						String.class, int.class, int.class, new XC_MethodHook() {
+					@Override
+					protected void afterHookedMethod(MethodHookParam param) {
+						Context mContext = (Context) getObjectField(param.thisObject, "mContext");
+						String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
+						if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(callingApp, Common.PREF_RECENT_TASKS)) {
+							param.setResult(true);
+						}
+					}
+				});
             }
 		} catch (Throwable e) {
 			XposedBridge.log(e);

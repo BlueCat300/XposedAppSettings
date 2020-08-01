@@ -315,6 +315,17 @@
                     android:text="@string/settings_legacy_menu" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/chkRecentTasks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_recent_tasks" />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/btnPermissions"
                 android:layout_width="wrap_content"

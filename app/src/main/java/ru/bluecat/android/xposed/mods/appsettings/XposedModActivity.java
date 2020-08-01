@@ -154,6 +154,9 @@ public class XposedModActivity extends Activity {
 		if (SDK_INT < 29) {
 			settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
 		}
+		if (SDK_INT >= 21) {
+			settings.add(new SettingInfo(Common.PREF_RECENT_TASKS, getString(R.string.settings_recent_tasks)));
+		}
 		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
 	}
 

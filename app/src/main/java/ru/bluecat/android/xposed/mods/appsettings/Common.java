@@ -55,6 +55,7 @@ public class Common {
 	public static String PREF_RECENTS_MODE = "/recents-mode";
 	public static String PREF_MUTE = "/mute";
 	public static String PREF_LEGACY_MENU = "/legacy-menu";
+	public static String PREF_RECENT_TASKS = "/recent-tasks";
 
 	public static int[] swdp = { 0, 320, 480, 600, 800, 1000, 1080, 1440 };
 	public static int[] wdp = { 0, 320, 480, 600, 800, 1000, 1080, 1440 };
