@@ -329,7 +329,7 @@ public class ApplicationSettings extends Activity {
 		((CheckBox) findViewById(R.id.chkNoFullscreenIME)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_FULLSCREEN_IME, false));
 
 		// Update No Big Notifications field
-		if (SDK_INT >= 16 && SDK_INT < 23) {
+		if (SDK_INT < 23) {
 			((CheckBox) findViewById(R.id.chkNoBigNotifications)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, false));
 		} else {
 			findViewById(R.id.chkNoBigNotifications).setVisibility(View.GONE);
@@ -357,7 +357,7 @@ public class ApplicationSettings extends Activity {
 		((CheckBox) findViewById(R.id.chkInsistentNotifications)).setChecked(prefs.getBoolean(pkgName + Common.PREF_INSISTENT_NOTIF, false));
 
 		// Load and render notifications priority
-		if (SDK_INT >= 16 && SDK_INT < 26) {
+		if (SDK_INT < 26) {
 			int notifPriority = prefs.getInt(pkgName + Common.PREF_NOTIF_PRIORITY, 0);
 			if (notifPriority < 0 || notifPriority >= Common.notifPriCodes.length)
 				notifPriority = 0;
@@ -446,12 +446,12 @@ public class ApplicationSettings extends Activity {
 		settingKeys.add(pkgName + Common.PREF_ORIENTATION);
 		settingKeys.add(pkgName + Common.PREF_RESIDENT);
 		settingKeys.add(pkgName + Common.PREF_NO_FULLSCREEN_IME);
-		if (SDK_INT >= 16 && SDK_INT < 23) {
+		if (SDK_INT < 23) {
 			settingKeys.add(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS);
 		}
 		settingKeys.add(pkgName + Common.PREF_INSISTENT_NOTIF);
 		settingKeys.add(pkgName + Common.PREF_ONGOING_NOTIF);
-		if (SDK_INT >= 16 && SDK_INT < 26) {
+		if (SDK_INT < 26) {
 			settingKeys.add(pkgName + Common.PREF_NOTIF_PRIORITY);
 		}
 		settingKeys.add(pkgName + Common.PREF_RECENTS_MODE);
@@ -529,7 +529,7 @@ public class ApplicationSettings extends Activity {
 			if (((CheckBox) findViewById(R.id.chkNoFullscreenIME)).isChecked())
 				settings.put(pkgName + Common.PREF_NO_FULLSCREEN_IME, true);
 
-			if (SDK_INT >= 16 && SDK_INT < 23) {
+			if (SDK_INT < 23) {
 				if (((CheckBox) findViewById(R.id.chkNoBigNotifications)).isChecked())
 					settings.put(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, true);
 			}
@@ -541,7 +541,7 @@ public class ApplicationSettings extends Activity {
 			if (ongoingNotif > 0)
 				settings.put(pkgName + Common.PREF_ONGOING_NOTIF, ongoingNotif);
 
-			if (SDK_INT >= 16 && SDK_INT < 26) {
+			if (SDK_INT < 26) {
 				int notifPriority = ((Spinner) findViewById(R.id.spnNotifPriority)).getSelectedItemPosition();
 				if (notifPriority > 0)
 					settings.put(pkgName + Common.PREF_NOTIF_PRIORITY, notifPriority);

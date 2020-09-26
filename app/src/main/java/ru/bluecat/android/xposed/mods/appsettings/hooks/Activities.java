@@ -231,17 +231,7 @@ class Activities {
 			// Hook one of the several variations of ActivityStack.realStartActivityLocked from different ROMs
 			ClassLoader classLoader = lpparam.classLoader;
 			Method mthRealStartActivityLocked;
-			if (SDK_INT < 19) {
-				try {
-					mthRealStartActivityLocked = findMethodExact("com.android.server.am.ActivityStack", classLoader, "realStartActivityLocked",
-							"com.android.server.am.ActivityRecord", "com.android.server.am.ProcessRecord",
-							boolean.class, boolean.class, boolean.class);
-				} catch (NoSuchMethodError t) {
-					mthRealStartActivityLocked = findMethodExact("com.android.server.am.ActivityStack", classLoader, "realStartActivityLocked",
-							"com.android.server.am.ActivityRecord", "com.android.server.am.ProcessRecord",
-							boolean.class, boolean.class);
-				}
-			} else if (SDK_INT <= 28) {
+			if (SDK_INT <= 28) {
 				mthRealStartActivityLocked = findMethodExact("com.android.server.am.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
 						"com.android.server.am.ActivityRecord", "com.android.server.am.ProcessRecord",
 						boolean.class, boolean.class);
@@ -275,9 +265,6 @@ class Activities {
 								proc = processRecord;
 							}
 							setIntField(proc, "maxAdj", adj);
-							if (SDK_INT <= 18) {
-								setIntField(proc, "hiddenAdj", adj);
-							}
 							if (SDK_INT >= 29) {
 								setIntField(proc, "mCurRawAdj", adj);
 							} else {

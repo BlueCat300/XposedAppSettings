@@ -43,7 +43,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.lang.ref.WeakReference;
@@ -164,11 +163,11 @@ public class XposedModActivity extends Activity {
 		settings.add(new SettingInfo(Common.PREF_NO_FULLSCREEN_IME, getString(R.string.settings_nofullscreenime)));
 		settings.add(new SettingInfo(Common.PREF_ORIENTATION, getString(R.string.settings_orientation)));
 		settings.add(new SettingInfo(Common.PREF_INSISTENT_NOTIF, getString(R.string.settings_insistentnotif)));
-		if (SDK_INT >= 16 && SDK_INT < 23) {
+		if (SDK_INT < 23) {
 			settings.add(new SettingInfo(Common.PREF_NO_BIG_NOTIFICATIONS, getString(R.string.settings_nobignotif)));
 		}
 		settings.add(new SettingInfo(Common.PREF_ONGOING_NOTIF, getString(R.string.settings_ongoingnotif)));
-		if (SDK_INT >= 16 && SDK_INT < 26) {
+		if (SDK_INT < 26) {
 			settings.add(new SettingInfo(Common.PREF_NOTIF_PRIORITY, getString(R.string.settings_notifpriority)));
 		}
 		settings.add(new SettingInfo(Common.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
@@ -375,7 +374,6 @@ public class XposedModActivity extends Activity {
 	public static boolean isModActive() {
 		return false;
 	}
-
 
 	private static void loadApps(ProgressDialog dialog, XposedModActivity activity) {
 
@@ -764,7 +762,8 @@ public class XposedModActivity extends Activity {
 
 			filter = new AppListFilter(this, mContext);
 			inflater = mContext.getLayoutInflater();
-			defaultIcon = mContext.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
+
+			defaultIcon = ContextCompat.getDrawable(mContext, android.R.drawable.sym_def_app_icon);
 
 			alphaIndexer = new HashMap<>();
 			for (int i = filteredAppList.size() - 1; i >= 0; i--) {

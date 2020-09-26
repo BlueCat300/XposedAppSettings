@@ -41,7 +41,6 @@ import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.removeAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.setFloatField;
 import static de.robv.android.xposed.XposedHelpers.setIntField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
@@ -104,15 +103,11 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
 					String packageName = (String) param.args[0];
+					Notification n = (Notification) param.args[6];
 
-					Notification n;
-					if (SDK_INT <= 15 || SDK_INT >= 18)
-						n = (Notification) param.args[6];
-					else
-						n = (Notification) param.args[5];
-
-					if (!isActive(packageName))
+					if (!isActive(packageName)) {
 						return;
+					}
 
 					if (isActive(packageName, Common.PREF_INSISTENT_NOTIF)) {
 						n.flags |= Notification.FLAG_INSISTENT;
@@ -132,7 +127,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 						n.sound = null;
 						n.flags &= ~Notification.DEFAULT_SOUND;
 					}
-					if (SDK_INT >= 16 && isActive(packageName) && prefs.contains(packageName + Common.PREF_NOTIF_PRIORITY)) {
+					if (SDK_INT < 26 && isActive(packageName) && prefs.contains(packageName + Common.PREF_NOTIF_PRIORITY)) {
 						int priority = XposedMod.prefs.getInt(packageName + Common.PREF_NOTIF_PRIORITY, 0);
 						if (priority > 0 && priority < Common.notifPriCodes.length) {
 							n.flags &= ~Notification.FLAG_HIGH_PRIORITY;
@@ -146,19 +141,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 			if (SDK_INT >= 21) {
 				notificationHookedClass = "com.android.server.notification.NotificationManagerService";
 			}
-			if (SDK_INT <= 15) {
-				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
-						String.class, int.class, int.class, String.class, int.class, int.class, Notification.class, int[].class,
-						notifyHook);
-			} else if (SDK_INT == 16) {
-				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
-						String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class,
-						notifyHook);
-			} else if (SDK_INT == 17) {
-				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
-						String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class, int.class,
-						notifyHook);
-			} else if (SDK_INT <= 25) {
+			if (SDK_INT <= 25) {
 				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
 						String.class, String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class, int.class,
 						notifyHook);
@@ -205,8 +188,9 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 							if (packageName != null) {
 								int screen = prefs.getInt(packageName + Common.PREF_SCREEN,
 										prefs.getInt(Common.PREF_DEFAULT + Common.PREF_SCREEN, 0));
-								if (screen < 0 || screen >= Common.swdp.length)
+								if (screen < 0 || screen >= Common.swdp.length) {
 									screen = 0;
+								}
 
 								int dpi = prefs.getInt(packageName + Common.PREF_DPI,
 										prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
@@ -218,47 +202,36 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 								boolean xlarge = prefs.getBoolean(packageName + Common.PREF_XLARGE, false);
 
-								if (swdp > 0 || xlarge || dpi > 0 || fontScale > 0) {
-
-									if (swdp > 0) {
-										config.smallestScreenWidthDp = swdp;
-										config.screenWidthDp = wdp;
-										config.screenHeightDp = hdp;
-									}
-									if (xlarge)
-										config.screenLayout |= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-									if (dpi > 0) {
-										newMetrics.density = dpi / 160f;
-										newMetrics.densityDpi = dpi;
-
-										if (SDK_INT >= 17)
-											setIntField(config, "densityDpi", dpi);
-									}
-									if (fontScale > 0)
-										config.fontScale = fontScale / 100.0f;
-										}
-									}
-
-									// https://github.com/solohsu/XposedAppLocale
-									Locale loc = getPackageSpecificLocale(packageName);
-									if (packageName != null || loc != null) {
-										if (SDK_INT >= 17) {
-											config.setLocale(loc); // config.setLayoutDirection(local);
-										} else {
-											config.locale = loc;
-										}
-									}
-
-									if (SDK_INT >= 17) {
-										context = context.createConfigurationContext(config);
-									} else {
-										res.updateConfiguration(config, newMetrics);
-									}
-
-									param.args[0] = context;
+								if (swdp > 0) {
+									config.smallestScreenWidthDp = swdp;
+									config.screenWidthDp = wdp;
+									config.screenHeightDp = hdp;
 								}
+								if (xlarge) {
+									config.screenLayout |= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+								}
+								if (dpi > 0) {
+									newMetrics.density = dpi / 160f;
+									newMetrics.densityDpi = dpi;
+									setIntField(config, "densityDpi", dpi);
+								}
+								if (fontScale > 0) {
+									config.fontScale = fontScale / 100.0f;
+								}
+
+								// https://github.com/solohsu/XposedAppLocale
+								Locale loc = getPackageSpecificLocale(packageName);
+
+								if (loc != null) {
+									config.setLocale(loc);
+								}
+								context = context.createConfigurationContext(config);
 							}
-						});
+
+							param.args[0] = context;
+						}
+					}
+				});
 			} catch (Throwable t) {
 				XposedBridge.log(t);
 			}
@@ -348,46 +321,25 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 	private void dpiInSystem () {
 		// Hook to override DPI (globally, including resource load + rendering)
 		try {
-			if (SDK_INT < 17) {
-				findAndHookMethod(Display.class, "init", int.class, new XC_MethodHook() {
-					@Override
-					protected void afterHookedMethod(MethodHookParam param) {
-						String packageName = AndroidAppHelper.currentPackageName();
+			findAndHookMethod(Display.class, "updateDisplayInfoLocked", new XC_MethodHook() {
+				@Override
+				protected void afterHookedMethod(MethodHookParam param) {
+					String packageName = AndroidAppHelper.currentPackageName();
 
-						if (!isActive(packageName)) {
-							// No overrides for this package
-							return;
-						}
-
-						int packageDPI = prefs.getInt(packageName + Common.PREF_DPI,
-								prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
-						if (packageDPI > 0) {
-							// Density for this package is overridden, change density
-							setFloatField(param.thisObject, "mDensity", packageDPI / 160.0f);
-						}
+					if (!isActive(packageName)) {
+						// No overrides for this package
+						return;
 					}
-				});
-			} else {
-				findAndHookMethod(Display.class, "updateDisplayInfoLocked", new XC_MethodHook() {
-					@Override
-					protected void afterHookedMethod(MethodHookParam param) {
-						String packageName = AndroidAppHelper.currentPackageName();
 
-						if (!isActive(packageName)) {
-							// No overrides for this package
-							return;
-						}
-
-						int packageDPI = prefs.getInt(packageName + Common.PREF_DPI,
-								prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
-						if (packageDPI > 0) {
-							// Density for this package is overridden, change density
-							Object mDisplayInfo = getObjectField(param.thisObject, "mDisplayInfo");
-							setIntField(mDisplayInfo, "logicalDensityDpi", packageDPI);
-						}
+					int packageDPI = prefs.getInt(packageName + Common.PREF_DPI,
+							prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
+					if (packageDPI > 0) {
+						// Density for this package is overridden, change density
+						Object mDisplayInfo = getObjectField(param.thisObject, "mDisplayInfo");
+						setIntField(mDisplayInfo, "logicalDensityDpi", packageDPI);
 					}
-				});
-			}
+				}
+			});
 
 		} catch (Throwable t) {
 			XposedBridge.log(t);

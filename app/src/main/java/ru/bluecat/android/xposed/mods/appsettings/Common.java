@@ -15,7 +15,6 @@ import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
-import static android.os.Build.VERSION.SDK_INT;
 
 public class Common {
 
@@ -25,11 +24,9 @@ public class Common {
 
 	public static String ACTION_PERMISSIONS = "update_permissions";
 
-
 	public static String PREFS = "ModSettings";
 
 	public static String PREF_DEFAULT = "default";
-
 	public static String PREF_ACTIVE = "/active";
 	public static String PREF_DPI = "/dpi";
 	public static String PREF_FONT_SCALE = "/font-scale";
@@ -70,14 +67,6 @@ public class Common {
 		// These require API 18
 		SCREEN_ORIENTATION_USER_PORTRAIT, SCREEN_ORIENTATION_USER_LANDSCAPE,
 			SCREEN_ORIENTATION_FULL_USER };
-	static {
-		if (SDK_INT < 18) {
-			// Strip out the last 3 entries
-			int[] newCodes = new int[orientationCodes.length - 3];
-			System.arraycopy(orientationCodes, 0, newCodes, 0, orientationCodes.length - 3);
-			orientationCodes = newCodes;
-		}
-	}
 	public static int[] orientationLabels = { R.string.settings_default,
 		R.string.settings_ori_normal,
 		R.string.settings_ori_portrait, R.string.settings_ori_landscape,
@@ -88,14 +77,6 @@ public class Common {
 		// These require API 18
 		R.string.settings_ori_portrait_user, R.string.settings_ori_landscape_user,
 		R.string.settings_ori_user_4way };
-	static {
-		if (SDK_INT < 18) {
-			// Strip out the last 3 entries
-			int[] newLabels = new int[orientationLabels.length - 3];
-			System.arraycopy(orientationLabels, 0, newLabels, 0, orientationLabels.length - 3);
-			orientationLabels = newLabels;
-		}
-	}
 
 	@SuppressLint("InlinedApi")
 	public static int[] notifPriCodes = { Integer.MIN_VALUE,

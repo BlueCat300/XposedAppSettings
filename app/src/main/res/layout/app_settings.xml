@@ -14,7 +14,6 @@
             android:id="@+id/app_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:contentDescription="@null" />
 
@@ -22,7 +21,6 @@
             android:id="@+id/app_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/app_icon"
             android:layout_toStartOf="@id/app_icon"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -31,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/app_label"
-            android:layout_toLeftOf="@id/app_icon"
             android:layout_toStartOf="@id/app_icon"
             android:textColor="#0099CC" />
     </RelativeLayout>
