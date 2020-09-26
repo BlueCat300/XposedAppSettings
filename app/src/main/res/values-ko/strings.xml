@@ -36,17 +36,15 @@ Xposed 프레임워크가 설치되어 있고 이 모듈을 활성화해야만 �
 
 
     <!-- main menu -->
-    <string name="menu_export">내보내기</string>
-    <string name="menu_import">가져오기</string>
+    <string name="menu_backup">내보내기</string>
+    <string name="menu_restore">가져오기</string>
     <string name="menu_about">어플리케이션 정보</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">파일이 존재하지 않음 : %s</string>
-    <string name="imp_exp_confirm">가져오기를 진행하면 기존 설정은 전부 지워지고 교체될 것입니다. 계속 하시겠습니까?</string>
-    <string name="imp_exp_exported">설정이 파일로 내보내짐 : %s</string>
-    <string name="imp_exp_export_error">내보내기 실패 : %s</string>
-    <string name="imp_exp_import_error">가져오기 실패 : %s</string>
-    <string name="imp_exp_imported">가져오기가 완료되었습니다. 설정이 교체됩니다.</string>
+    <string name="imp_exp_backup_completed">설정이 파일로 내보내짐 : %s</string>
+    <string name="imp_exp_backup_error">내보내기 실패 : %s</string>
+    <string name="imp_exp_restore_error">가져오기 실패 : %s</string>
+    <string name="imp_exp_restored">가져오기가 완료되었습니다. 설정이 교체됩니다.</string>
 
 
     <!-- app-specific menu -->

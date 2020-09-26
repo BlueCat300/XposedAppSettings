@@ -33,17 +33,15 @@ Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende
 
 
     <!-- main menu -->
-    <string name="menu_export">Exportieren</string>
-    <string name="menu_import">Importieren</string>
+    <string name="menu_backup">Exportieren</string>
+    <string name="menu_restore">Importieren</string>
     <string name="menu_about">Über</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">Datei existiert nicht: %s</string>
-    <string name="imp_exp_confirm">Alle Einstellungen mit den zu importierenden ersetzen?</string>
-    <string name="imp_exp_exported">Einstellungen in Datei exportiert: %s</string>
-    <string name="imp_exp_export_error">Export fehlgeschlagen: %s</string>
-    <string name="imp_exp_import_error">Import fehlgeschlagen: %s</string>
-    <string name="imp_exp_imported">Import vollständig, Einstellungen überschrieben</string>
+    <string name="imp_exp_backup_completed">Einstellungen in Datei exportiert: %s</string>
+    <string name="imp_exp_backup_error">Export fehlgeschlagen: %s</string>
+    <string name="imp_exp_restore_error">Import fehlgeschlagen: %s</string>
+    <string name="imp_exp_restored">Import vollständig, Einstellungen überschrieben</string>
 
 
     <!-- app-specific menu -->

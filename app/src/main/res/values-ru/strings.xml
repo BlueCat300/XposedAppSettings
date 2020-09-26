@@ -42,20 +42,19 @@ DPI; Замена ресурсов; Язык; Полный экран;
 
 
     <!-- main menu -->
+    <string name="menu_search">Поиск</string>
     <string name="menu_refresh">Обновить</string>
     <string name="menu_recents">Последние приложения</string>
-    <string name="menu_export">Экспорт</string>
-    <string name="menu_import">Импорт</string>
+    <string name="menu_backup">Резервное копирование</string>
+    <string name="menu_restore">Восстановление</string>
     <string name="menu_about">О программе</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">Файл не существует: %s</string>
-    <string name="imp_exp_confirm">Заменить все настройки импортированными?</string>
-    <string name="imp_exp_exported">Настройки экспортированы в файл: %s</string>
-    <string name="imp_exp_export_error">Ошибка экспорта: %s</string>
-    <string name="imp_exp_import_error">Ошибка импорта: %s</string>
-    <string name="imp_exp_imported">Импорт успешен; настройки заменены</string>
-    <string name="imp_exp_permission_not_granted_storage">Разрешение не получено: Действие не может быть выполнено</string>
+    <string name="imp_exp_backup_completed">Настройки скопированы в файл: %s</string>
+    <string name="imp_exp_backup_error">Ошибка резервного копирования: %s</string>
+    <string name="imp_exp_restore_error">Ошибка восстановления: %s</string>
+    <string name="imp_exp_restored">Восстановление выполнено успешно; настройки заменены</string>
+    <string name="imp_exp_file_picker_error">Ошибка открытия системного DocumentUI</string>
 
     <!-- app-specific menu -->
     <string name="menu_save">Сохранить</string>
@@ -161,7 +160,6 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="filter_cancel">Отменить</string>
     <string name="filter_clear">Очистить</string>
     <string name="filter_apply">Применить</string>
-
 
     <string name="translator">webserfer / Blue cat (4pda.ru)</string>
 </resources>

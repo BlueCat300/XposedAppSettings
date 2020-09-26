@@ -33,17 +33,15 @@ DPI, Μέγεθος γραμματοσειράς, Αλλαγή φορτωμέν�
 
 
     <!-- main menu -->
-    <string name="menu_export">Εξαγωγή</string>
-    <string name="menu_import">Εισαγωγή</string>
+    <string name="menu_backup">Εξαγωγή</string>
+    <string name="menu_restore">Εισαγωγή</string>
     <string name="menu_about">Σχετικά</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">Το αρχείο δεν υπάρχει: %s</string>
-    <string name="imp_exp_confirm">Αντικατάσταση όλων των ρυθμίσεων με αυτές που θα εισαχθούν;</string>
-    <string name="imp_exp_exported">Οι ρυθμίσεις εξάχθηκαν στο αρχείο: %s</string>
-    <string name="imp_exp_export_error">Εξαγωγή απέτυχε: %s</string>
-    <string name="imp_exp_import_error">Εισαγωγή απέτυχε: %s</string>
-    <string name="imp_exp_imported">Εισαγωγή επιτυχής. Οι ρυθμίσεις αντικαταστάθηκαν.</string>
+    <string name="imp_exp_backup_completed">Οι ρυθμίσεις εξάχθηκαν στο αρχείο: %s</string>
+    <string name="imp_exp_backup_error">Εξαγωγή απέτυχε: %s</string>
+    <string name="imp_exp_restore_error">Εισαγωγή απέτυχε: %s</string>
+    <string name="imp_exp_restored">Εισαγωγή επιτυχής. Οι ρυθμίσεις αντικαταστάθηκαν.</string>
 
 
     <!-- app-specific menu -->

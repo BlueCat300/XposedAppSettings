@@ -34,17 +34,15 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
 
 
     <!-- main menu -->
-    <string name="menu_export">导出</string>
-    <string name="menu_import">导入</string>
+    <string name="menu_backup">导出</string>
+    <string name="menu_restore">导入</string>
     <string name="menu_about">关于</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">文件不存在：%s</string>
-    <string name="imp_exp_confirm">是否使用导入文件覆盖所有设置？</string>
-    <string name="imp_exp_exported">设置已导出到：%s</string>
-    <string name="imp_exp_export_error">导出失败：%s</string>
-    <string name="imp_exp_import_error">导入失败：%s</string>
-    <string name="imp_exp_imported">导入成功，设置已覆盖！</string>
+    <string name="imp_exp_backup_completed">设置已导出到：%s</string>
+    <string name="imp_exp_backup_error">导出失败：%s</string>
+    <string name="imp_exp_restore_error">导入失败：%s</string>
+    <string name="imp_exp_restored">导入成功，设置已覆盖！</string>
 
 
     <!-- app-specific menu -->

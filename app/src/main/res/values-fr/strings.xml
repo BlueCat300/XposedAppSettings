@@ -35,17 +35,15 @@ module est activé dans sa configuration!</string>
 
 
     <!-- main menu -->
-    <string name="menu_export">Exporter</string>
-    <string name="menu_import">Importer</string>
+    <string name="menu_backup">Exporter</string>
+    <string name="menu_restore">Importer</string>
     <string name="menu_about">A propos</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">Fichier inexistant: %s</string>
-    <string name="imp_exp_confirm">Replacer toutes les réglages par ceux qui vont être importés?</string>
-    <string name="imp_exp_exported">Réglages exportés vers: %s</string>
-    <string name="imp_exp_export_error">Exportation échouée: %s</string>
-    <string name="imp_exp_import_error">Importation échouée: %s</string>
-    <string name="imp_exp_imported">Importation réussie; réglages replacés</string>
+    <string name="imp_exp_backup_completed">Réglages exportés vers: %s</string>
+    <string name="imp_exp_backup_error">Exportation échouée: %s</string>
+    <string name="imp_exp_restore_error">Importation échouée: %s</string>
+    <string name="imp_exp_restored">Importation réussie; réglages replacés</string>
 
 
     <!-- app-specific menu -->

@@ -35,17 +35,15 @@ ativado nas configurações!</string>
 
 
     <!-- main menu -->
-    <string name="menu_export">Exportar</string>
-    <string name="menu_import">Importar</string>
+    <string name="menu_backup">Exportar</string>
+    <string name="menu_restore">Importar</string>
     <string name="menu_about">Sobre</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">O arquivo %s não existe</string>
-    <string name="imp_exp_confirm">Todas as configurações atuais serão substituídas pelas importadas, confirma?</string>
-    <string name="imp_exp_exported">Configurações exportadas para o arquivo: %s</string>
-    <string name="imp_exp_export_error">Falha na exportação: %s</string>
-    <string name="imp_exp_import_error">Falha na importação: %s</string>
-    <string name="imp_exp_imported">Importação concluída; configurações substituídas</string>
+    <string name="imp_exp_backup_completed">Configurações exportadas para o arquivo: %s</string>
+    <string name="imp_exp_backup_error">Falha na exportação: %s</string>
+    <string name="imp_exp_restore_error">Falha na importação: %s</string>
+    <string name="imp_exp_restored">Importação concluída; configurações substituídas</string>
 
 
     <!-- app-specific menu -->

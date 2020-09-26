@@ -43,20 +43,19 @@ they will only affect the apps if the Xposed framework is installed and if this 
 
 
     <!-- main menu -->
+    <string name="menu_search">Search</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_recents">Recent apps</string>
-    <string name="menu_export">Export</string>
-    <string name="menu_import">Import</string>
+    <string name="menu_backup">Backup</string>
+    <string name="menu_restore">Restore</string>
     <string name="menu_about">About</string>
 
-    <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">File does not exist: %s</string>
-    <string name="imp_exp_confirm">Replace all settings with the ones that are about to be imported?</string>
-    <string name="imp_exp_exported">Settings exported to file: %s</string>
-    <string name="imp_exp_export_error">Export failed: %s</string>
-    <string name="imp_exp_import_error">Import failed: %s</string>
-    <string name="imp_exp_imported">Import successful; settings replaced</string>
-    <string name="imp_exp_permission_not_granted_storage">Permission not granted: Action could not be performed</string>
+    <!-- Restore / Backup -->
+    <string name="imp_exp_backup_completed">Settings copied to file: %s</string>
+    <string name="imp_exp_backup_error">Backup failed: %s</string>
+    <string name="imp_exp_restore_error">Restore failed: %s</string>
+    <string name="imp_exp_restored">Restore completed successfully; settings replaced</string>
+    <string name="imp_exp_file_picker_error">Error opening system DocumentUI</string>
 
     <!-- app-specific menu -->
     <string name="menu_save">Save</string>
@@ -162,7 +161,6 @@ Really go back and discard changes?</string>
     <string name="filter_cancel">Cancel</string>
     <string name="filter_clear">Clear</string>
     <string name="filter_apply">Apply</string>
-
 
     <string name="translator"> </string>
 </resources>

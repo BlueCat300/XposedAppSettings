@@ -10,13 +10,13 @@
         android:showAsAction="withText"
         android:title="@string/menu_recents"/>
     <item
-        android:id="@+id/menu_export"
+        android:id="@+id/menu_backup"
         android:showAsAction="withText"
-        android:title="@string/menu_export"/>
+        android:title="@string/menu_backup"/>
     <item
-        android:id="@+id/menu_import"
+        android:id="@+id/menu_restore"
         android:showAsAction="withText"
-        android:title="@string/menu_import"/>
+        android:title="@string/menu_restore"/>
     <item
         android:id="@+id/menu_about"
         android:icon="@android:drawable/ic_menu_help"

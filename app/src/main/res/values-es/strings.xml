@@ -36,17 +36,15 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
 
 
     <!-- main menu -->
-    <string name="menu_export">Exportar</string>
-    <string name="menu_import">Importar</string>
+    <string name="menu_backup">Exportar</string>
+    <string name="menu_restore">Importar</string>
     <string name="menu_about">Acerca de...</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">Archivo no existe: %s</string>
-    <string name="imp_exp_confirm">¿Reemplazar toda la configuración con los valores a punto de ser importados?</string>
-    <string name="imp_exp_exported">Configuración exportada al archivo: %s</string>
-    <string name="imp_exp_export_error">Falló la exportación: %s</string>
-    <string name="imp_exp_import_error">Falló la importación: %s</string>
-    <string name="imp_exp_imported">Importación exitosa; valores reemplazados</string>
+    <string name="imp_exp_backup_completed">Configuración exportada al archivo: %s</string>
+    <string name="imp_exp_backup_error">Falló la exportación: %s</string>
+    <string name="imp_exp_restore_error">Falló la importación: %s</string>
+    <string name="imp_exp_restored">Importación exitosa; valores reemplazados</string>
 
 
     <!-- app-specific menu -->

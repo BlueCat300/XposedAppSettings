@@ -22,8 +22,6 @@ public class Common {
 	public static String TAG = "AppSettingsReborn";
 	public static String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
 	public static String REBOOT = "android.permission.REBOOT";
-	static String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
-	static String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
 
 	public static String ACTION_PERMISSIONS = "update_permissions";
 

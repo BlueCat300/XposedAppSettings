@@ -21,7 +21,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -42,19 +41,11 @@ import android.widget.SearchView;
 import android.widget.SectionIndexer;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,8 +65,7 @@ import ru.bluecat.android.xposed.mods.appsettings.settings.ApplicationSettings;
 import ru.bluecat.android.xposed.mods.appsettings.settings.PermissionsListAdapter;
 
 import static android.os.Build.VERSION.SDK_INT;
-import static ru.bluecat.android.xposed.mods.appsettings.Common.READ_EXTERNAL_STORAGE;
-import static ru.bluecat.android.xposed.mods.appsettings.Common.WRITE_EXTERNAL_STORAGE;
+import static ru.bluecat.android.xposed.mods.appsettings.BackupActivity.restoreSuccessful;
 
 public class XposedModActivity extends Activity {
 
@@ -97,9 +87,6 @@ public class XposedModActivity extends Activity {
 
 	private static SharedPreferences prefs;
 
-	private File backupPrefsFile = new File(Environment.getExternalStorageDirectory(),
-			"AppSettings.backup");
-
     @Override
 	public void onCreate(Bundle savedInstanceState) {
 		setTitle(R.string.app_name);
@@ -111,6 +98,7 @@ public class XposedModActivity extends Activity {
 		}
 		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 
+		restoreSuccessful = false;
 		loadSettings();
 		setContentView(R.layout.main);
 		ListView list = findViewById(R.id.lstApps);
@@ -123,6 +111,40 @@ public class XposedModActivity extends Activity {
 			startActivityForResult(i, position);
 		});
 		refreshApps();
+	}
+
+	@Override
+	public void onDestroy () {
+    	super.onDestroy();
+		clearSearchQueryOnFinish();
+	}
+
+	private void clearSearchQueryOnFinish() {
+		SearchView searchBar = this.findViewById(R.id.searchApp);
+		if(searchBar.getQuery().length() != 0) {
+			searchBar.setIconified(true);
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		refreshAppsAfterImport();
+	}
+
+	private void refreshAppsAfterImport() {
+		if (restoreSuccessful) {
+			// Refresh preferences
+			Context ctx = ContextCompat.createDeviceProtectedStorageContext(this);
+			if (ctx == null) {
+				ctx = this;
+			}
+			prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+			// Refresh listed apps (account for filters)
+			XposedModActivity.AppListAdapter appListAdapter = (XposedModActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+			appListAdapter.getFilter().filter(nameFilter);
+			restoreSuccessful = false;
+		}
 	}
 
 	private void loadSettings() {
@@ -197,11 +219,11 @@ public class XposedModActivity extends Activity {
 		case R.id.menu_recents:
 			showRecents();
 			return true;
-		case R.id.menu_export:
-			doExport();
+		case R.id.menu_backup:
+			BackupActivity.startBackupActivity(this, false);
 			return true;
-		case R.id.menu_import:
-			doImportInternal();
+		case R.id.menu_restore:
+			BackupActivity.startBackupActivity(this, true);
 			return true;
 		case R.id.menu_about:
 			showAboutDialog();
@@ -264,225 +286,6 @@ public class XposedModActivity extends Activity {
 				startActivityForResult(i, Integer.MAX_VALUE);
 			})
 			.show();
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode,
-										   @NonNull String[] permissions, @NonNull int[] grantResults) {
-		switch (requestCode) {
-			case 1: {
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					new ExportTask(this).execute(backupPrefsFile);
-				} else {
-					Toast.makeText(this, getString(R.string.imp_exp_permission_not_granted_storage),
-							Toast.LENGTH_LONG).show();
-				}
-				break;
-			}
-			case 2: {
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					doImport();
-				} else {
-					Toast.makeText(this, getString(R.string.imp_exp_permission_not_granted_storage),
-							Toast.LENGTH_LONG).show();
-				}
-				break;
-			}
-		}
-	}
-
-	private void doExport() {
-		if (SDK_INT >= 23) {
-			if(checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-				new ExportTask(this).execute(backupPrefsFile);
-			} else {
-				ActivityCompat.requestPermissions(this, new String[]
-						{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},1);
-			}
-		} else {
-			new ExportTask(this).execute(backupPrefsFile);
-		}
-	}
-
-	private void doImportInternal() {
-		if (SDK_INT >= 23) {
-			if(checkSelfPermission(READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-				doImport();
-			} else {
-				ActivityCompat.requestPermissions(this, new String[]
-						{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},2);
-			}
-		} else {
-			doImport();
-		}
-	}
-
-	private void doImport() {
-		if (!backupPrefsFile.exists()) {
-			Toast.makeText(this, getString(R.string.imp_exp_file_doesnt_exist, backupPrefsFile.getAbsolutePath()),
-					Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.menu_import);
-		builder.setMessage(R.string.imp_exp_confirm);
-		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
-			dialog.dismiss();
-			new ImportTask(this).execute(backupPrefsFile);
-		});
-		builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
-			// Do nothing
-			dialog.dismiss();
-		});
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
-
-
-	private static class ExportTask extends AsyncTask<File, String, String> {
-
-		private WeakReference<XposedModActivity> activityReference;
-
-		ExportTask(XposedModActivity context) {
-			activityReference = new WeakReference<>(context);
-		}
-
-        @Override
-		protected String doInBackground(File... params) {
-            boolean exportSuccessful = false;
-			XposedModActivity activity = activityReference.get();
-
-			File outFile = params[0];
-            ObjectOutputStream output = null;
-            String error = null;
-            try {
-                output = new ObjectOutputStream(new FileOutputStream(outFile));
-				Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
-				if (ctx == null) {
-					ctx = activity;
-				}
-				SharedPreferences pref = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
-                output.writeObject(pref.getAll());
-                exportSuccessful = true;
-            } catch (FileNotFoundException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            } catch (IOException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            }finally {
-                try {
-                    if (output != null) {
-                        output.flush();
-                        output.close();
-                    }
-                } catch (IOException e) {
-                    error = e.getMessage();
-                    e.printStackTrace();
-                }
-            }
-
-            if(exportSuccessful) {
-                return activity.getResources().getString(R.string.imp_exp_exported, outFile.getAbsolutePath());
-            } else {
-                return activity.getResources().getString(R.string.imp_exp_export_error, error);
-            }
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
-		}
-	}
-
-	private static class ImportTask extends AsyncTask<File, String, String> {
-		private boolean importSuccessful;
-		private WeakReference<XposedModActivity> activityReference;
-
-		ImportTask(XposedModActivity context) {
-			activityReference = new WeakReference<>(context);
-		}
-
-		@Override
-		protected String doInBackground(File... params) {
-			importSuccessful = false;
-			XposedModActivity activity = activityReference.get();
-
-			File inFile = params[0];
-            ObjectInputStream input = null;
-            String error = null;
-            try {
-                input = new ObjectInputStream(new FileInputStream(inFile));
-				Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
-				if (ctx == null) {
-					ctx = activity;
-				}
-				SharedPreferences.Editor prefEdit = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE).edit();
-                prefEdit.clear();
-				@SuppressWarnings("unchecked")
-                Map<String, ?> entries = (Map<String, ?>) input.readObject();
-                for (Map.Entry<String, ?> entry : entries.entrySet()) {
-                    Object v = entry.getValue();
-                    String key = entry.getKey();
-
-                    if (v instanceof Boolean)
-                        prefEdit.putBoolean(key, (Boolean) v);
-                    else if (v instanceof Float)
-                        prefEdit.putFloat(key, (Float) v);
-                    else if (v instanceof Integer)
-                        prefEdit.putInt(key, (Integer) v);
-                    else if (v instanceof Long)
-                        prefEdit.putLong(key, (Long) v);
-                    else if (v instanceof String)
-                        prefEdit.putString(key, ((String) v));
-                }
-                prefEdit.apply();
-                importSuccessful = true;
-            } catch (FileNotFoundException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            } catch (IOException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    error = e.getMessage();
-                    e.printStackTrace();
-                }
-            }
-
-            if(importSuccessful) {
-                return activity.getResources().getString(R.string.imp_exp_imported);
-            } else {
-                return activity.getResources().getString(R.string.imp_exp_import_error, error);
-            }
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			XposedModActivity activity = activityReference.get();
-			if (importSuccessful) {
-				// Refresh preferences
-				Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
-				if (ctx == null) {
-					ctx = activity;
-				}
-				prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
-				// Refresh listed apps (account for filters)
-				AppListAdapter appListAdapter = (AppListAdapter) ((ListView) activity.findViewById(R.id.lstApps)).getAdapter();
-				appListAdapter.getFilter().filter(nameFilter);
-			}
-
-			Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
-		}
 	}
 
 	private void showAboutDialog() {

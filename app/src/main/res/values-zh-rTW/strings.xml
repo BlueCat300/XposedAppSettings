@@ -38,17 +38,15 @@
 
 
     <!-- main menu -->
-    <string name="menu_export">匯出設定</string>
-    <string name="menu_import">匯入設定</string>
+    <string name="menu_backup">匯出設定</string>
+    <string name="menu_restore">匯入設定</string>
     <string name="menu_about">關於</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">找不到檔案：%s</string>
-    <string name="imp_exp_confirm">確定以匯入資料取代現有設定？</string>
-    <string name="imp_exp_exported">設定已匯出至：%s</string>
-    <string name="imp_exp_export_error">匯出失敗：%s</string>
-    <string name="imp_exp_import_error">匯入失敗：%s</string>
-    <string name="imp_exp_imported">匯入成功，設定已變更。</string>
+    <string name="imp_exp_backup_completed">設定已匯出至：%s</string>
+    <string name="imp_exp_backup_error">匯出失敗：%s</string>
+    <string name="imp_exp_restore_error">匯入失敗：%s</string>
+    <string name="imp_exp_restored">匯入成功，設定已變更。</string>
 
 
     <!-- app-specific menu -->

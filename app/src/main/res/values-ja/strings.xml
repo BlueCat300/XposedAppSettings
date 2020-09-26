@@ -35,17 +35,15 @@ DPI; フォントスケール; 言語;全画面; タイトル非表示; 画面�
 
 
     <!-- main menu -->
-    <string name="menu_export">保存</string>
-    <string name="menu_import">読み込み</string>
+    <string name="menu_backup">保存</string>
+    <string name="menu_restore">読み込み</string>
     <string name="menu_about">情報</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">ファイルがありません: %s</string>
-    <string name="imp_exp_confirm">読み込んだファイルで全ての設定を置換しますか?</string>
-    <string name="imp_exp_exported">設定の保存先: %s</string>
-    <string name="imp_exp_export_error">保存失敗: %s</string>
-    <string name="imp_exp_import_error">読み込み失敗: %s</string>
-    <string name="imp_exp_imported">読み込み成功; 設定を置換しました。</string>
+    <string name="imp_exp_backup_completed">設定の保存先: %s</string>
+    <string name="imp_exp_backup_error">保存失敗: %s</string>
+    <string name="imp_exp_restore_error">読み込み失敗: %s</string>
+    <string name="imp_exp_restored">読み込み成功; 設定を置換しました。</string>
 
 
     <!-- app-specific menu -->

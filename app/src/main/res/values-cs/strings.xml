@@ -31,17 +31,15 @@ DPI, velikost písma, jazyk, načítání zdrojů, zobrazení na celou obrazovku
 
 
     <!-- main menu -->
-    <string name="menu_export">Exportovat</string>
-    <string name="menu_import">Importovat</string>
+    <string name="menu_backup">Exportovat</string>
+    <string name="menu_restore">Importovat</string>
     <string name="menu_about">O aplikaci</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">Soubor neexistuje: %s</string>
-    <string name="imp_exp_confirm">Nahradit všechny nastavení nastaveními, které se chystáte importovat?</string>
-    <string name="imp_exp_exported">Nastavení byli exportované do souboru: %s</string>
-    <string name="imp_exp_export_error">Export selhal: %s</string>
-    <string name="imp_exp_import_error">Import selhal: %s</string>
-    <string name="imp_exp_imported">Import byl úspěšný; nastavení bylo nahrazeno</string>
+    <string name="imp_exp_backup_completed">Nastavení byli exportované do souboru: %s</string>
+    <string name="imp_exp_backup_error">Export selhal: %s</string>
+    <string name="imp_exp_restore_error">Import selhal: %s</string>
+    <string name="imp_exp_restored">Import byl úspěšný; nastavení bylo nahrazeno</string>
 
 
     <!-- app-specific menu -->

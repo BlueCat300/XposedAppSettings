@@ -34,17 +34,15 @@
 
 
     <!-- main menu -->
-    <string name="menu_export">Exportálás</string>
-    <string name="menu_import">Importálás</string>
+    <string name="menu_backup">Exportálás</string>
+    <string name="menu_restore">Importálás</string>
     <string name="menu_about">Névjegy</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_file_doesnt_exist">A fájl nem létezik: %s</string>
-    <string name="imp_exp_confirm">Kicseréli az összes beállitást, biztos importálja?</string>
-    <string name="imp_exp_exported">Beállítások exportálása fájlba: %s</string>
-    <string name="imp_exp_export_error">Exportálás sikertelen: %s</string>
-    <string name="imp_exp_import_error">Importálás sikertelen: %s</string>
-    <string name="imp_exp_imported">Importálása sikeres; beállítások lecserélve</string>
+    <string name="imp_exp_backup_completed">Beállítások exportálása fájlba: %s</string>
+    <string name="imp_exp_backup_error">Exportálás sikertelen: %s</string>
+    <string name="imp_exp_restore_error">Importálás sikertelen: %s</string>
+    <string name="imp_exp_restored">Importálása sikeres; beállítások lecserélve</string>
 
 
     <!-- app-specific menu -->
