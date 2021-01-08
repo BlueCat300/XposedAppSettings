@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
@@ -39,7 +40,7 @@ public class PackagePermissions extends BroadcastReceiver {
 		mSettings = getObjectField(pmSvc, "mSettings");
 	}
 
-	public static void initHooks(XC_LoadPackage.LoadPackageParam lpparam) {
+	public static void initHooks(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
 		/* Hook to the PackageManager service in order to
 		 * - Listen for broadcasts to apply new settings and restart the app
 		 * - Intercept the permission granting function to remove disabled permissions
@@ -87,10 +88,10 @@ public class PackagePermissions extends BroadcastReceiver {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
 					String pkgName = (String) getObjectField(param.args[0], "packageName");
-					if (!XposedMod.isActive(pkgName) || !XposedMod.prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false))
+					if (!XposedMod.isActive(prefs, pkgName) || !prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false))
 						return;
 
-					Set<String> disabledPermissions = XposedMod.prefs.getStringSet(pkgName + Common.PREF_REVOKELIST, null);
+					Set<String> disabledPermissions = prefs.getStringSet(pkgName + Common.PREF_REVOKELIST, null);
 					if (disabledPermissions == null || disabledPermissions.isEmpty())
 						return;
 

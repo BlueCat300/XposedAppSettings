@@ -40,6 +40,9 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="app_translation">Translator: %s</string>
     <string name="app_notactive_warning">Note: Although the configuration panels can be used as-is,
 they will only affect the apps if the Xposed framework is installed and if this module is enabled in its configuration!</string>
+    <string name="app_min_api_warning_title">Xposed Framework</string>
+    <string name="app_min_api_warning_message">Xposed is not activated or does not match the minimum version.
+\nMinimum version: <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.4</a></string>
 
 
     <!-- main menu -->

@@ -14,6 +14,7 @@ import android.view.inputmethod.InputConnection;
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
@@ -45,7 +46,7 @@ class Activities {
 	private static int FLAG_NEEDS_MENU_KEY = SDK_INT >= 22 ? 0 : getStaticIntField(WindowManager.LayoutParams.class, "FLAG_NEEDS_MENU_KEY");
     private static String CLASS_PHONEWINDOW = SDK_INT >= 23 ? "com.android.internal.policy.PhoneWindow" : "com.android.internal.policy.impl.PhoneWindow";
 
-    static void hookActivitySettings() {
+    static void hookActivitySettings(XSharedPreferences prefs) {
         String CLASS_PHONEWINDOW_DECORVIEW;
         if (SDK_INT >= 24) {
 			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.DecorView";
@@ -64,16 +65,16 @@ class Activities {
 					Context context = window.getContext();
 					String packageName = context.getPackageName();
 
-					if (!XposedMod.isActive(packageName))
+					if (!XposedMod.isActive(prefs, packageName))
 						return;
 
 					int fullscreen;
 					try {
-						fullscreen = XposedMod.prefs.getInt(packageName + Common.PREF_FULLSCREEN,
+						fullscreen = prefs.getInt(packageName + Common.PREF_FULLSCREEN,
 								Common.FULLSCREEN_DEFAULT);
 					} catch (ClassCastException ex) {
 						// Legacy boolean setting
-						fullscreen = XposedMod.prefs.getBoolean(packageName + Common.PREF_FULLSCREEN, false)
+						fullscreen = prefs.getBoolean(packageName + Common.PREF_FULLSCREEN, false)
                                 ? Common.FULLSCREEN_FORCE : Common.FULLSCREEN_DEFAULT;
 					}
 					if (fullscreen == Common.FULLSCREEN_FORCE) {
@@ -92,21 +93,21 @@ class Activities {
 								| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 					}
 
-					if (XposedMod.prefs.getBoolean(packageName + Common.PREF_NO_TITLE, false))
+					if (prefs.getBoolean(packageName + Common.PREF_NO_TITLE, false))
 						window.requestFeature(Window.FEATURE_NO_TITLE);
 
-					if (XposedMod.prefs.getBoolean(packageName + Common.PREF_ALLOW_ON_LOCKSCREEN, false))
+					if (prefs.getBoolean(packageName + Common.PREF_ALLOW_ON_LOCKSCREEN, false))
 							window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
 								WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
 								WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-					if (XposedMod.prefs.getBoolean(packageName + Common.PREF_SCREEN_ON, false)) {
+					if (prefs.getBoolean(packageName + Common.PREF_SCREEN_ON, false)) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 						setAdditionalInstanceField(window, PROP_KEEP_SCREEN_ON, Boolean.TRUE);
 					}
 
-					if (XposedMod.prefs.getBoolean(packageName + Common.PREF_LEGACY_MENU, false)) {
-						if (SDK_INT >= 22) {
+					if (prefs.getBoolean(packageName + Common.PREF_LEGACY_MENU, false)) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 						     // NEEDS_MENU_SET_TRUE = 1
 						     callMethod(window, "setNeedsMenuKey", 1);
 						}
@@ -116,7 +117,7 @@ class Activities {
 						}
 					}
 
-                    int screenshot = XposedMod.prefs.getInt(packageName + Common.PREF_SCREENSHOT,
+                    int screenshot = prefs.getInt(packageName + Common.PREF_SCREENSHOT,
                             Common.PREF_SCREENSHOT_DEFAULT);
                     if (screenshot == Common.PREF_SCREENSHOT_ALLOW) {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
@@ -124,7 +125,7 @@ class Activities {
                         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
                     }
 
-					int orientation = XposedMod.prefs.getInt(packageName + Common.PREF_ORIENTATION, XposedMod.prefs.getInt(Common.PREF_DEFAULT + Common.PREF_ORIENTATION, 0));
+					int orientation = prefs.getInt(packageName + Common.PREF_ORIENTATION, prefs.getInt(Common.PREF_DEFAULT + Common.PREF_ORIENTATION, 0));
 					if (orientation > 0 && orientation < Common.orientationCodes.length && context instanceof Activity) {
 						((Activity) context).setRequestedOrientation(Common.orientationCodes[orientation]);
 						setAdditionalInstanceField(context, PROP_ORIENTATION, orientation);
@@ -216,7 +217,7 @@ class Activities {
 				protected void beforeHookedMethod(MethodHookParam param) {
 					EditorInfo info = (EditorInfo) param.args[1];
 					if (info != null && info.packageName != null) {
-						if (XposedMod.isActive(info.packageName, Common.PREF_NO_FULLSCREEN_IME))
+						if (XposedMod.isActive(prefs, info.packageName, Common.PREF_NO_FULLSCREEN_IME))
 							info.imeOptions |= EditorInfo.IME_FLAG_NO_FULLSCREEN;
 					}
 				}
@@ -226,7 +227,7 @@ class Activities {
 		}
 	}
 
-	static void hookActivitySettingsInSystemServer(XC_LoadPackage.LoadPackageParam lpparam) {
+	static void hookActivitySettingsInSystemServer(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
 		try {
 			// Hook one of the several variations of ActivityStack.realStartActivityLocked from different ROMs
 			ClassLoader classLoader = lpparam.classLoader;
@@ -255,7 +256,7 @@ class Activities {
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
 					String pkgName = (String) getObjectField(param.args[0], "packageName");
-					if (XposedMod.isActive(pkgName, Common.PREF_RESIDENT)) {
+					if (XposedMod.isActive(prefs, pkgName, Common.PREF_RESIDENT)) {
 						int adj = -12;
 						Object proc = getObjectField(param.args[0], "app");
 
@@ -290,8 +291,8 @@ class Activities {
 					if (aInfo == null)
 						return;
 					String pkgName = aInfo.packageName;
-					if (XposedMod.prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT) > 0) {
-						int recentsMode = XposedMod.prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT);
+					if (prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT) > 0) {
+						int recentsMode = prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT);
 						if (recentsMode == Common.PREF_RECENTS_DEFAULT)
 							return;
 						Intent intent = (Intent) getObjectField(param.thisObject, "intent");
@@ -318,7 +319,7 @@ class Activities {
 					protected void afterHookedMethod(MethodHookParam param) {
 						Context mContext = (Context) getObjectField(param.thisObject, "mContext");
 						String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
-						if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(callingApp, Common.PREF_RECENT_TASKS)) {
+						if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(prefs, callingApp, Common.PREF_RECENT_TASKS)) {
 							param.setResult(true);
 						}
 					}

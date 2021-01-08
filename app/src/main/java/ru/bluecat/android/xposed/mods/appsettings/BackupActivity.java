@@ -1,5 +1,6 @@
 package ru.bluecat.android.xposed.mods.appsettings;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -10,8 +11,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-
-import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -98,6 +97,7 @@ public class BackupActivity extends Activity {
             activityReference = new WeakReference<>(context);
         }
 
+        @SuppressLint("WorldReadableFiles")
         @Override
         protected String doInBackground(Uri... params) {
             boolean backupSuccessful = false;
@@ -106,14 +106,20 @@ public class BackupActivity extends Activity {
             ObjectOutputStream output = null;
             String error = null;
             try {
-                output = new ObjectOutputStream(activity.getContentResolver().openOutputStream(params[0]));
-                Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
-                if (ctx == null) {
-                    ctx = activity;
+                SharedPreferences pref;
+                try {
+                    //noinspection deprecation
+                    pref = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+                } catch (SecurityException e) {
+                    // The new XSharedPreferences is not enabled or module's not loading
+                    error = e.getMessage();
+                    pref = null;
                 }
-                SharedPreferences pref = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
-                output.writeObject(pref.getAll());
-                backupSuccessful = true;
+                if(pref != null) {
+                    output = new ObjectOutputStream(activity.getContentResolver().openOutputStream(params[0]));
+                    output.writeObject(pref.getAll());
+                    backupSuccessful = true;
+                }
             } catch (IOException e) {
                 error = e.getMessage();
                 e.printStackTrace();
@@ -149,6 +155,7 @@ public class BackupActivity extends Activity {
             activityReference = new WeakReference<>(context);
         }
 
+        @SuppressLint("WorldReadableFiles")
         @Override
         protected String doInBackground(Uri... params) {
             BackupActivity activity = activityReference.get();
@@ -156,32 +163,40 @@ public class BackupActivity extends Activity {
             ObjectInputStream input = null;
             String error = null;
             try {
-                input = new ObjectInputStream(activity.getContentResolver().openInputStream(params[0]));
-                Context ctx = ContextCompat.createDeviceProtectedStorageContext(activity);
-                if (ctx == null) {
-                    ctx = activity;
+                SharedPreferences pref;
+                try {
+                    //noinspection deprecation
+                    pref = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+                } catch (SecurityException e) {
+                    // The new XSharedPreferences is not enabled or module's not loading
+                    error = e.getMessage();
+                    pref = null;
                 }
-                SharedPreferences.Editor prefEdit = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE).edit();
-                prefEdit.clear();
-                @SuppressWarnings("unchecked")
-                Map<String, ?> entries = (Map<String, ?>) input.readObject();
-                for (Map.Entry<String, ?> entry : entries.entrySet()) {
-                    Object v = entry.getValue();
-                    String key = entry.getKey();
+                if(pref != null) {
+                    input = new ObjectInputStream(activity.getContentResolver().openInputStream(params[0]));
+                    SharedPreferences.Editor prefEdit = pref.edit();
+                    prefEdit.clear();
 
-                    if (v instanceof Boolean)
-                        prefEdit.putBoolean(key, (Boolean) v);
-                    else if (v instanceof Float)
-                        prefEdit.putFloat(key, (Float) v);
-                    else if (v instanceof Integer)
-                        prefEdit.putInt(key, (Integer) v);
-                    else if (v instanceof Long)
-                        prefEdit.putLong(key, (Long) v);
-                    else if (v instanceof String)
-                        prefEdit.putString(key, ((String) v));
+                    @SuppressWarnings("unchecked")
+                    Map<String, ?> entries = (Map<String, ?>) input.readObject();
+                    for (Map.Entry<String, ?> entry : entries.entrySet()) {
+                        Object v = entry.getValue();
+                        String key = entry.getKey();
+
+                        if (v instanceof Boolean)
+                            prefEdit.putBoolean(key, (Boolean) v);
+                        else if (v instanceof Float)
+                            prefEdit.putFloat(key, (Float) v);
+                        else if (v instanceof Integer)
+                            prefEdit.putInt(key, (Integer) v);
+                        else if (v instanceof Long)
+                            prefEdit.putLong(key, (Long) v);
+                        else if (v instanceof String)
+                            prefEdit.putString(key, ((String) v));
+                    }
+                    prefEdit.apply();
+                    restoreSuccessful = true;
                 }
-                prefEdit.apply();
-                restoreSuccessful = true;
             } catch (IOException | ClassNotFoundException e) {
                 error = e.getMessage();
                 e.printStackTrace();

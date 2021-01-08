@@ -31,7 +31,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.BlendModeColorFilterCompat;
 import androidx.core.graphics.BlendModeCompat;
 
@@ -51,7 +50,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ru.bluecat.android.xposed.mods.appsettings.Common;
-import ru.bluecat.android.xposed.mods.appsettings.PrefFileManager;
 import ru.bluecat.android.xposed.mods.appsettings.R;
 import ru.bluecat.android.xposed.mods.appsettings.XposedModActivity;
 
@@ -69,30 +67,9 @@ public class ApplicationSettings extends Activity {
 	private boolean allowRevoking;
 	private Intent parentIntent;
 	private LocaleList localeList;
-    private PrefFileManager prefFileManager;
-
-    @Override
-    public void attachBaseContext(Context newBase) {
-        super.attachBaseContext(newBase);
-        prefFileManager = PrefFileManager.getInstance(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //Setting permission for reading xposed settings
-        prefFileManager.onResume();
-    }
-
-    @Override
-    protected void onStop() {
-        //Setting permission for reading xposed settings
-        prefFileManager.onPause();
-        super.onStop();
-    }
 
 	/** Called when the activity is first created. */
-	@SuppressLint({"SetTextI18n", "DefaultLocale"})
+	@SuppressLint({"SetTextI18n", "DefaultLocale", "WorldReadableFiles"})
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -105,15 +82,15 @@ public class ApplicationSettings extends Activity {
 
 		Intent i = getIntent();
 		parentIntent = i;
-
-        //Setting permission for reading xposed settings
-        prefFileManager.fixFolderPermissionsAsync();
-
-        Context ctx = ContextCompat.createDeviceProtectedStorageContext(this);
-        if (ctx == null) {
-            ctx = this;
-        }
-        prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+		try {
+			//noinspection deprecation
+			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+		} catch (SecurityException ignored) {
+			// The new XSharedPreferences is not enabled or module's not loading
+			MainActivity.xposedNotActive(this);
+			prefs = null;
+			return;
+		}
 
 		ApplicationInfo app;
 		try {

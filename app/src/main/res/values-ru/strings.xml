@@ -39,6 +39,8 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="app_translation">Перевод: %s</string>
     <string name="app_notactive_warning">Примечание: хотя панели конфигурации могут быть использованы
         как есть, они могут влиять на приложения, только если установлен Xposed framework и модуль активирован!</string>
+    <string name="app_min_api_warning_message">Xposed не активирован или не соответствует минимальной версии.
+\nМинимальная версия: <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.4</a></string>
 
 
     <!-- main menu -->

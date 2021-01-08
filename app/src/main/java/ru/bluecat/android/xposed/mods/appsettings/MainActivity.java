@@ -1,5 +1,6 @@
 package ru.bluecat.android.xposed.mods.appsettings;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RecentTaskInfo;
@@ -20,6 +21,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
@@ -63,7 +65,6 @@ import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterStat
 import ru.bluecat.android.xposed.mods.appsettings.settings.ApplicationSettings;
 import ru.bluecat.android.xposed.mods.appsettings.settings.PermissionsListAdapter;
 
-import static android.os.Build.VERSION.SDK_INT;
 import static ru.bluecat.android.xposed.mods.appsettings.BackupActivity.restoreSuccessful;
 
 public class XposedModActivity extends Activity {
@@ -86,17 +87,20 @@ public class XposedModActivity extends Activity {
 
 	private static SharedPreferences prefs;
 
-    @Override
+    @SuppressLint("WorldReadableFiles")
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setTitle(R.string.app_name);
 		super.onCreate(savedInstanceState);
-
-		Context ctx = ContextCompat.createDeviceProtectedStorageContext(this);
-		if (ctx == null) {
-			ctx = this;
+		try {
+			//noinspection deprecation
+			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+		} catch (SecurityException ignored) {
+			// The new XSharedPreferences is not enabled or module's not loading
+			xposedNotActive(this);
+			prefs = null;
+			return;
 		}
-		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
-
 		restoreSuccessful = false;
 		loadSettings();
 		setContentView(R.layout.main);
@@ -110,6 +114,25 @@ public class XposedModActivity extends Activity {
 			startActivityForResult(i, position);
 		});
 		refreshApps();
+	}
+
+	public static void xposedNotActive(Activity context) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+		dialog.setTitle(R.string.app_min_api_warning_title);
+		dialog.setMessage(R.string.app_min_api_warning_message);
+		dialog.setPositiveButton("Ok", (dialog1, id) -> {
+			dialog1.dismiss();
+			System.exit(0);
+		});
+		AlertDialog alert = dialog.create();
+		alert.setCancelable(false);
+		alert.setCanceledOnTouchOutside(false);
+		alert.show();
+
+		TextView msgText = alert.findViewById(android.R.id.message);
+		if (msgText != null) {
+			msgText.setMovementMethod(LinkMovementMethod.getInstance());
+		}
 	}
 
 	@Override
@@ -131,14 +154,19 @@ public class XposedModActivity extends Activity {
 		refreshAppsAfterImport();
 	}
 
+	@SuppressLint("WorldReadableFiles")
 	private void refreshAppsAfterImport() {
 		if (restoreSuccessful) {
 			// Refresh preferences
-			Context ctx = ContextCompat.createDeviceProtectedStorageContext(this);
-			if (ctx == null) {
-				ctx = this;
+			try {
+				//noinspection deprecation
+				prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			} catch (SecurityException ignored) {
+				// The new XSharedPreferences is not enabled or module's not loading
+				xposedNotActive(this);
+				prefs = null;
+				return;
 			}
-			prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 			// Refresh listed apps (account for filters)
 			XposedModActivity.AppListAdapter appListAdapter = (XposedModActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
 			appListAdapter.getFilter().filter(nameFilter);
@@ -639,6 +667,7 @@ public class XposedModActivity extends Activity {
 			activityReference = context;
 		}
 
+		@SuppressLint("WorldReadableFiles")
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			// NOTE: this function is *always* called from a background thread, and
@@ -648,12 +677,13 @@ public class XposedModActivity extends Activity {
 			synchronized (this) {
 				items = new ArrayList<>(appList);
 			}
-
-			Context ctx = ContextCompat.createDeviceProtectedStorageContext(activityReference);
-			if (ctx == null) {
-				ctx = activityReference;
+			try {
+				//noinspection deprecation
+				prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			} catch (SecurityException ignored) {
+				// The new XSharedPreferences is not enabled or module's not loading
+				prefs = null;
 			}
-			SharedPreferences prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
 
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.length() > 0) {
@@ -668,7 +698,7 @@ public class XposedModActivity extends Activity {
 			}
 			for (Iterator<ApplicationInfo> i = items.iterator(); i.hasNext(); ) {
 				ApplicationInfo app = i.next();
-				if (filteredOut(prefs, app))
+				if (prefs != null && filteredOut(prefs, app))
 					i.remove();
 			}
 

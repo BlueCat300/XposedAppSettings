@@ -8,8 +8,8 @@ android {
         applicationId "ru.bluecat.android.xposed.mods.appsettings"
         minSdkVersion 19
         targetSdkVersion 29
-        versionName "1.1"
-        versionCode 3
+        versionName "1.2"
+        versionCode 4
         archivesBaseName = "App Settings Reborn v${versionName}"
     }
 
