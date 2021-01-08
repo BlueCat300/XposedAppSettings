@@ -24,15 +24,15 @@ import ru.bluecat.android.xposed.mods.appsettings.R;
  * Manages a popup dialog for editing the Permission Revoking settings for a package
  */
 public class PermissionSettings {
-	private Dialog dialog;
+	private final Dialog dialog;
 
 	private OnDismissListener onOkListener;
 	private OnDismissListener onCancelListener;
 
 	private boolean revokeActive;
-	private Set<String> disabledPerms;
+	private final Set<String> disabledPerms;
 
-	private List<PermissionInfo> permsList = new LinkedList<>();
+	private final List<PermissionInfo> permsList = new LinkedList<>();
 
 	/**
 	 * Prepare a dialog for editing the permissions for the supplied package,

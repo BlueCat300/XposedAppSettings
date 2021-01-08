@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.inputmethodservice.InputMethodService;
+import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,7 +20,6 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 
-import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedBridge.hookMethod;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -43,14 +43,16 @@ class Activities {
 	private static final String PROP_LEGACY_MENU = "AppSettings-LegacyMenu";
 	private static final String PROP_ORIENTATION = "AppSettings-Orientation";
 
-	private static int FLAG_NEEDS_MENU_KEY = SDK_INT >= 22 ? 0 : getStaticIntField(WindowManager.LayoutParams.class, "FLAG_NEEDS_MENU_KEY");
-    private static String CLASS_PHONEWINDOW = SDK_INT >= 23 ? "com.android.internal.policy.PhoneWindow" : "com.android.internal.policy.impl.PhoneWindow";
+	private static final int FLAG_NEEDS_MENU_KEY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 ?
+			0 : getStaticIntField(WindowManager.LayoutParams.class, "FLAG_NEEDS_MENU_KEY");
+    private static final String CLASS_PHONEWINDOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ?
+			"com.android.internal.policy.PhoneWindow" : "com.android.internal.policy.impl.PhoneWindow";
 
     static void hookActivitySettings(XSharedPreferences prefs) {
         String CLASS_PHONEWINDOW_DECORVIEW;
-        if (SDK_INT >= 24) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.DecorView";
-		} else if (SDK_INT == 23) {
+		} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
 			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.PhoneWindow.DecorView";
 		} else {
 			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.impl.PhoneWindow.DecorView";
@@ -83,7 +85,8 @@ class Activities {
 					} else if (fullscreen == Common.FULLSCREEN_PREVENT) {
 						window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.FALSE);
-					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE && SDK_INT >= 19) {
+					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE &&
+							Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
 						setAdditionalInstanceField(decorView, PROP_IMMERSIVE, Boolean.TRUE);
@@ -172,7 +175,7 @@ class Activities {
 				}
 			});
 
-			if (SDK_INT >= 19) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 				findAndHookMethod("android.view.ViewRootImpl", null, "dispatchSystemUiVisibilityChanged",
 						int.class, int.class, int.class, int.class, new XC_MethodHook() {
 					@Override
@@ -232,7 +235,7 @@ class Activities {
 			// Hook one of the several variations of ActivityStack.realStartActivityLocked from different ROMs
 			ClassLoader classLoader = lpparam.classLoader;
 			Method mthRealStartActivityLocked;
-			if (SDK_INT <= 28) {
+			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
 				mthRealStartActivityLocked = findMethodExact("com.android.server.am.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
 						"com.android.server.am.ActivityRecord", "com.android.server.am.ProcessRecord",
 						boolean.class, boolean.class);
@@ -241,7 +244,7 @@ class Activities {
 						"com.android.server.wm.ActivityRecord", "com.android.server.wm.WindowProcessController",
 						boolean.class, boolean.class);
 			}
-            if (SDK_INT >= 29) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 findAndHookConstructor("com.android.server.am.ProcessRecord", classLoader, "com.android.server.am.ActivityManagerService",
 						"android.content.pm.ApplicationInfo", String.class, int.class, new XC_MethodHook() {
 					@Override
@@ -262,11 +265,11 @@ class Activities {
 
 						// Override the *Adj values if meant to be resident in memory
 						if (proc != null) {
-							if (SDK_INT >= 29) {
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 								proc = processRecord;
 							}
 							setIntField(proc, "maxAdj", adj);
-							if (SDK_INT >= 29) {
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 								setIntField(proc, "mCurRawAdj", adj);
 							} else {
 								setIntField(proc, "curRawAdj", adj);
@@ -281,7 +284,7 @@ class Activities {
 
             // Recent Tasks
 			String activityRecordClass = "com.android.server.am.ActivityRecord";
-			if (SDK_INT >= 29) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 				activityRecordClass = "com.android.server.wm.ActivityRecord";
 			}
 			hookAllConstructors(findClass(activityRecordClass, classLoader), new XC_MethodHook() {
@@ -308,9 +311,9 @@ class Activities {
 
             //Disable restricting Android API to get recent tasks in Lollipop and newer.
             //https://github.com/pylerSM/UnrestrictedGetTasks
-            if(SDK_INT >= 21) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				String recentTasksClass = "com.android.server.am.ActivityManagerService";
-				if (SDK_INT >= 29) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 					recentTasksClass = "com.android.server.wm.ActivityTaskManagerService";
 				}
 				findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",

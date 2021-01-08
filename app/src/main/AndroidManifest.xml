@@ -20,7 +20,7 @@
         android:allowBackup="false"
         tools:targetApi="q">
         <activity
-            android:name=".XposedModActivity"
+            android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Main">
             <intent-filter>

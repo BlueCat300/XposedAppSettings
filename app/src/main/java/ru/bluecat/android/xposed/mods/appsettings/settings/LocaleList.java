@@ -40,8 +40,8 @@ class LocaleList {
 		}
 	}
 
-	private String[] localeCodes;
-	private String[] localeDescriptions;
+	private final String[] localeCodes;
+	private final String[] localeDescriptions;
 
 	LocaleList(String defaultLabel) {
 		String[] locales = Resources.getSystem().getAssets().getLocales();

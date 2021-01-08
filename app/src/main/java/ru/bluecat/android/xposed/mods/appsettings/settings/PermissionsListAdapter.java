@@ -26,10 +26,10 @@ import ru.bluecat.android.xposed.mods.appsettings.R;
  */
 public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> implements Filterable {
 
-	private Activity context;
-	private List<PermissionInfo> originalPermsList;
-	private Set<String> disabledPerms;
-	private boolean allowEdits;
+	private final Activity context;
+	private final List<PermissionInfo> originalPermsList;
+	private final Set<String> disabledPerms;
+	private final boolean allowEdits;
 	private boolean canEdit;
 	private Filter mFilter;
 

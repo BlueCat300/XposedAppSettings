@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
@@ -51,9 +52,7 @@ import java.util.regex.Pattern;
 
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 import ru.bluecat.android.xposed.mods.appsettings.R;
-import ru.bluecat.android.xposed.mods.appsettings.XposedModActivity;
-
-import static android.os.Build.VERSION.SDK_INT;
+import ru.bluecat.android.xposed.mods.appsettings.MainActivity;
 
 public class ApplicationSettings extends Activity {
 
@@ -251,7 +250,7 @@ public class ApplicationSettings extends Activity {
 			Spinner spnFullscreen = findViewById(R.id.spnFullscreen);
 			// Note: the order of these items must match the Common.FULLSCREEN_... constants
 			String[] fullscreenArray;
-			if (SDK_INT >= 19) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 				fullscreenArray = new String[] {
 						getString(R.string.settings_default),
 						getString(R.string.settings_force),
@@ -306,7 +305,7 @@ public class ApplicationSettings extends Activity {
 		((CheckBox) findViewById(R.id.chkNoFullscreenIME)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_FULLSCREEN_IME, false));
 
 		// Update No Big Notifications field
-		if (SDK_INT < 23) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			((CheckBox) findViewById(R.id.chkNoBigNotifications)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, false));
 		} else {
 			findViewById(R.id.chkNoBigNotifications).setVisibility(View.GONE);
@@ -334,7 +333,7 @@ public class ApplicationSettings extends Activity {
 		((CheckBox) findViewById(R.id.chkInsistentNotifications)).setChecked(prefs.getBoolean(pkgName + Common.PREF_INSISTENT_NOTIF, false));
 
 		// Load and render notifications priority
-		if (SDK_INT < 26) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 			int notifPriority = prefs.getInt(pkgName + Common.PREF_NOTIF_PRIORITY, 0);
 			if (notifPriority < 0 || notifPriority >= Common.notifPriCodes.length)
 				notifPriority = 0;
@@ -357,14 +356,14 @@ public class ApplicationSettings extends Activity {
 		((CheckBox) findViewById(R.id.chkMute)).setChecked(prefs.getBoolean(pkgName + Common.PREF_MUTE, false));
 
 		// Update Legacy Menu field
-		if (SDK_INT < 29) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 			((CheckBox) findViewById(R.id.chkLegacyMenu)).setChecked(prefs.getBoolean(pkgName + Common.PREF_LEGACY_MENU, false));
 		} else {
 			findViewById(R.id.chkLegacyMenu).setVisibility(View.GONE);
 		}
 
 		// Update Recent Tasks field
-		if (SDK_INT >= 21) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName + Common.PREF_RECENT_TASKS, false));
 		} else {
 			findViewById(R.id.chkRecentTasks).setVisibility(View.GONE);
@@ -423,20 +422,20 @@ public class ApplicationSettings extends Activity {
 		settingKeys.add(pkgName + Common.PREF_ORIENTATION);
 		settingKeys.add(pkgName + Common.PREF_RESIDENT);
 		settingKeys.add(pkgName + Common.PREF_NO_FULLSCREEN_IME);
-		if (SDK_INT < 23) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			settingKeys.add(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS);
 		}
 		settingKeys.add(pkgName + Common.PREF_INSISTENT_NOTIF);
 		settingKeys.add(pkgName + Common.PREF_ONGOING_NOTIF);
-		if (SDK_INT < 26) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 			settingKeys.add(pkgName + Common.PREF_NOTIF_PRIORITY);
 		}
 		settingKeys.add(pkgName + Common.PREF_RECENTS_MODE);
 		settingKeys.add(pkgName + Common.PREF_MUTE);
-		if (SDK_INT < 29) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 			settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
 		}
-		if (SDK_INT >= 21) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
 		}
 		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
@@ -506,7 +505,7 @@ public class ApplicationSettings extends Activity {
 			if (((CheckBox) findViewById(R.id.chkNoFullscreenIME)).isChecked())
 				settings.put(pkgName + Common.PREF_NO_FULLSCREEN_IME, true);
 
-			if (SDK_INT < 23) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 				if (((CheckBox) findViewById(R.id.chkNoBigNotifications)).isChecked())
 					settings.put(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, true);
 			}
@@ -518,7 +517,7 @@ public class ApplicationSettings extends Activity {
 			if (ongoingNotif > 0)
 				settings.put(pkgName + Common.PREF_ONGOING_NOTIF, ongoingNotif);
 
-			if (SDK_INT < 26) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 				int notifPriority = ((Spinner) findViewById(R.id.spnNotifPriority)).getSelectedItemPosition();
 				if (notifPriority > 0)
 					settings.put(pkgName + Common.PREF_NOTIF_PRIORITY, notifPriority);
@@ -531,10 +530,10 @@ public class ApplicationSettings extends Activity {
 			if (((CheckBox) findViewById(R.id.chkMute)).isChecked())
 				settings.put(pkgName + Common.PREF_MUTE, true);
 
-			if (SDK_INT < 29 && ((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
 				settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
 
-			if (SDK_INT >= 21 && ((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && ((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
 				settings.put(pkgName + Common.PREF_RECENT_TASKS, true);
 
 			if (allowRevoking)
@@ -608,7 +607,7 @@ public class ApplicationSettings extends Activity {
 		} catch (Exception ignored) {
 		}
 
-		if (!XposedModActivity.isModActive()) {
+		if (!MainActivity.isModActive()) {
 			menu.findItem(R.id.menu_reboot).setEnabled(false);
 		}
 	}

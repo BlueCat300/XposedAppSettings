@@ -67,15 +67,15 @@ import ru.bluecat.android.xposed.mods.appsettings.settings.PermissionsListAdapte
 
 import static ru.bluecat.android.xposed.mods.appsettings.BackupActivity.restoreSuccessful;
 
-public class XposedModActivity extends Activity {
+public class MainActivity extends Activity {
 
-	private static ArrayList<ApplicationInfo> appList = new ArrayList<>();
+	private static final ArrayList<ApplicationInfo> appList = new ArrayList<>();
 	private static ArrayList<ApplicationInfo> filteredAppList = new ArrayList<>();
 
-	private static Map<String, Set<String>> permUsage = new HashMap<>();
-	private static Map<String, Set<String>> sharedUsers = new HashMap<>();
+	private static final Map<String, Set<String>> permUsage = new HashMap<>();
+	private static final Map<String, Set<String>> sharedUsers = new HashMap<>();
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-	private static Map<String, String> pkgSharedUsers = new HashMap<>();
+	private static final Map<String, String> pkgSharedUsers = new HashMap<>();
 
 	private static FilterState filterAppType;
 	private static FilterState filterAppState;
@@ -168,7 +168,7 @@ public class XposedModActivity extends Activity {
 				return;
 			}
 			// Refresh listed apps (account for filters)
-			XposedModActivity.AppListAdapter appListAdapter = (XposedModActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+			MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
 			appListAdapter.getFilter().filter(nameFilter);
 			restoreSuccessful = false;
 		}
@@ -191,19 +191,19 @@ public class XposedModActivity extends Activity {
 		settings.add(new SettingInfo(Common.PREF_NO_FULLSCREEN_IME, getString(R.string.settings_nofullscreenime)));
 		settings.add(new SettingInfo(Common.PREF_ORIENTATION, getString(R.string.settings_orientation)));
 		settings.add(new SettingInfo(Common.PREF_INSISTENT_NOTIF, getString(R.string.settings_insistentnotif)));
-		if (SDK_INT < 23) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			settings.add(new SettingInfo(Common.PREF_NO_BIG_NOTIFICATIONS, getString(R.string.settings_nobignotif)));
 		}
 		settings.add(new SettingInfo(Common.PREF_ONGOING_NOTIF, getString(R.string.settings_ongoingnotif)));
-		if (SDK_INT < 26) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 			settings.add(new SettingInfo(Common.PREF_NOTIF_PRIORITY, getString(R.string.settings_notifpriority)));
 		}
 		settings.add(new SettingInfo(Common.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
 		settings.add(new SettingInfo(Common.PREF_MUTE, getString(R.string.settings_mute)));
-		if (SDK_INT < 29) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 			settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
 		}
-		if (SDK_INT >= 21) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			settings.add(new SettingInfo(Common.PREF_RECENT_TASKS, getString(R.string.settings_recent_tasks)));
 		}
 		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
@@ -215,8 +215,7 @@ public class XposedModActivity extends Activity {
 
 		// Refresh the app that was just edited, if it's visible in the list
 		ListView list = findViewById(R.id.lstApps);
-		if (requestCode >= list.getFirstVisiblePosition() &&
-				requestCode <= list.getLastVisiblePosition()) {
+		if (requestCode >= list.getFirstVisiblePosition() && requestCode <= list.getLastVisiblePosition()) {
 			View v = list.getChildAt(requestCode - list.getFirstVisiblePosition());
 			list.getAdapter().getView(requestCode, v, list);
 		} else if (requestCode == Integer.MAX_VALUE) {
@@ -232,32 +231,28 @@ public class XposedModActivity extends Activity {
 	}
 
 	private static void updateMainMenuEntries(Menu menu) {
-		if(SDK_INT > 21 && !isModActive()) {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !isModActive()) {
 			menu.findItem(R.id.menu_recents).setEnabled(false);
 		}
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_refresh:
+		int id = item.getItemId();
+		if (prefs == null) {
+			xposedNotActive(this);
+		} else if (id == R.id.menu_refresh) {
 			refreshApps();
-			return true;
-		case R.id.menu_recents:
+		} else if (id == R.id.menu_recents) {
 			showRecents();
-			return true;
-		case R.id.menu_backup:
+		} else if(id == R.id.menu_backup) {
 			BackupActivity.startBackupActivity(this, false);
-			return true;
-		case R.id.menu_restore:
+		} else if (id == R.id.menu_restore) {
 			BackupActivity.startBackupActivity(this, true);
-			return true;
-		case R.id.menu_about:
+		} else if (id == R.id.menu_about) {
 			showAboutDialog();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
 		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void refreshApps() {
@@ -311,8 +306,7 @@ public class XposedModActivity extends Activity {
 				Intent i = new Intent(getApplicationContext(), ApplicationSettings.class);
 				i.putExtra("package", (String) data.get(which).get("package"));
 				startActivityForResult(i, Integer.MAX_VALUE);
-			})
-			.show();
+			}).show();
 	}
 
 	private void showAboutDialog() {
@@ -403,7 +397,7 @@ public class XposedModActivity extends Activity {
 		return false;
 	}
 
-	private static void loadApps(ProgressDialog dialog, XposedModActivity activity) {
+	private static void loadApps(ProgressDialog dialog, MainActivity activity) {
 
 		appList.clear();
 		permUsage.clear();
@@ -458,7 +452,7 @@ public class XposedModActivity extends Activity {
 		});
 	}
 
-	private static void prepareAppList(XposedModActivity activity) {
+	private static void prepareAppList(MainActivity activity) {
 		final AppListAdapter appListAdapter = new AppListAdapter(activity, appList);
 
 		((ListView) activity.findViewById(R.id.lstApps)).setAdapter(appListAdapter);
@@ -605,15 +599,15 @@ public class XposedModActivity extends Activity {
 	// Handle background loading of apps
 	private static class PrepareAppsAdapter extends AsyncTask<Void,Void,AppListAdapter> {
 		ProgressDialog dialog;
-		private WeakReference<XposedModActivity> activityReference;
+		private final WeakReference<MainActivity> activityReference;
 
-		PrepareAppsAdapter(XposedModActivity context) {
+		PrepareAppsAdapter(MainActivity context) {
 			activityReference = new WeakReference<>(context);
 		}
 
 		@Override
 		protected void onPreExecute() {
-			XposedModActivity activity = activityReference.get();
+			MainActivity activity = activityReference.get();
 			dialog = new ProgressDialog(activity.findViewById(R.id.lstApps).getContext());
 			dialog.setMessage(activity.getResources().getString(R.string.app_loading));
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -658,8 +652,8 @@ public class XposedModActivity extends Activity {
 
 	private static class AppListFilter extends Filter {
 
-		private AppListAdapter adapter;
-		private Activity activityReference;
+		private final AppListAdapter adapter;
+		private final Activity activityReference;
 
 		AppListFilter(AppListAdapter adapter, Activity context) {
 			super();
@@ -777,14 +771,14 @@ public class XposedModActivity extends Activity {
 
 	static class AppListAdapter extends ArrayAdapter<ApplicationInfo> implements SectionIndexer {
 
-		private Map<String, Integer> alphaIndexer;
+		private final Map<String, Integer> alphaIndexer;
 		private String[] sections;
-		private Filter filter;
-		private LayoutInflater inflater;
-		private Drawable defaultIcon;
-		private XposedModActivity mContext;
+		private final Filter filter;
+		private final LayoutInflater inflater;
+		private final Drawable defaultIcon;
+		private final MainActivity mContext;
 
-		AppListAdapter(XposedModActivity context, List<ApplicationInfo> items) {
+		AppListAdapter(MainActivity context, List<ApplicationInfo> items) {
 			super(context, R.layout.app_list_item, new ArrayList<>(items));
 			mContext = context;
 
@@ -864,10 +858,10 @@ public class XposedModActivity extends Activity {
 
 		private static class ImageLoadTask extends AsyncTask<AppListViewHolder, Void, Drawable> {
 			private AppListViewHolder v;
-			private ApplicationInfo app;
-			private WeakReference<XposedModActivity> activityReference;
+			private final ApplicationInfo app;
+			private final WeakReference<MainActivity> activityReference;
 
-			private ImageLoadTask(ApplicationInfo appInfo, XposedModActivity activity) {
+			private ImageLoadTask(ApplicationInfo appInfo, MainActivity activity) {
 				app = appInfo;
 				activityReference = new WeakReference<>(activity);
 			}

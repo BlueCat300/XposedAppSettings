@@ -53,16 +53,12 @@ public class FilterItemComponent extends LinearLayout {
 		// Notify any listener of changes in the selected option
 		((RadioGroup) findViewById(R.id.radOptions)).setOnCheckedChangeListener((group, checkedId) -> {
 			if (listener != null) {
-				switch (checkedId) {
-				case R.id.radOverridden:
+				if (checkedId == R.id.radOverridden) {
 					listener.onFilterChanged(this, FilterState.OVERRIDDEN);
-					break;
-				case R.id.radUnchanged:
+				} else if (checkedId == R.id.radUnchanged) {
 					listener.onFilterChanged(this, FilterState.UNCHANGED);
-					break;
-				default:
+				} else {
 					listener.onFilterChanged(this, FilterState.ALL);
-					break;
 				}
 			}
 		});
@@ -101,12 +97,12 @@ public class FilterItemComponent extends LinearLayout {
 	 * Get currently selected filter option
 	 */
 	public FilterState getFilterState() {
-		switch (((RadioGroup) findViewById(R.id.radOptions)).getCheckedRadioButtonId()) {
-		case R.id.radOverridden:
+		int id = (((RadioGroup) findViewById(R.id.radOptions)).getCheckedRadioButtonId());
+		if (id == R.id.radOverridden) {
 			return FilterState.OVERRIDDEN;
-		case R.id.radUnchanged:
+		} else if (id == R.id.radUnchanged) {
 			return FilterState.UNCHANGED;
-		default:
+		} else {
 			return FilterState.ALL;
 		}
 	}

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 
-import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -26,8 +26,8 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class PackagePermissions extends BroadcastReceiver {
-	private Object pmSvc;
-	private Object mPermissionCallback;
+	private final Object pmSvc;
+	private final Object mPermissionCallback;
 	private final Map<String, Object> mPackages;
 	private static Object mSettings;
 	private static Object permissionSvc;
@@ -62,7 +62,7 @@ public class PackagePermissions extends BroadcastReceiver {
 				}
 			});
 
-			if (SDK_INT >= 28) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 				XC_MethodHook hookClassInstance = new XC_MethodHook() {
 					@Override
 					protected void afterHookedMethod(MethodHookParam param) {
@@ -71,7 +71,7 @@ public class PackagePermissions extends BroadcastReceiver {
 				};
 
 				clsManagerService = findClass("com.android.server.pm.permission.PermissionManagerService", classLoader);
-				if(SDK_INT == 28) {
+				if(Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
 					findAndHookConstructor(clsManagerService, Context.class,
 							"com.android.server.pm.permission.DefaultPermissionGrantPolicy$DefaultPermissionGrantedCallback",
 							Object.class, hookClassInstance);
@@ -126,11 +126,11 @@ public class PackagePermissions extends BroadcastReceiver {
 					}
 				}
 			};
-			if (SDK_INT < 21) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 				findAndHookMethod(clsManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, hookGrantPermissions);
-			} else if (SDK_INT <= 27){
+			} else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1){
 				findAndHookMethod(clsManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, String.class, hookGrantPermissions);
-			} else if (SDK_INT == 28){
+			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P){
 				findAndHookMethod(clsManagerService, "grantPermissions", "android.content.pm.PackageParser$Package", boolean.class, String.class,
 						"com.android.server.pm.permission.PermissionManagerInternal$PermissionCallback", hookGrantPermissions);
 			} else {
@@ -173,11 +173,11 @@ public class PackagePermissions extends BroadcastReceiver {
 			Object pkgInfo;
 			synchronized (mPackages) {
 				pkgInfo = mPackages.get(pkgName);
-				if (SDK_INT < 21) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 					callMethod(pmSvc, "grantPermissionsLPw", pkgInfo, true);
-				} else if (SDK_INT <= 27) {
+				} else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
 					callMethod(pmSvc, "grantPermissionsLPw", pkgInfo, true, pkgName);
-				} else if (SDK_INT == 28) {
+				} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
 					callMethod(permissionSvc, "grantPermissions", pkgInfo, true, pkgName, mPermissionCallback);
 				} else {
 					callMethod(permissionSvc, "restorePermissionState", pkgInfo, true, pkgName, mPermissionCallback);

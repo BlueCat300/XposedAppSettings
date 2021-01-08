@@ -26,7 +26,7 @@ public class BackupActivity extends Activity {
     static boolean restoreSuccessful;
     private static String backupFileName;
 
-    static void startBackupActivity(XposedModActivity activity, boolean isRestore) {
+    static void startBackupActivity(MainActivity activity, boolean isRestore) {
         Intent i = new Intent(activity, BackupActivity.class);
         i.putExtra("backup", isRestore);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -91,7 +91,7 @@ public class BackupActivity extends Activity {
 
     private static class BackupTask extends AsyncTask<Uri, String, String> {
 
-        private WeakReference<BackupActivity> activityReference;
+        private final WeakReference<BackupActivity> activityReference;
 
         BackupTask(BackupActivity context) {
             activityReference = new WeakReference<>(context);
@@ -149,7 +149,7 @@ public class BackupActivity extends Activity {
     }
 
     private static class RestoreTask extends AsyncTask<Uri, String, String> {
-        private WeakReference<BackupActivity> activityReference;
+        private final WeakReference<BackupActivity> activityReference;
 
         RestoreTask(BackupActivity context) {
             activityReference = new WeakReference<>(context);

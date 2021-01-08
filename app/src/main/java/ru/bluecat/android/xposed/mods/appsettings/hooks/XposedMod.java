@@ -33,7 +33,6 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 
-import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -71,7 +70,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 	@Override
 	public void handleLoadPackage(LoadPackageParam lpparam) {
 		if (Common.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
-			findAndHookMethod("ru.bluecat.android.xposed.mods.appsettings.XposedModActivity",
+			findAndHookMethod("ru.bluecat.android.xposed.mods.appsettings.MainActivity",
 					lpparam.classLoader, "isModActive", XC_MethodReplacement.returnConstant(true));
 		}
 		if(XposedBridge.getXposedVersion() != 93) {
@@ -142,10 +141,10 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 			};
 			String notificationHookedMethod = "enqueueNotificationInternal";
 			String notificationHookedClass = "com.android.server.NotificationManagerService";
-			if (SDK_INT >= 21) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				notificationHookedClass = "com.android.server.notification.NotificationManagerService";
 			}
-			if (SDK_INT <= 25) {
+			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
 				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
 						String.class, String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class, int.class,
 						notifyHook);
@@ -184,7 +183,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 							// Workaround for KitKat. The keyguard is a different package now but runs in the
 							// same process as SystemUI and displays as main package
-							if (SDK_INT >= 19 && packageName.equals("com.android.keyguard")) {
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && packageName.equals("com.android.keyguard")) {
 								packageName = SYSTEMUI_PACKAGE;
 							}
 
