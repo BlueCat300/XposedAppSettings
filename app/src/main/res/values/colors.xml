@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="blue_gray">#263238</color>
-    <color name="dark_blue_gray">#161C20</color>
+    <color name="dark_blue_gray">#161c20</color>
+    <color name="light_blue">#2196f3</color>
+    <color name="blue">#0099cc</color>
+    <color name="gray">#404040</color>
+    <color name="white">#ffffff</color>
+    <color name="white_gray">#fafafa</color>
+    <color name="transparent_white">#80ffffff</color>
+    <color name="black_gray">#262626</color>
 </resources>

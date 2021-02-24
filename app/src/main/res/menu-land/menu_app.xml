@@ -13,7 +13,7 @@
         android:id="@+id/menu_app_launch"
         android:icon="@drawable/ic_app_launch"
         android:title="@string/menu_launch"
-        app:showAsAction="withText" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_app_settings"
         android:icon="@drawable/ic_app_settings"

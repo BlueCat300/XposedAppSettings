@@ -49,8 +49,12 @@ they will only affect the apps if the Xposed framework is installed and if this 
     <string name="menu_search">Search</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_recents">Recent apps</string>
+
+    <!-- drawer -->
     <string name="menu_backup">Backup</string>
     <string name="menu_restore">Restore</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_permission">Filter by permission</string>
     <string name="menu_about">About</string>
 
     <!-- Restore / Backup -->

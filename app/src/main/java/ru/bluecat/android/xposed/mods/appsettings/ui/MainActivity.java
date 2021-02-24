@@ -1,11 +1,9 @@
-package ru.bluecat.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RecentTaskInfo;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -25,27 +23,34 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.SectionIndexer;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -61,13 +66,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent;
 import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
-import ru.bluecat.android.xposed.mods.appsettings.settings.ApplicationSettings;
-import ru.bluecat.android.xposed.mods.appsettings.settings.PermissionsListAdapter;
+import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
+import ru.bluecat.android.xposed.mods.appsettings.R;
 
-import static ru.bluecat.android.xposed.mods.appsettings.BackupActivity.restoreSuccessful;
+import static ru.bluecat.android.xposed.mods.appsettings.ui.BackupActivity.restoreSuccessful;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 	private static final ArrayList<ApplicationInfo> appList = new ArrayList<>();
 	private static ArrayList<ApplicationInfo> filteredAppList = new ArrayList<>();
@@ -86,38 +93,165 @@ public class MainActivity extends Activity {
 	private static List<SettingInfo> settings;
 
 	private static SharedPreferences prefs;
+	private static Menu optionsMenu;
 
     @SuppressLint("WorldReadableFiles")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setTitle(R.string.app_name);
 		super.onCreate(savedInstanceState);
 		try {
 			//noinspection deprecation
 			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
 		} catch (SecurityException ignored) {
-			// The new XSharedPreferences is not enabled or module's not loading
 			xposedNotActive(this);
 			prefs = null;
 			return;
 		}
+		setContentView(R.layout.activity_main);
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setUpDrawer(toolbar);
 		restoreSuccessful = false;
 		loadSettings();
-		setContentView(R.layout.main);
 		ListView list = findViewById(R.id.lstApps);
 		registerForContextMenu(list);
 		list.setOnItemClickListener((parent, view, position, id) -> {
 			// Open settings activity when clicking on an application
 			String pkgName = ((TextView) view.findViewById(R.id.app_package)).getText().toString();
-			Intent i = new Intent(getApplicationContext(), ApplicationSettings.class);
+			Intent i = new Intent(getApplicationContext(), ApplicationsActivity.class);
 			i.putExtra("package", pkgName);
 			startActivityForResult(i, position);
 		});
 		refreshApps();
 	}
 
+	private void setUpDrawer(Toolbar toolbar) {
+		DrawerLayout drawer = findViewById(R.id. drawer_layout);
+		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+				this, drawer, toolbar, 0,
+				0);
+		drawer.addDrawerListener(toggle);
+		toggle.syncState();
+		NavigationView navigationView = findViewById(R.id.nav_view);
+		navigationView.setNavigationItemSelectedListener(this);
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.drawer_backup) {
+			BackupActivity.startBackupActivity(this, false);
+		} else if (id == R.id.drawer_restore) {
+			BackupActivity.startBackupActivity(this, true);
+		} else if (id == R.id.drawer_filter) {
+			appFilter();
+		} else if (id == R.id.drawer_permission) {
+			permissionFilter();
+		} else if (id == R.id.drawer_about) {
+			showAboutDialog();
+		}
+		DrawerLayout drawer = findViewById(R.id.drawer_layout );
+		drawer.closeDrawer(GravityCompat.START);
+		return true;
+	}
+
+	@Override
+	public void onBackPressed () {
+		DrawerLayout drawer = findViewById(R.id.drawer_layout);
+		if (drawer.isDrawerOpen(GravityCompat.START )) {
+			drawer.closeDrawer(GravityCompat.START );
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		refreshAppsAfterImport();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		// Refresh the app that was just edited, if it's visible in the list
+		ListView list = findViewById(R.id.lstApps);
+		if (requestCode >= list.getFirstVisiblePosition() && requestCode <= list.getLastVisiblePosition()) {
+			View v = list.getChildAt(requestCode - list.getFirstVisiblePosition());
+			list.getAdapter().getView(requestCode, v, list);
+		} else if (requestCode == 1000) {
+			list.invalidateViews();
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_main, menu);
+		optionsMenu = menu;
+		updateMainMenuEntries();
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.menu_refresh) {
+			refreshApps();
+		} else if (id == R.id.menu_recents) {
+			showRecents();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		if (v.getId() == R.id.lstApps) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			ApplicationInfo appInfo = filteredAppList.get(info.position);
+
+			menu.setHeaderTitle(getPackageManager().getApplicationLabel(appInfo));
+			getMenuInflater().inflate(R.menu.menu_app, menu);
+			menu.findItem(R.id.menu_save).setVisible(false);
+
+			ApplicationsActivity.updateMenuEntries(getApplicationContext(), menu, appInfo.packageName);
+		} else {
+			super.onCreateContextMenu(menu, v, menuInfo);
+		}
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		String pkgName = filteredAppList.get(info.position).packageName;
+		if (item.getItemId() == R.id.menu_app_launch) {
+			Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(pkgName);
+			startActivity(LaunchIntent);
+			return true;
+		} else if (item.getItemId() == R.id.menu_app_settings) {
+			startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkgName)));
+			return true;
+		} else if (item.getItemId() == R.id.menu_app_store) {
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
+			return true;
+		}
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_SEARCH && (event.getFlags() & KeyEvent.FLAG_CANCELED) == 0) {
+			SearchView searchV = findViewById(R.id.menu_searchApp);
+			if (searchV.isShown()) {
+				searchV.setIconified(false);
+				return true;
+			}
+		}
+		return super.onKeyUp(keyCode, event);
+	}
+
 	public static void xposedNotActive(Activity context) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context, R.style.Theme_Main_Dialog);
 		dialog.setTitle(R.string.app_min_api_warning_title);
 		dialog.setMessage(R.string.app_min_api_warning_message);
 		dialog.setPositiveButton("Ok", (dialog1, id) -> {
@@ -135,23 +269,16 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	@Override
-	public void onDestroy () {
-    	super.onDestroy();
-		clearSearchQueryOnFinish();
-	}
-
-	private void clearSearchQueryOnFinish() {
-		SearchView searchBar = this.findViewById(R.id.searchApp);
-		if(searchBar.getQuery().length() != 0) {
-			searchBar.setIconified(true);
+	private void updateMainMenuEntries() {
+		if(!isModActive()) {
+			optionsMenu.findItem(R.id.menu_recents).setEnabled(false);
 		}
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		refreshAppsAfterImport();
+	private void refreshApps() {
+		appList.clear();
+		// (re)load the list of apps in the background
+		new PrepareAppsAdapter(this).execute();
 	}
 
 	@SuppressLint("WorldReadableFiles")
@@ -162,7 +289,6 @@ public class MainActivity extends Activity {
 				//noinspection deprecation
 				prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
 			} catch (SecurityException ignored) {
-				// The new XSharedPreferences is not enabled or module's not loading
 				xposedNotActive(this);
 				prefs = null;
 				return;
@@ -207,64 +333,13 @@ public class MainActivity extends Activity {
 		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		// Refresh the app that was just edited, if it's visible in the list
-		ListView list = findViewById(R.id.lstApps);
-		if (requestCode >= list.getFirstVisiblePosition() && requestCode <= list.getLastVisiblePosition()) {
-			View v = list.getChildAt(requestCode - list.getFirstVisiblePosition());
-			list.getAdapter().getView(requestCode, v, list);
-		} else if (requestCode == Integer.MAX_VALUE) {
-			list.invalidateViews();
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		updateMainMenuEntries(menu);
-		return true;
-	}
-
-	private static void updateMainMenuEntries(Menu menu) {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !isModActive()) {
-			menu.findItem(R.id.menu_recents).setEnabled(false);
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (prefs == null) {
-			xposedNotActive(this);
-		} else if (id == R.id.menu_refresh) {
-			refreshApps();
-		} else if (id == R.id.menu_recents) {
-			showRecents();
-		} else if(id == R.id.menu_backup) {
-			BackupActivity.startBackupActivity(this, false);
-		} else if (id == R.id.menu_restore) {
-			BackupActivity.startBackupActivity(this, true);
-		} else if (id == R.id.menu_about) {
-			showAboutDialog();
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	private void refreshApps() {
-		appList.clear();
-		// (re)load the list of apps in the background
-		new PrepareAppsAdapter(this).execute();
-	}
-
 	private void showRecents() {
 		ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		PackageManager pm = getPackageManager();
 
 		final List<Map<String, Object>> data = new ArrayList<>();
 		if (am != null) {
+			//noinspection deprecation
 			for (RecentTaskInfo task : am.getRecentTasks(30, ActivityManager.RECENT_WITH_EXCLUDED)) {
 				Intent i = task.baseIntent;
 				if (i.getComponent() == null)
@@ -298,13 +373,17 @@ public class MainActivity extends Activity {
 			return false;
 		});
 
-		new AlertDialog.Builder(this)
+		new AlertDialog.Builder(this, R.style.Theme_Main_Dialog)
 			.setTitle(R.string.recents_title)
 			.setAdapter(adapter, (dialog, which) -> {
-				Intent i = new Intent(getApplicationContext(), ApplicationSettings.class);
+				Intent i = new Intent(getApplicationContext(), ApplicationsActivity.class);
 				i.putExtra("package", (String) data.get(which).get("package"));
-				startActivityForResult(i, Integer.MAX_VALUE);
+				startActivityForResult(i, 1000);
 			}).show();
+	}
+
+	public static boolean isModActive() {
+		return false;
 	}
 
 	private void showAboutDialog() {
@@ -336,63 +415,13 @@ public class MainActivity extends Activity {
 		}
 
 		// Prepare and show the dialog
-		Builder dlgBuilder = new AlertDialog.Builder(this);
+		AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
 		dlgBuilder.setTitle(R.string.app_name);
 		dlgBuilder.setCancelable(true);
 		dlgBuilder.setIcon(R.drawable.ic_launcher);
 		dlgBuilder.setPositiveButton(android.R.string.ok, null);
 		dlgBuilder.setView(vAbout);
 		dlgBuilder.show();
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		if (v.getId() == R.id.lstApps) {
-			AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-			ApplicationInfo appInfo = filteredAppList.get(info.position);
-
-			menu.setHeaderTitle(getPackageManager().getApplicationLabel(appInfo));
-			getMenuInflater().inflate(R.menu.menu_app, menu);
-			menu.findItem(R.id.menu_save).setVisible(false);
-
-			ApplicationSettings.updateMenuEntries(getApplicationContext(), menu, appInfo.packageName);
-		} else {
-			super.onCreateContextMenu(menu, v, menuInfo);
-		}
-	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		String pkgName = filteredAppList.get(info.position).packageName;
-		if (item.getItemId() == R.id.menu_app_launch) {
-			Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(pkgName);
-			startActivity(LaunchIntent);
-			return true;
-		} else if (item.getItemId() == R.id.menu_app_settings) {
-			startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkgName)));
-			return true;
-		} else if (item.getItemId() == R.id.menu_app_store) {
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
-			return true;
-		}
-		return super.onContextItemSelected(item);
-	}
-
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_SEARCH && (event.getFlags() & KeyEvent.FLAG_CANCELED) == 0) {
-			SearchView searchV = findViewById(R.id.searchApp);
-			if (searchV.isShown()) {
-				searchV.setIconified(false);
-				return true;
-			}
-		}
-		return super.onKeyUp(keyCode, event);
-	}
-
-	public static boolean isModActive() {
-		return false;
 	}
 
 	private static void loadApps(ProgressDialog dialog, MainActivity activity) {
@@ -452,16 +481,18 @@ public class MainActivity extends Activity {
 
 	private static void prepareAppList(MainActivity activity) {
 		final AppListAdapter appListAdapter = new AppListAdapter(activity, appList);
-
 		((ListView) activity.findViewById(R.id.lstApps)).setAdapter(appListAdapter);
 		appListAdapter.getFilter().filter(nameFilter);
-		((SearchView) activity.findViewById(R.id.searchApp)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+		MenuItem searchItem = optionsMenu.findItem(R.id.menu_searchApp);
+		View searchView = searchItem.getActionView();
+		((SearchView) searchView.findViewById(R.id.menu_searchApp)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				nameFilter = query;
 				appListAdapter.getFilter().filter(nameFilter);
-				activity.findViewById(R.id.searchApp).clearFocus();
+				searchView.findViewById(R.id.menu_searchApp).clearFocus();
 				return false;
 			}
 
@@ -473,125 +504,125 @@ public class MainActivity extends Activity {
 			}
 
 		});
+	}
 
-		activity.findViewById(R.id.btnFilter).setOnClickListener(new View.OnClickListener() {
-			Dialog filterDialog;
-			Map<String, FilterItemComponent> filterComponents;
+	private void appFilter () {
+		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+		appListAdapter.getFilter().filter(nameFilter);
+
+		Dialog filterDialog;
+		Map<String, FilterItemComponent> filterComponents;
+
+		filterDialog = new Dialog(this, R.style.Theme_Legacy_Dialog);
+		filterDialog.setContentView(R.layout.filter_dialog);
+		filterDialog.setTitle(R.string.filter_title);
+		filterDialog.setCancelable(true);
+		filterDialog.setOwnerActivity(this);
+
+		LinearLayout entriesView = filterDialog.findViewById(R.id.filter_entries);
+		filterComponents = new HashMap<>();
+		for (SettingInfo setting : settings) {
+			FilterItemComponent component = new FilterItemComponent(this, setting.label, null, null, null);
+			component.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			component.setFilterState(setting.filter);
+			entriesView.addView(component);
+			filterComponents.put(setting.settingKey, component);
+		}
+
+		((FilterItemComponent) filterDialog.findViewById(R.id.fltAppType)).setFilterState(filterAppType);
+		((FilterItemComponent) filterDialog.findViewById(R.id.fltAppState)).setFilterState(filterAppState);
+		((FilterItemComponent) filterDialog.findViewById(R.id.fltActive)).setFilterState(filterActive);
+
+		// Block or unblock the details based on the Active setting
+		enableFilterDetails(!FilterState.UNCHANGED.equals(filterActive), filterComponents);
+		((FilterItemComponent) filterDialog.findViewById(R.id.fltActive)).
+				setOnFilterChangeListener((item, state) -> enableFilterDetails(!FilterState.UNCHANGED.equals(state), filterComponents));
+
+		// Close the dialog with the possible options
+		filterDialog.findViewById(R.id.btnFilterCancel).setOnClickListener(v1 -> filterDialog.dismiss());
+		filterDialog.findViewById(R.id.btnFilterClear).setOnClickListener(v12 -> {
+			filterAppType = FilterState.ALL;
+			filterAppState = FilterState.ALL;
+			filterActive = FilterState.ALL;
+			for (SettingInfo setting : settings)
+				setting.filter = FilterState.ALL;
+
+			filterDialog.dismiss();
+			appListAdapter.getFilter().filter(nameFilter);
+		});
+		filterDialog.findViewById(R.id.btnFilterApply).setOnClickListener(v13 -> {
+			filterAppType = ((FilterItemComponent) filterDialog.findViewById(R.id.fltAppType)).getFilterState();
+			filterAppState = ((FilterItemComponent) filterDialog.findViewById(R.id.fltAppState)).getFilterState();
+			filterActive = ((FilterItemComponent) filterDialog.findViewById(R.id.fltActive)).getFilterState();
+			for (SettingInfo setting : settings)
+				setting.filter = Objects.requireNonNull(filterComponents.get(setting.settingKey)).getFilterState();
+
+			filterDialog.dismiss();
+			appListAdapter.getFilter().filter(nameFilter);
+		});
+
+		filterDialog.show();
+	}
+
+	private void enableFilterDetails(boolean enable, Map<String, FilterItemComponent> filterComponents) {
+		for (FilterItemComponent component : filterComponents.values())
+			component.setEnabled(enable);
+	}
+
+	private void permissionFilter () {
+		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+		appListAdapter.getFilter().filter(nameFilter);
+
+		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+		bld.setCancelable(true);
+		bld.setTitle(R.string.perms_filter_title);
+
+		List<String> perms = new LinkedList<>(permUsage.keySet());
+		Collections.sort(perms);
+		List<PermissionInfo> items = new ArrayList<>();
+		PackageManager pm = this.getPackageManager();
+		for (String perm : perms) {
+			try {
+				items.add(pm.getPermissionInfo(perm, 0));
+			} catch (NameNotFoundException e) {
+				PermissionInfo unknownPerm = new PermissionInfo();
+				unknownPerm.name = perm;
+				items.add(unknownPerm);
+			}
+		}
+		PermissionsListAdapter adapter = new PermissionsListAdapter(this, items, new HashSet<>(), false);
+		bld.setAdapter(adapter, (dialog, which) -> {
+			filterPermissionUsage = Objects.requireNonNull(adapter.getItem(which)).name;
+			appListAdapter.getFilter().filter(nameFilter);
+		});
+
+		View permsView = View.inflate(this, R.layout.permission_search, null);
+		((SearchView) permsView.findViewById(R.id.searchPermission)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
-			public void onClick(View v) {
-				// set up dialog
-				filterDialog = new Dialog(activity);
-				filterDialog.setContentView(R.layout.filter_dialog);
-				filterDialog.setTitle(R.string.filter_title);
-				filterDialog.setCancelable(true);
-				filterDialog.setOwnerActivity(activity);
-
-				LinearLayout entriesView = filterDialog.findViewById(R.id.filter_entries);
-				filterComponents = new HashMap<>();
-				for (SettingInfo setting : settings) {
-					FilterItemComponent component = new FilterItemComponent(activity, setting.label, null, null, null);
-					component.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-					component.setFilterState(setting.filter);
-					entriesView.addView(component);
-					filterComponents.put(setting.settingKey, component);
-				}
-
-				((FilterItemComponent) filterDialog.findViewById(R.id.fltAppType)).setFilterState(filterAppType);
-				((FilterItemComponent) filterDialog.findViewById(R.id.fltAppState)).setFilterState(filterAppState);
-				((FilterItemComponent) filterDialog.findViewById(R.id.fltActive)).setFilterState(filterActive);
-
-				// Block or unblock the details based on the Active setting
-				enableFilterDetails(!FilterState.UNCHANGED.equals(filterActive));
-				((FilterItemComponent) filterDialog.findViewById(R.id.fltActive)).
-						setOnFilterChangeListener((item, state) -> enableFilterDetails(!FilterState.UNCHANGED.equals(state)));
-
-				// Close the dialog with the possible options
-				filterDialog.findViewById(R.id.btnFilterCancel).setOnClickListener(v1 -> filterDialog.dismiss());
-				filterDialog.findViewById(R.id.btnFilterClear).setOnClickListener(v12 -> {
-					filterAppType = FilterState.ALL;
-					filterAppState = FilterState.ALL;
-					filterActive = FilterState.ALL;
-					for (SettingInfo setting : settings)
-						setting.filter = FilterState.ALL;
-
-					filterDialog.dismiss();
-					appListAdapter.getFilter().filter(nameFilter);
-				});
-				filterDialog.findViewById(R.id.btnFilterApply).setOnClickListener(v13 -> {
-					filterAppType = ((FilterItemComponent) filterDialog.findViewById(R.id.fltAppType)).getFilterState();
-					filterAppState = ((FilterItemComponent) filterDialog.findViewById(R.id.fltAppState)).getFilterState();
-					filterActive = ((FilterItemComponent) filterDialog.findViewById(R.id.fltActive)).getFilterState();
-					for (SettingInfo setting : settings)
-						setting.filter = Objects.requireNonNull(filterComponents.get(setting.settingKey)).getFilterState();
-
-					filterDialog.dismiss();
-					appListAdapter.getFilter().filter(nameFilter);
-				});
-
-				filterDialog.show();
+			public boolean onQueryTextSubmit(String query) {
+				adapter.getFilter().filter(query);
+				permsView.findViewById(R.id.searchPermission).clearFocus();
+				return false;
 			}
 
-			private void enableFilterDetails(boolean enable) {
-				for (FilterItemComponent component : filterComponents.values())
-					component.setEnabled(enable);
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				adapter.getFilter().filter(newText);
+				return false;
 			}
 		});
+		//bld.setView(permsView);
 
-		activity.findViewById(R.id.btnPermsFilter).setOnClickListener(v -> {
-
-			Builder bld = new Builder(activity);
-			bld.setCancelable(true);
-			bld.setTitle(R.string.perms_filter_title);
-
-			List<String> perms = new LinkedList<>(permUsage.keySet());
-			Collections.sort(perms);
-			List<PermissionInfo> items = new ArrayList<>();
-			PackageManager pm = activity.getPackageManager();
-			for (String perm : perms) {
-				try {
-					items.add(pm.getPermissionInfo(perm, 0));
-				} catch (NameNotFoundException e) {
-					PermissionInfo unknownPerm = new PermissionInfo();
-					unknownPerm.name = perm;
-					items.add(unknownPerm);
-				}
-			}
-			PermissionsListAdapter adapter = new PermissionsListAdapter(activity, items, new HashSet<>(), false);
-			bld.setAdapter(adapter, (dialog, which) -> {
-				filterPermissionUsage = Objects.requireNonNull(adapter.getItem(which)).name;
-				appListAdapter.getFilter().filter(nameFilter);
-			});
-
-			View permsView = View.inflate(activity, R.layout.permission_search, null);
-			((SearchView) permsView.findViewById(R.id.searchPermission)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-				@Override
-				public boolean onQueryTextSubmit(String query) {
-					adapter.getFilter().filter(query);
-					permsView.findViewById(R.id.searchPermission).clearFocus();
-					return false;
-				}
-
-				@Override
-				public boolean onQueryTextChange(String newText) {
-					adapter.getFilter().filter(newText);
-					return false;
-				}
-			});
-			bld.setView(permsView);
-
-			bld.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-				filterPermissionUsage = null;
-				appListAdapter.getFilter().filter(nameFilter);
-			});
-
-			AlertDialog dialog = bld.create();
-			dialog.getListView().setFastScrollEnabled(true);
-
-			dialog.show();
+		bld.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+			filterPermissionUsage = null;
+			appListAdapter.getFilter().filter(nameFilter);
 		});
 
+		AlertDialog dialog = bld.create();
+		dialog.getListView().setFastScrollEnabled(true);
+
+		dialog.show();
 	}
 
 	// Handle background loading of apps
@@ -673,7 +704,6 @@ public class MainActivity extends Activity {
 				//noinspection deprecation
 				prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
 			} catch (SecurityException ignored) {
-				// The new XSharedPreferences is not enabled or module's not loading
 				prefs = null;
 			}
 
@@ -912,7 +942,6 @@ public class MainActivity extends Activity {
 			if (section >= sections.length)
 				return filteredAppList.size() - 1;
 
-			//noinspection ConstantConditions
 			return alphaIndexer.get(sections[section]);
 		}
 
@@ -925,7 +954,6 @@ public class MainActivity extends Activity {
 			int latestDelta = Integer.MAX_VALUE;
 
 			for (int i = 0; i < sections.length; i++) {
-				//noinspection ConstantConditions
 				int current = alphaIndexer.get(sections[i]);
 				if (current == position) {
 					// If position matches an index, return it immediately

@@ -47,8 +47,12 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="menu_search">Поиск</string>
     <string name="menu_refresh">Обновить</string>
     <string name="menu_recents">Последние приложения</string>
+
+    <!-- drawer -->
     <string name="menu_backup">Резервное копирование</string>
     <string name="menu_restore">Восстановление</string>
+    <string name="menu_filter">Фильтр</string>
+    <string name="menu_permission">Фильтр по разрешению</string>
     <string name="menu_about">О программе</string>
 
     <!-- Import / Export -->

@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,7 +9,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PermissionInfo;
 import android.graphics.Color;
 import android.widget.ListView;
-import android.widget.Switch;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
 import ru.bluecat.android.xposed.mods.appsettings.R;
 
 
@@ -39,7 +41,7 @@ public class PermissionSettings {
 	 * with the provided owner activity and initial settings
 	 */
 	PermissionSettings(Activity owner, String pkgName, boolean revoking, Set<String> disabledPermissions) throws NameNotFoundException {
-		dialog = new Dialog(owner);
+		dialog = new Dialog(owner, R.style.Theme_Legacy_Dialog);
 		dialog.setContentView(R.layout.permissions_dialog);
 		dialog.setTitle(R.string.perms_title);
 		dialog.setCancelable(true);
@@ -51,7 +53,7 @@ public class PermissionSettings {
 		else
 			disabledPerms = new HashSet<>();
 
-		Switch swtRevoke = dialog.findViewById(R.id.swtRevokePerms);
+		SwitchCompat swtRevoke = dialog.findViewById(R.id.swtRevokePerms);
 		swtRevoke.setChecked(revokeActive);
 
 		// Load the list of permissions for the package and present them
@@ -129,7 +131,7 @@ public class PermissionSettings {
 		PackageManager pm = dialog.getContext().getPackageManager();
 		PackageInfo pkgInfo = pm.getPackageInfo(pkgName, PackageManager.GET_PERMISSIONS);
 		if (pkgInfo.sharedUserId != null) {
-			Switch swtRevoke = dialog.findViewById(R.id.swtRevokePerms);
+			SwitchCompat swtRevoke = dialog.findViewById(R.id.swtRevokePerms);
 			swtRevoke.setText(R.string.perms_shared_warning);
 			swtRevoke.setTextColor(Color.RED);
 		}

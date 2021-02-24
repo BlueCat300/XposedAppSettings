@@ -70,7 +70,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 	@Override
 	public void handleLoadPackage(LoadPackageParam lpparam) {
 		if (Common.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
-			findAndHookMethod("ru.bluecat.android.xposed.mods.appsettings.MainActivity",
+			findAndHookMethod("ru.bluecat.android.xposed.mods.appsettings.ui.MainActivity",
 					lpparam.classLoader, "isModActive", XC_MethodReplacement.returnConstant(true));
 		}
 		if(XposedBridge.getXposedVersion() != 93) {

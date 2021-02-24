@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Main" parent="android:Theme.DeviceDefault">
-        <item name="android:actionBarStyle">@style/Theme.Main.ActionBar</item>
+    <style name="Theme.Main" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/blue_gray</item>
+        <item name="colorPrimaryDark">@color/dark_blue_gray</item>
+        <item name="colorAccent">@color/light_blue</item>
+        <item name="android:windowBackground">@color/black_gray</item>
+        <item name="android:itemBackground">@color/dark_blue_gray</item>
+        <item name="android:navigationBarColor">@color/dark_blue_gray</item>
+        <item name="android:alertDialogTheme">@style/Theme.Main.Dialog</item>
     </style>
-    <style name="Theme.Main.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+    <style name="Theme.Main.Dialog" parent="@style/Theme.AppCompat.Dialog.Alert">
+        <item name="android:textColorPrimary">@color/dialog_text_color</item>
+        <item name="android:textColorSecondary">@color/dialog_text_color</item>
         <item name="android:background">@color/blue_gray</item>
-        <item name="android:titleTextStyle">@style/Theme.Main.ActionBar.TitleTextStyle</item>
+        <item name="android:textColorAlertDialogListItem">@color/white</item>
+        <item name="colorAccent">@color/light_blue</item>
     </style>
-    <style name="Theme.Main.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.StatusBar.Title">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">20sp</item>
+    <style name="Theme.Legacy.Dialog" parent="Theme.Main">
+        <item name="android:textColorPrimary">@color/dialog_text_color</item>
+        <item name="android:textColorSecondary">@color/dialog_text_color</item>
+        <item name="android:background">@color/blue_gray</item>
+        <item name="android:textColorAlertDialogListItem">@color/white</item>
+        <item name="colorAccent">@color/light_blue</item>
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+    <style name="Theme.AppCompat.Translucent">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
     </style>
 </resources>

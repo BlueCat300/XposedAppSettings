@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,7 +23,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class BackupActivity extends Activity {
+import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.R;
+
+public class BackupActivity extends AppCompatActivity {
 
     static boolean restoreSuccessful;
     private static String backupFileName;
@@ -111,7 +116,6 @@ public class BackupActivity extends Activity {
                     //noinspection deprecation
                     pref = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
                 } catch (SecurityException e) {
-                    // The new XSharedPreferences is not enabled or module's not loading
                     error = e.getMessage();
                     pref = null;
                 }
@@ -168,7 +172,6 @@ public class BackupActivity extends Activity {
                     //noinspection deprecation
                     pref = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
                 } catch (SecurityException e) {
-                    // The new XSharedPreferences is not enabled or module's not loading
                     error = e.getMessage();
                     pref = null;
                 }

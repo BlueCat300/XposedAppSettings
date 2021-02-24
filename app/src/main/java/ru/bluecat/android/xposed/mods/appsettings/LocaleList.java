@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.content.res.Resources;
 
@@ -12,7 +12,7 @@ import java.util.Locale;
 /**
  * Manages a list of valid locales for the system
  */
-class LocaleList {
+public class LocaleList {
 
 	/*
 	 * From AOSP code - listing available languages to present to the user
@@ -43,7 +43,7 @@ class LocaleList {
 	private final String[] localeCodes;
 	private final String[] localeDescriptions;
 
-	LocaleList(String defaultLabel) {
+	public LocaleList(String defaultLabel) {
 		String[] locales = Resources.getSystem().getAssets().getLocales();
 		Arrays.sort(locales);
 		int origSize = locales.length;
@@ -117,7 +117,7 @@ class LocaleList {
 	/**
 	 * Retrieve the locale code at a specific position in the list.
 	 */
-	String getLocale(int pos) {
+	public String getLocale(int pos) {
 		return localeCodes[pos];
 	}
 
@@ -125,7 +125,7 @@ class LocaleList {
 	 * Retrieve the position where the specified locale code is, or 0 if it was
 	 * not found.
 	 */
-	int getLocalePos(String locale) {
+	public int getLocalePos(String locale) {
 		for (int i = 1; i < localeCodes.length; i++) {
 			if (localeCodes[i].equals(locale))
 				return i;
@@ -136,7 +136,7 @@ class LocaleList {
 	/**
 	 * Retrieve an ordered list of the locale descriptions
 	 */
-	List<String> getDescriptionList() {
+	public List<String> getDescriptionList() {
 		return Arrays.asList(localeDescriptions);
 	}
 

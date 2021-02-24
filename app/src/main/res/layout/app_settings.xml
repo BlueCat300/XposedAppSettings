@@ -5,6 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" >
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include layout="@layout/toolbar"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/app_label"
             android:layout_toStartOf="@id/app_icon"
-            android:textColor="#0099CC" />
+            android:textColor="@color/blue" />
     </RelativeLayout>
 
     <ScrollView
@@ -51,6 +57,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white"
                     android:text="@string/settings_dpi" >
                 </TextView>
 
@@ -69,6 +76,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white"
                     android:text="@string/settings_fontscale" >
                 </TextView>
 
@@ -100,6 +108,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_screenshot" />
 
                 <Spinner
@@ -117,6 +126,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/white"
                     android:text="@string/settings_screen" >
                 </TextView>
 
@@ -142,6 +152,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_locale" />
 
                 <Spinner
@@ -160,6 +171,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_fullscreen" />
 
                 <Spinner
@@ -221,6 +233,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_orientation" />
 
                 <Spinner
@@ -258,6 +271,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_ongoingnotif" />
 
                 <Spinner
@@ -277,6 +291,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_notifpriority" />
 
                 <Spinner
@@ -294,6 +309,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:textColor="@color/white"
                     android:text="@string/settings_recents_mode" />
 
                 <Spinner

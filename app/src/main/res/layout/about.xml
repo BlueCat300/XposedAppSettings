@@ -14,6 +14,7 @@
             android:id="@+id/about_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:text="@string/app_about"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -21,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
+            android:textColor="@color/white"
             android:text="@string/app_description" />
 
         <TextView
@@ -28,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="20dp"
+            android:textColor="@color/white"
             android:text="@string/app_version" />
 
         <TextView
@@ -35,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
+            android:textColor="@color/white"
             android:text="@string/app_translation" />
 
         <TextView

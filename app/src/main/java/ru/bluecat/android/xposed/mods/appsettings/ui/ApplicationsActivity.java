@@ -1,8 +1,6 @@
-package ru.bluecat.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,10 +26,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.BlendModeColorFilterCompat;
 import androidx.core.graphics.BlendModeCompat;
 
@@ -51,12 +54,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.LocaleList;
 import ru.bluecat.android.xposed.mods.appsettings.R;
-import ru.bluecat.android.xposed.mods.appsettings.MainActivity;
 
-public class ApplicationSettings extends Activity {
+public class ApplicationsActivity extends AppCompatActivity {
 
-	private Switch swtActive;
+	private SwitchCompat swtActive;
 
 	private String pkgName;
 	private SharedPreferences prefs;
@@ -72,25 +75,27 @@ public class ApplicationSettings extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		swtActive = new Switch(this);
-		Objects.requireNonNull(getActionBar()).setCustomView(swtActive);
-		getActionBar().setDisplayShowCustomEnabled(true);
-
-		setContentView(R.layout.app_settings);
-
-		Intent i = getIntent();
-		parentIntent = i;
 		try {
 			//noinspection deprecation
 			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
 		} catch (SecurityException ignored) {
-			// The new XSharedPreferences is not enabled or module's not loading
 			MainActivity.xposedNotActive(this);
 			prefs = null;
 			return;
 		}
+		setContentView(R.layout.app_settings);
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		ActionBar bar = getSupportActionBar();
+		bar.setDisplayShowCustomEnabled(true);
+		bar.setDisplayHomeAsUpEnabled(true);
+		toolbar.setTitle(R.string.settings_title);
+		toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
+		swtActive = new SwitchCompat(this);
+		Objects.requireNonNull(getSupportActionBar()).setCustomView(swtActive);
+		Intent i = getIntent();
+		parentIntent = i;
 		ApplicationInfo app;
 		try {
 			app = getPackageManager().getApplicationInfo(Objects.requireNonNull(
@@ -194,7 +199,7 @@ public class ApplicationSettings extends Activity {
 
 		// Helper to list all apk folders under /res
 		findViewById(R.id.btnListRes).setOnClickListener(v -> {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
 
 			ScrollView scrollPane = new ScrollView(this);
 			TextView txtPane = new TextView(this);
@@ -540,7 +545,7 @@ public class ApplicationSettings extends Activity {
 		}
 
 		// Require confirmation to exit the screen and lose configuration changes
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
 		builder.setTitle(R.string.settings_unsaved_title);
 		builder.setIconAttribute(android.R.attr.alertDialogIcon);
 		builder.setMessage(R.string.settings_unsaved_detail);
@@ -584,9 +589,9 @@ public class ApplicationSettings extends Activity {
 		try {
 			Resources res = context.createPackageContext("com.android.vending", 0).getResources();
 			int id = res.getIdentifier("ic_launcher_play_store", "mipmap", "com.android.vending");
-			Drawable icon = res.getDrawable(id);
+			Drawable icon = ResourcesCompat.getDrawable(context.getResources(), id, null);
 			if (!hasMarketLink) {
-				icon = icon.mutate();
+				icon = Objects.requireNonNull(icon).mutate();
 				icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
 			}
 			menu.findItem(R.id.menu_app_store).setIcon(icon);
@@ -617,7 +622,7 @@ public class ApplicationSettings extends Activity {
 	}
 
 	private void confirmReboot () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
 		builder.setTitle(R.string.menu_reboot_confirm);
 		builder.setMessage(R.string.menu_reboot_confirm_desc);
 		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
@@ -666,7 +671,7 @@ public class ApplicationSettings extends Activity {
 		initialSettings = newSettings;
 
 		// Check if in addition to saving the settings, the app should also be killed
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
 		builder.setTitle(R.string.settings_apply_title);
 		builder.setMessage(R.string.settings_apply_detail);
 		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {

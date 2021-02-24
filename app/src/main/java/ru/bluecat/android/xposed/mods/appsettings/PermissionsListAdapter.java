@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings.settings;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
-import ru.bluecat.android.xposed.mods.appsettings.R;
 
 /*
  * Adapter to feed the list of permission entries
@@ -42,7 +40,7 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 		canEdit = false;
 	}
 
-	void setCanEdit(boolean canEdit) {
+	public void setCanEdit(boolean canEdit) {
 		this.canEdit = canEdit;
 	}
 

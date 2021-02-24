@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <SearchView
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/searchPermission"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
