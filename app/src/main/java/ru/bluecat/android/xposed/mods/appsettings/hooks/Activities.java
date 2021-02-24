@@ -85,8 +85,7 @@ class Activities {
 					} else if (fullscreen == Common.FULLSCREEN_PREVENT) {
 						window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.FALSE);
-					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE &&
-							Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
 						setAdditionalInstanceField(decorView, PROP_IMMERSIVE, Boolean.TRUE);
@@ -175,33 +174,29 @@ class Activities {
 				}
 			});
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				findAndHookMethod("android.view.ViewRootImpl", null, "dispatchSystemUiVisibilityChanged",
-						int.class, int.class, int.class, int.class, new XC_MethodHook() {
-					@Override
-					protected void beforeHookedMethod(MethodHookParam param) {
-						// Has the navigation bar been shown?
-						int localChanges = (Integer) param.args[3];
-						if ((localChanges & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0)
-							return;
+			findAndHookMethod("android.view.ViewRootImpl", null,
+					"dispatchSystemUiVisibilityChanged", int.class, int.class, int.class, int.class, new XC_MethodHook() {
+				@Override
+				protected void beforeHookedMethod(MethodHookParam param) {
+					// Has the navigation bar been shown?
+					int localChanges = (Integer) param.args[3];
+					if ((localChanges & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0)
+						return;
 
-						// Should it be hidden?
-						View decorView = (View) getObjectField(param.thisObject, "mView");
-						Boolean immersive = (decorView == null)
-								? null
-								: (Boolean) getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
-						if (immersive == null || !immersive) //immersive.booleanValue())
-							return;
+					// Should it be hidden?
+					View decorView = (View) getObjectField(param.thisObject, "mView");
+					Boolean immersive = (decorView == null) ? null : (Boolean) getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
+					if (immersive == null || !immersive) //immersive.booleanValue())
+						return;
 
-						// Enforce SYSTEM_UI_FLAG_HIDE_NAVIGATION and hide changes to this flag
-						int globalVisibility = (Integer) param.args[1];
-						int localValue = (Integer) param.args[2];
-						param.args[1] = globalVisibility | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-						param.args[2] = localValue | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-						param.args[3] = localChanges & ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-					}
-				});
-			}
+					// Enforce SYSTEM_UI_FLAG_HIDE_NAVIGATION and hide changes to this flag
+					int globalVisibility = (Integer) param.args[1];
+					int localValue = (Integer) param.args[2];
+					param.args[1] = globalVisibility | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+					param.args[2] = localValue | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+					param.args[3] = localChanges & ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+				}
+			});
 
 			// force orientation
 			findAndHookMethod(Activity.class, "setRequestedOrientation", int.class, new XC_MethodHook() {
@@ -311,23 +306,21 @@ class Activities {
 
             //Disable restricting Android API to get recent tasks in Lollipop and newer.
             //https://github.com/pylerSM/UnrestrictedGetTasks
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				String recentTasksClass = "com.android.server.am.ActivityManagerService";
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-					recentTasksClass = "com.android.server.wm.ActivityTaskManagerService";
-				}
-				findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",
-						String.class, int.class, int.class, new XC_MethodHook() {
-					@Override
-					protected void afterHookedMethod(MethodHookParam param) {
-						Context mContext = (Context) getObjectField(param.thisObject, "mContext");
-						String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
-						if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(prefs, callingApp, Common.PREF_RECENT_TASKS)) {
-							param.setResult(true);
-						}
+			String recentTasksClass = "com.android.server.am.ActivityManagerService";
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+				recentTasksClass = "com.android.server.wm.ActivityTaskManagerService";
+			}
+			findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",
+					String.class, int.class, int.class, new XC_MethodHook() {
+				@Override
+				protected void afterHookedMethod(MethodHookParam param) {
+					Context mContext = (Context) getObjectField(param.thisObject, "mContext");
+					String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
+					if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(prefs, callingApp, Common.PREF_RECENT_TASKS)) {
+						param.setResult(true);
 					}
-				});
-            }
+				}
+			});
 		} catch (Throwable e) {
 			XposedBridge.log(e);
 		}

@@ -168,9 +168,7 @@ public class PackagePermissions extends BroadcastReceiver {
 			Object pkgInfo;
 			synchronized (mPackages) {
 				pkgInfo = mPackages.get(pkgName);
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-					callMethod(pmSvc, "grantPermissionsLPw", pkgInfo, true);
-				} else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
 					callMethod(pmSvc, "grantPermissionsLPw", pkgInfo, true, pkgName);
 				} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
 					callMethod(permissionSvc, "grantPermissions", pkgInfo, true, pkgName, mPermissionCallback);

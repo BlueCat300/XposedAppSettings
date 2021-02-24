@@ -140,10 +140,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 				}
 			};
 			String notificationHookedMethod = "enqueueNotificationInternal";
-			String notificationHookedClass = "com.android.server.NotificationManagerService";
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				notificationHookedClass = "com.android.server.notification.NotificationManagerService";
-			}
+			String notificationHookedClass = "com.android.server.notification.NotificationManagerService";
 			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
 				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
 						String.class, String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class, int.class,
@@ -183,7 +180,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 							// Workaround for KitKat. The keyguard is a different package now but runs in the
 							// same process as SystemUI and displays as main package
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && packageName.equals("com.android.keyguard")) {
+							if (packageName.equals("com.android.keyguard")) {
 								packageName = SYSTEMUI_PACKAGE;
 							}
 

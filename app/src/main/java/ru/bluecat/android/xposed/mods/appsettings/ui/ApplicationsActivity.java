@@ -250,20 +250,12 @@ public class ApplicationSettings extends Activity {
 			Spinner spnFullscreen = findViewById(R.id.spnFullscreen);
 			// Note: the order of these items must match the Common.FULLSCREEN_... constants
 			String[] fullscreenArray;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				fullscreenArray = new String[] {
-						getString(R.string.settings_default),
-						getString(R.string.settings_force),
-						getString(R.string.settings_prevent),
-						getString(R.string.settings_immersive)
-				};
-			} else {
-				fullscreenArray = new String[] {
-						getString(R.string.settings_default),
-						getString(R.string.settings_force),
-						getString(R.string.settings_prevent)
-				};
-			}
+			fullscreenArray = new String[] {
+					getString(R.string.settings_default),
+					getString(R.string.settings_force),
+					getString(R.string.settings_prevent),
+					getString(R.string.settings_immersive)
+			};
 
 			List<String> lstFullscreen = Arrays.asList(fullscreenArray);
 			ArrayAdapter<String> fullscreenAdapter = new ArrayAdapter<>(this,
@@ -363,11 +355,7 @@ public class ApplicationSettings extends Activity {
 		}
 
 		// Update Recent Tasks field
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName + Common.PREF_RECENT_TASKS, false));
-		} else {
-			findViewById(R.id.chkRecentTasks).setVisibility(View.GONE);
-		}
+		((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName + Common.PREF_RECENT_TASKS, false));
 
 		// Setting for permissions revoking
 		allowRevoking = prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false);
@@ -435,9 +423,7 @@ public class ApplicationSettings extends Activity {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
 			settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
-		}
+		settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
 		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
 		settingKeys.add(pkgName + Common.PREF_REVOKELIST);
 		return settingKeys;
@@ -533,7 +519,7 @@ public class ApplicationSettings extends Activity {
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
 				settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && ((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
+			if (((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
 				settings.put(pkgName + Common.PREF_RECENT_TASKS, true);
 
 			if (allowRevoking)
