@@ -19,7 +19,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -35,7 +34,10 @@ public class PackagePermissions extends BroadcastReceiver {
 	@SuppressWarnings("unchecked")
 	public PackagePermissions(Object pmSvc) {
 		this.pmSvc = pmSvc;
-		this.mPermissionCallback = getObjectField(pmSvc, "mPermissionCallback");
+		Object svc = Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q ? pmSvc : permissionSvc;
+		String mCallback = Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q ?
+				"mPermissionCallback" : "mDefaultPermissionCallback";
+		this.mPermissionCallback = getObjectField(svc, mCallback);
 		this.mPackages = (Map<String, Object>) getObjectField(pmSvc, "mPackages");
 		mSettings = getObjectField(pmSvc, "mSettings");
 	}
@@ -46,40 +48,6 @@ public class PackagePermissions extends BroadcastReceiver {
 		 * - Intercept the permission granting function to remove disabled permissions
 		 */
 		try {
-			ClassLoader classLoader = lpparam.classLoader;
-			Class<?> clsManagerService;
-			clsManagerService = findClass("com.android.server.pm.PackageManagerService", classLoader);
-
-			// Listen for broadcasts from the Settings part of the mod, so it's applied immediately
-			findAndHookMethod(clsManagerService, "systemReady", new XC_MethodHook() {
-				@Override
-				protected void afterHookedMethod(MethodHookParam param) {
-					Context mContext = (Context) getObjectField(param.thisObject, "mContext");
-					mContext.registerReceiver(new PackagePermissions(param.thisObject),
-							new IntentFilter(Common.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS"),
-							Common.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION",
-							null);
-				}
-			});
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-				XC_MethodHook hookClassInstance = new XC_MethodHook() {
-					@Override
-					protected void afterHookedMethod(MethodHookParam param) {
-						permissionSvc = param.thisObject;
-					}
-				};
-
-				clsManagerService = findClass("com.android.server.pm.permission.PermissionManagerService", classLoader);
-				if(Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
-					findAndHookConstructor(clsManagerService, Context.class,
-							"com.android.server.pm.permission.DefaultPermissionGrantPolicy$DefaultPermissionGrantedCallback",
-							Object.class, hookClassInstance);
-				} else {
-					findAndHookConstructor(clsManagerService, Context.class, Object.class, hookClassInstance);
-				}
-			}
-
 			// if the user has disabled certain permissions for an app, do as if the hadn't requested them
 			// you requested those internet permissions? I didn't read that, sorry
 			// restore requested permissions if they were modified
@@ -115,6 +83,8 @@ public class PackagePermissions extends BroadcastReceiver {
 				@SuppressWarnings("unchecked")
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
+					permissionSvc = param.thisObject;
+
 					// restore requested permissions if they were modified
 					ArrayList<String> origRequestedPermissions = (ArrayList<String>) param.getObjectExtra("orig_requested_permissions");
 					if (origRequestedPermissions != null) {
@@ -122,36 +92,61 @@ public class PackagePermissions extends BroadcastReceiver {
 					}
 					String pkgName = (String) getObjectField(param.args[0], "packageName");
 					if (Common.MY_PACKAGE_NAME.equals(pkgName)) {
-						grantRebootPermission(param);
+						grantRebootPermission(param, pkgName);
 					}
 				}
 			};
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-				findAndHookMethod(clsManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, hookGrantPermissions);
-			} else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1){
-				findAndHookMethod(clsManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, String.class, hookGrantPermissions);
-			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P){
-				findAndHookMethod(clsManagerService, "grantPermissions", "android.content.pm.PackageParser$Package", boolean.class, String.class,
+
+			ClassLoader classLoader = lpparam.classLoader;
+			Class<?> clsPermManagerService = findClass("com.android.server.pm.permission.PermissionManagerService", classLoader);
+			Class<?> clsPkgManagerService = findClass("com.android.server.pm.PackageManagerService", classLoader);
+
+			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+				findAndHookMethod(clsPkgManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, String.class, hookGrantPermissions);
+			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+				findAndHookMethod(clsPermManagerService, "grantPermissions", "android.content.pm.PackageParser$Package", boolean.class, String.class,
 						"com.android.server.pm.permission.PermissionManagerInternal$PermissionCallback", hookGrantPermissions);
+			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+				findAndHookMethod(clsPermManagerService, "restorePermissionState", "android.content.pm.PackageParser$Package", boolean.class, String.class,
+						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
 			} else {
-				findAndHookMethod(clsManagerService, "restorePermissionState", "android.content.pm.PackageParser$Package", boolean.class, String.class,
+				findAndHookMethod(clsPermManagerService, "restorePermissionState", "com.android.server.pm.parsing.pkg.AndroidPackage", boolean.class, String.class,
 						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
 			}
+
+			// Listen for broadcasts from the Settings part of the mod, so it's applied immediately
+			findAndHookMethod(clsPkgManagerService, "systemReady", new XC_MethodHook() {
+				@Override
+				protected void afterHookedMethod(MethodHookParam param) {
+					Context mContext = (Context) getObjectField(param.thisObject, "mContext");
+					mContext.registerReceiver(new PackagePermissions(param.thisObject),
+							new IntentFilter(Common.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS"),
+							Common.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION",
+							null);
+				}
+			});
 		} catch (Throwable e) {
 			XposedBridge.log(e);
 		}
 	}
 
 	// https://github.com/Firefds/FirefdsKit
-	private static void grantRebootPermission(XC_MethodHook.MethodHookParam param) {
+	private static void grantRebootPermission(XC_MethodHook.MethodHookParam param, String pkgName) {
 		try {
-			Object extras = getObjectField(param.args[0], "mExtras");
-			Object ps = callMethod(extras, "getPermissionsState");
-			Object settings = getObjectField(param.thisObject, "mSettings");
-			Object permissions = getObjectField(settings, "mPermissions");
-			if (!(Boolean) callMethod(ps, "hasInstallPermission", Common.REBOOT)) {
-				Object pAccess = callMethod(permissions, "get", Common.REBOOT);
-				callMethod(ps, "grantInstallPermission", pAccess);
+			Object packageSettings;
+			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+				packageSettings = getObjectField(param.args[0], "mExtras");
+			} else {
+				Object mPackageManagerInt = getObjectField(param.thisObject,"mPackageManagerInt");
+				packageSettings = callMethod(mPackageManagerInt, "getPackageSetting", pkgName);
+			}
+
+			Object permissionsState = callMethod(packageSettings, "getPermissionsState");
+			Object mSettings = getObjectField(param.thisObject, "mSettings");
+			Object mPermissions = getObjectField(mSettings, "mPermissions");
+			if (!(Boolean) callMethod(permissionsState, "hasInstallPermission", Common.REBOOT)) {
+				Object pAccess = callMethod(mPermissions, "get", Common.REBOOT);
+				callMethod(permissionsState, "grantInstallPermission", pAccess);
 			}
 		} catch (Throwable e) {
 			XposedBridge.log(e);
@@ -187,12 +182,14 @@ public class PackagePermissions extends BroadcastReceiver {
 
 			// Apply new permissions if needed
 			if (killApp) {
-				try {
-					ApplicationInfo appInfo = (ApplicationInfo) getObjectField(pkgInfo, "applicationInfo");
-					callMethod(pmSvc, "killApplication", pkgName, appInfo.uid, "apply App Settings");
-				} catch (Throwable t) {
-					XposedBridge.log(t);
+				ApplicationInfo appInfo;
+				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+					appInfo = (ApplicationInfo) getObjectField(pkgInfo, "applicationInfo");
+				} else {
+					Context mContext = (Context) getObjectField(pmSvc, "mContext");
+					appInfo = mContext.getPackageManager().getApplicationInfo(pkgName, 0);
 				}
+				callMethod(pmSvc, "killApplication", pkgName, appInfo.uid, "apply App Settings");
 			}
 		} catch (Throwable t) {
 			XposedBridge.log(t);
