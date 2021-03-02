@@ -196,16 +196,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		} else if (id == R.id.drawer_about) {
 			showAboutDialog();
 		}
-		DrawerLayout drawer = findViewById(R.id.drawer_layout );
+		DrawerLayout drawer = findViewById(R.id.drawer_layout);
 		drawer.closeDrawer(GravityCompat.START);
 		return true;
 	}
 
 	@Override
-	public void onBackPressed () {
+	public void onBackPressed() {
 		DrawerLayout drawer = findViewById(R.id.drawer_layout);
-		if (drawer.isDrawerOpen(GravityCompat.START )) {
-			drawer.closeDrawer(GravityCompat.START );
+		if (drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
 		} else {
 			super.onBackPressed();
 		}
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		if (requestCode >= list.getFirstVisiblePosition() && requestCode <= list.getLastVisiblePosition()) {
 			View v = list.getChildAt(requestCode - list.getFirstVisiblePosition());
 			list.getAdapter().getView(requestCode, v, list);
-		} else if (requestCode == 1000) {
+		} else if (requestCode == 2000) {
 			list.invalidateViews();
 		}
 	}
@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			.setAdapter(adapter, (dialog, which) -> {
 				Intent i = new Intent(getApplicationContext(), ApplicationsActivity.class);
 				i.putExtra("package", (String) data.get(which).get("package"));
-				startActivityForResult(i, 1000);
+				startActivityForResult(i, 2000);
 			}).show();
 	}
 
