@@ -31,7 +31,6 @@ DPI; フォントスケール; 言語;全画面; タイトル非表示; 画面�
 \n- 権限の拒否</string>
     <string name="app_version">バージョン: %s</string>
     <string name="app_translation">翻訳: %s</string>
-    <string name="app_notactive_warning">注意:Xposedフレームワークがインストールされていてこのモジュールが有効化されているときのみ設定が反映されます!</string>
 
 
     <!-- main menu -->

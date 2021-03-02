@@ -31,7 +31,6 @@ DPI, veľkosť písma, jazyk, načítať zdroje, zobraziť na celú obrazovku, b
 \n- zakázať oznámenia</string>
     <string name="app_version">Verzia: %s</string>
     <string name="app_translation">Prekladateľ: %s</string>
-    <string name="app_notactive_warning">Poznámka: Aj keď nastavenia môžu byť zmenené, vplyv na aplikácie budú mať iba ak bude Xposed framework nainštalovaný a tento modul bude povolený!</string>
 
 
     <!-- main menu -->

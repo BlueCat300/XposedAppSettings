@@ -27,9 +27,6 @@ DPI, Μέγεθος γραμματοσειράς, Αλλαγή φορτωμέν�
 \n- άρνηση αδειών</string>
     <string name="app_version">Έκδοση: %s</string>
     <string name="app_translation">Μεταφραστής: %s</string>
-    <string name="app_notactive_warning">Σημείωση: Αν και οι ρυθμίσεις μπορούν να χρησιμοποιηθούν όπως είναι,
-οι εφαρμογές θα επηρεαστούν μόνο αν το Xposed framework είναι εγκατεστημένο και αν αυτό το module
-είναι ενεργοποιημένο στις ρυθμίσεις του!</string>
 
 
     <!-- main menu -->

@@ -30,7 +30,6 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
 \n- 撤销权限</string>
     <string name="app_version">版本: %s</string>
     <string name="app_translation">翻者: %s</string>
-    <string name="app_notactive_warning">注意：虽然您现在可以直接进行配置，但只有在已安装 Xposed 框架并启用本模块时才会生效！</string>
 
 
     <!-- main menu -->

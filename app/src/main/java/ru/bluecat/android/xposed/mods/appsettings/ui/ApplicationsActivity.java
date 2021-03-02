@@ -1,6 +1,7 @@
 package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,6 +35,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.BlendModeColorFilterCompat;
 import androidx.core.graphics.BlendModeCompat;
@@ -55,20 +57,57 @@ import java.util.regex.Pattern;
 
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 import ru.bluecat.android.xposed.mods.appsettings.LocaleList;
+import ru.bluecat.android.xposed.mods.appsettings.PrefFileManager;
 import ru.bluecat.android.xposed.mods.appsettings.R;
+import ru.bluecat.android.xposed.mods.appsettings.SELinux;
+
+import static ru.bluecat.android.xposed.mods.appsettings.ui.MainActivity.isSELinuxCheckerEnabled;
 
 public class ApplicationsActivity extends AppCompatActivity {
 
 	private SwitchCompat swtActive;
 
+	private static SharedPreferences prefs;
 	private String pkgName;
-	private SharedPreferences prefs;
 	private Set<String> settingKeys;
 	private Map<String, Object> initialSettings;
 	private Set<String> disabledPermissions;
 	private boolean allowRevoking;
 	private Intent parentIntent;
 	private LocaleList localeList;
+	private PrefFileManager prefFileManager;
+
+	@Override
+	public void attachBaseContext(Context newBase) {
+		super.attachBaseContext(newBase);
+		if(isSELinuxCheckerEnabled) {
+			if(SELinux.isSELinuxPermissive()) {
+				prefFileManager = PrefFileManager.getInstance(this);
+			}
+		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if(isSELinuxCheckerEnabled) {
+			if(SELinux.isSELinuxPermissive()) {
+				//Setting permission for reading xposed settings
+				prefFileManager.onResume();
+			}
+		}
+	}
+
+	@Override
+	protected void onStop() {
+		if(isSELinuxCheckerEnabled) {
+			if(SELinux.isSELinuxPermissive()) {
+				//Setting permission for reading xposed settings
+				prefFileManager.onPause();
+			}
+		}
+		super.onStop();
+	}
 
 	/** Called when the activity is first created. */
 	@SuppressLint({"SetTextI18n", "DefaultLocale", "WorldReadableFiles"})
@@ -79,9 +118,14 @@ public class ApplicationsActivity extends AppCompatActivity {
 			//noinspection deprecation
 			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
 		} catch (SecurityException ignored) {
-			MainActivity.xposedNotActive(this);
-			prefs = null;
-			return;
+			if(SELinux.isSELinuxPermissive()) {
+				//Setting permission for reading xposed settings
+				prefFileManager.fixFolderPermissionsAsync();
+				getLegacyPrefs(this);
+			} else {
+				MainActivity.frameworkWarning(this, 2);
+				return;
+			}
 		}
 		setContentView(R.layout.app_settings);
 		Toolbar toolbar = findViewById(R.id.toolbar);
@@ -399,6 +443,14 @@ public class ApplicationsActivity extends AppCompatActivity {
 		initialSettings = getSettings();
 	}
 
+	private static void getLegacyPrefs (Activity context) {
+		Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+		if (ctx == null) {
+			ctx = context;
+		}
+		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+	}
+
 	private Set<String> getSettingKeys() {
 		HashSet<String> settingKeys = new HashSet<>();
 		settingKeys.add(pkgName + Common.PREF_ACTIVE);
@@ -596,10 +648,6 @@ public class ApplicationsActivity extends AppCompatActivity {
 			}
 			menu.findItem(R.id.menu_app_store).setIcon(icon);
 		} catch (Exception ignored) {
-		}
-
-		if (!MainActivity.isModActive()) {
-			menu.findItem(R.id.menu_reboot).setEnabled(false);
 		}
 	}
 

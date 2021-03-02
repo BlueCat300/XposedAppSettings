@@ -34,10 +34,6 @@ DPI; Заміна ресурсів; Мова; Повний екран;
 \n- відключення збільшених сповіщень (не доступно на ОС 6.0+)</string>
     <string name="app_version">Версія: %s</string>
     <string name="app_translation">Переклад: %s</string>
-    <string name="app_notactive_warning">Примітка: хоча панелі конфігурації можуть бути використані
-        як є, вони можуть впливати на додатки, тільки якщо встановлений Xposed framework і модуль активований!</string>
-    <string name="app_min_api_warning_message">Xposed не активовано або не відповідає мінімальній версії.
-\nМінімальна версія: <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.4</a></string>
 
 
     <!-- main menu -->

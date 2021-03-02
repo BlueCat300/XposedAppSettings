@@ -71,6 +71,7 @@ import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent;
 import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
 import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
 import ru.bluecat.android.xposed.mods.appsettings.R;
+import ru.bluecat.android.xposed.mods.appsettings.SELinux;
 
 import static ru.bluecat.android.xposed.mods.appsettings.ui.BackupActivity.restoreSuccessful;
 
@@ -94,18 +95,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	private static SharedPreferences prefs;
 	private static Menu optionsMenu;
+	static boolean isSELinuxCheckerEnabled;
 
     @SuppressLint("WorldReadableFiles")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		try {
-			//noinspection deprecation
-			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-		} catch (SecurityException ignored) {
-			xposedNotActive(this);
-			prefs = null;
+		if(!isModuleActive()) {
+			frameworkWarning(this, 1);
 			return;
+		}
+		if(prefs == null) {
+			try {
+				//noinspection deprecation
+				prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+				isSELinuxCheckerEnabled = false;
+			} catch (SecurityException ignored) {
+				if(SELinux.isSELinuxPermissive()) {
+					isSELinuxCheckerEnabled = true;
+					getLegacyPrefs(this);
+				} else {
+					frameworkWarning(this, 2);
+					return;
+				}
+			}
 		}
 		setContentView(R.layout.activity_main);
 		Toolbar toolbar = findViewById(R.id.toolbar);
@@ -123,6 +136,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			startActivityForResult(i, position);
 		});
 		refreshApps();
+	}
+
+	private static void getLegacyPrefs (Activity context) {
+		Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+		if (ctx == null) {
+			ctx = context;
+		}
+		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+	}
+
+	public static void frameworkWarning(Activity context, int warningType) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context, R.style.Theme_Main_Dialog);
+		dialog.setTitle(R.string.app_framework_warning_title);
+		int message = R.string.app_framework_warning_message;
+		if(warningType == 2) {
+			message = R.string.app_selinux_warning_message;
+		}
+		dialog.setMessage(message);
+		dialog.setPositiveButton("Ok", (dialog1, id) -> {
+			dialog1.dismiss();
+			context.finish();
+		});
+		AlertDialog alert = dialog.create();
+		alert.setCancelable(false);
+		alert.setCanceledOnTouchOutside(false);
+		alert.show();
+
+		if(warningType == 2) {
+			TextView msgText = alert.findViewById(android.R.id.message);
+			if (msgText != null) {
+				msgText.setMovementMethod(LinkMovementMethod.getInstance());
+			}
+		}
 	}
 
 	private void setUpDrawer(Toolbar toolbar) {
@@ -189,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 		optionsMenu = menu;
-		updateMainMenuEntries();
 		return true;
 	}
 
@@ -250,31 +295,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		return super.onKeyUp(keyCode, event);
 	}
 
-	public static void xposedNotActive(Activity context) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(context, R.style.Theme_Main_Dialog);
-		dialog.setTitle(R.string.app_min_api_warning_title);
-		dialog.setMessage(R.string.app_min_api_warning_message);
-		dialog.setPositiveButton("Ok", (dialog1, id) -> {
-			dialog1.dismiss();
-			System.exit(0);
-		});
-		AlertDialog alert = dialog.create();
-		alert.setCancelable(false);
-		alert.setCanceledOnTouchOutside(false);
-		alert.show();
-
-		TextView msgText = alert.findViewById(android.R.id.message);
-		if (msgText != null) {
-			msgText.setMovementMethod(LinkMovementMethod.getInstance());
-		}
-	}
-
-	private void updateMainMenuEntries() {
-		if(!isModActive()) {
-			optionsMenu.findItem(R.id.menu_recents).setEnabled(false);
-		}
-	}
-
 	private void refreshApps() {
 		appList.clear();
 		// (re)load the list of apps in the background
@@ -285,13 +305,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	private void refreshAppsAfterImport() {
 		if (restoreSuccessful) {
 			// Refresh preferences
-			try {
-				//noinspection deprecation
-				prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-			} catch (SecurityException ignored) {
-				xposedNotActive(this);
-				prefs = null;
-				return;
+			if(prefs == null) {
+				try {
+					//noinspection deprecation
+					prefs = activityContext.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+				} catch (SecurityException ignored) {
+					if(SELinux.isSELinuxPermissive()) {
+						getLegacyPrefs(activityContext);
+					} else {
+						frameworkWarning(activityContext, 2);
+					}
+				}
 			}
 			// Refresh listed apps (account for filters)
 			MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
@@ -382,17 +406,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			}).show();
 	}
 
-	public static boolean isModActive() {
+	public static boolean isModuleActive() {
 		return false;
 	}
 
 	private void showAboutDialog() {
 		View vAbout;
 		vAbout = View.inflate(this, R.layout.about, null);
-
-		// Warn if the module is not active
-		if (!isModActive())
-			vAbout.findViewById(R.id.about_notactive).setVisibility(View.VISIBLE);
 
 		// Display the resources translator, or hide it if none
 		String translator = getResources().getString(R.string.translator);
@@ -700,11 +720,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			synchronized (this) {
 				items = new ArrayList<>(appList);
 			}
-			try {
-				//noinspection deprecation
-				prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-			} catch (SecurityException ignored) {
-				prefs = null;
+			if(prefs == null) {
+				try {
+					//noinspection deprecation
+					prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+				} catch (SecurityException ignored) {
+					if(SELinux.isSELinuxPermissive()) {
+						getLegacyPrefs(activityReference);
+					} else {
+						frameworkWarning(activityReference, 2);
+					}
+				}
 			}
 
 			FilterResults result = new FilterResults();

@@ -34,7 +34,6 @@
 \n- 限制存取權限</string>
     <string name="app_version">版本: %s</string>
     <string name="app_translation">譯者: %s</string>
-    <string name="app_notactive_warning">注意：就算設定介面正常顯示，但本程式需要在Xposed framework中啟用才可以發揮作用！</string>
 
 
     <!-- main menu -->

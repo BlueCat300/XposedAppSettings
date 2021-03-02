@@ -32,7 +32,6 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
 \n- revocar permisos</string>
     <string name="app_version">Versión: %s</string>
     <string name="app_translation">Traductor: %s</string>
-    <string name="app_notactive_warning">Nota: Aunque los paneles de configuración pueden ser usados como están, solo tendrán efecto sobre las aplicaciones si el marco Xposed se encuentra instalado y si éste módulo se encuentra activo en su configuración.</string>
 
 
     <!-- main menu -->

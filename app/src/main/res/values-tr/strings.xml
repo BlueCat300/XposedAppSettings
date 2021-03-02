@@ -37,7 +37,6 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="app_name">App Settings Reborn</string>
     <string name="app_version">Sürüm: %s</string>
     <string name="app_translation">Çevirmen: %s</string>
-    <string name="app_notactive_warning">Not: Yapılandırma panelleri olduğu gibi kullanılabilse de, Xposed framework yüklüyse ve bu modül yapılandırmasında etkinse uygulamaları etkiler!</string>
 
 
     <!-- main menu -->

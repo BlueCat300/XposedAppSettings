@@ -31,8 +31,6 @@ DPI; 글씨 크기; 특정 리소스만 사용; 언어;
 \n- 권한 수정</string>
     <string name="app_version">버전 : %s</string>
     <string name="app_translation">번역자 : %s</string>
-    <string name="app_notactive_warning">알림 : 앱 별로 설정할 수 있는 패널은 들어갈 수 있지만,
-Xposed 프레임워크가 설치되어 있고 이 모듈을 활성화해야만 설정한 값들이 적용됩니다!</string>
 
 
     <!-- main menu -->

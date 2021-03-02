@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 import ru.bluecat.android.xposed.mods.appsettings.R;
+import ru.bluecat.android.xposed.mods.appsettings.SELinux;
 
 public class BackupActivity extends AppCompatActivity {
 
@@ -94,6 +96,14 @@ public class BackupActivity extends AppCompatActivity {
         return "AppSettings_" + formatter.format(formatedDate) + ".backup";
     }
 
+    private static void getLegacyPrefs (Activity context) {
+        Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
+        if (ctx == null) {
+            ctx = context;
+        }
+        prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+    }
+
     private static class BackupTask extends AsyncTask<Uri, String, String> {
 
         private final WeakReference<BackupActivity> activityReference;
@@ -111,17 +121,19 @@ public class BackupActivity extends AppCompatActivity {
             ObjectOutputStream output = null;
             String error = null;
             try {
-                SharedPreferences pref;
                 try {
                     //noinspection deprecation
-                    pref = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+                    prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
                 } catch (SecurityException e) {
-                    error = e.getMessage();
-                    pref = null;
+                    if(SELinux.isSELinuxPermissive()) {
+                        getLegacyPrefs(activity);
+                    } else {
+                        MainActivity.frameworkWarning(activity, 2);
+                    }
                 }
-                if(pref != null) {
+                if(prefs != null) {
                     output = new ObjectOutputStream(activity.getContentResolver().openOutputStream(params[0]));
-                    output.writeObject(pref.getAll());
+                    output.writeObject(prefs.getAll());
                     backupSuccessful = true;
                 }
             } catch (IOException e) {
@@ -167,17 +179,19 @@ public class BackupActivity extends AppCompatActivity {
             ObjectInputStream input = null;
             String error = null;
             try {
-                SharedPreferences pref;
                 try {
                     //noinspection deprecation
-                    pref = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-                } catch (SecurityException e) {
-                    error = e.getMessage();
-                    pref = null;
+                    prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+                } catch (SecurityException ignored) {
+                    if(SELinux.isSELinuxPermissive()) {
+                        getLegacyPrefs(activity);
+                    } else {
+                        MainActivity.frameworkWarning(activity, 2);
+                    }
                 }
-                if(pref != null) {
+                if(prefs != null) {
                     input = new ObjectInputStream(activity.getContentResolver().openInputStream(params[0]));
-                    SharedPreferences.Editor prefEdit = pref.edit();
+                    SharedPreferences.Editor prefEdit = prefs.edit();
                     prefEdit.clear();
 
                     @SuppressWarnings("unchecked")

@@ -30,7 +30,6 @@
 \n- engedélyek visszavonása</string>
     <string name="app_version">Verzió: %s</string>
     <string name="app_translation">Forditó: %s</string>
-    <string name="app_notactive_warning">Megjegyzés:Az alkalmazás csak akkor befolyásolja az alkalmazásokat, ha az Xposed keretrendszer telepítve van, és ha ez a modul engedélyezve van a keretrendszerben!</string>
 
 
     <!-- main menu -->

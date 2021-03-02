@@ -15,6 +15,7 @@ import android.media.JetPlayer;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -22,6 +23,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.ViewConfiguration;
 
+import java.io.File;
 import java.util.Locale;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -33,6 +35,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 
+import static android.os.Build.VERSION.SDK_INT;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -43,6 +46,7 @@ import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
+	private static XSharedPreferences prefs;
 	private static final String SYSTEMUI_PACKAGE = "com.android.systemui";
 	private static final String[] SYSTEMUI_ADJUSTED_DIMENSIONS = {
 		"status_bar_height",
@@ -53,33 +57,38 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 	@Override
 	public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) {
-		if(XposedBridge.getXposedVersion() != 93) {
-			XposedBridge.log(Common.TAG + " | Xposed Framework API does not meet minimum(93) version. The module has ended.");
-			return;
-		}
-		XSharedPreferences prefs = getModulePrefs();
+
 		if(prefs == null) {
-			XposedBridge.log(Common.TAG + " | Unable to load module settings at system startup.");
-			return;
+			if(XposedBridge.getXposedVersion() < 93) {
+				prefs = getLegacyModulePrefs();
+			} else {
+				prefs = getModulePrefs();
+			}
 		}
-		adjustSystemDimensions(prefs);
-		dpiInSystem(prefs);
-		Activities.hookActivitySettings(prefs);
+
+		if(prefs != null) {
+			prefs.reload();
+			adjustSystemDimensions(prefs);
+			dpiInSystem(prefs);
+			Activities.hookActivitySettings(prefs);
+		}
 	}
 
 	@Override
 	public void handleLoadPackage(LoadPackageParam lpparam) {
-		if (Common.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
-			findAndHookMethod("ru.bluecat.android.xposed.mods.appsettings.ui.MainActivity",
-					lpparam.classLoader, "isModActive", XC_MethodReplacement.returnConstant(true));
+		if (lpparam.packageName.equals(Common.MY_PACKAGE_NAME)) {
+			findAndHookMethod(Common.MY_PACKAGE_NAME + ".ui.MainActivity",
+					lpparam.classLoader,
+					"isModuleActive",
+					XC_MethodReplacement.returnConstant(true));
 		}
-		if(XposedBridge.getXposedVersion() != 93) {
+
+		if(prefs != null) {
+			prefs.reload();
+		} else {
 			return;
 		}
-		XSharedPreferences prefs = getModulePrefs();
-		if(prefs == null) {
-			return;
-		}
+
 		if (isActive(prefs, lpparam.packageName, Common.PREF_LEGACY_MENU)) {
 			try {
 				findAndHookMethod(ViewConfiguration.class, "hasPermanentMenuKey",
@@ -88,6 +97,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 				XposedBridge.log(t);
 			}
 		}
+
 		if (lpparam.packageName.equals("android")) {
 			Activities.hookActivitySettingsInSystemServer(lpparam, prefs);
 			PackagePermissions.initHooks(lpparam, prefs);
@@ -95,6 +105,28 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 		}
 		hookScreenSettings(lpparam, prefs);
 		hookSoundPool(lpparam, prefs);
+	}
+
+	public static XSharedPreferences getModulePrefs() {
+		XSharedPreferences pref = new XSharedPreferences(Common.MY_PACKAGE_NAME, Common.PREFS);
+		return pref.getFile().canRead() ? pref : null;
+	}
+
+	private XSharedPreferences getLegacyModulePrefs() {
+		String dataDir = "data/";
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+			dataDir = "user_de/0/";
+		}
+		File f = new File(Environment.getDataDirectory(), dataDir + Common.MY_PACKAGE_NAME + "/shared_prefs/" + Common.PREFS + ".xml");
+		return new XSharedPreferences(f);
+	}
+
+	static boolean isActive(XSharedPreferences prefs, String packageName) {
+		return prefs.getBoolean(packageName + Common.PREF_ACTIVE, false);
+	}
+
+	static boolean isActive(XSharedPreferences prefs, String packageName, String sub) {
+		return prefs.getBoolean(packageName + Common.PREF_ACTIVE, false) && prefs.getBoolean(packageName + sub, false);
 	}
 
 	private void hookNotificationManager (LoadPackageParam lpparam, XSharedPreferences prefs) {
@@ -130,7 +162,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 						n.sound = null;
 						n.flags &= ~Notification.DEFAULT_SOUND;
 					}
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && isActive(prefs, packageName) && prefs.contains(packageName + Common.PREF_NOTIF_PRIORITY)) {
+					if (SDK_INT < Build.VERSION_CODES.O && isActive(prefs, packageName) && prefs.contains(packageName + Common.PREF_NOTIF_PRIORITY)) {
 						int priority = prefs.getInt(packageName + Common.PREF_NOTIF_PRIORITY, 0);
 						if (priority > 0 && priority < Common.notifPriCodes.length) {
 							n.flags &= ~Notification.FLAG_HIGH_PRIORITY;
@@ -141,7 +173,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 			};
 			String notificationHookedMethod = "enqueueNotificationInternal";
 			String notificationHookedClass = "com.android.server.notification.NotificationManagerService";
-			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+			if (SDK_INT <= Build.VERSION_CODES.N_MR1) {
 				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
 						String.class, String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class, int.class,
 						notifyHook);
@@ -356,18 +388,5 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 		String region = (localeParts.length >= 2) ? localeParts[1] : "";
 		String variant = (localeParts.length >= 3) ? localeParts[2] : "";
 		return new Locale(language, region, variant);
-	}
-
-	public static XSharedPreferences getModulePrefs() {
-		XSharedPreferences pref = new XSharedPreferences(Common.MY_PACKAGE_NAME, Common.PREFS);
-		return pref.getFile().canRead() ? pref : null;
-	}
-
-	static boolean isActive(XSharedPreferences prefs, String packageName) {
-		return prefs.getBoolean(packageName + Common.PREF_ACTIVE, false);
-	}
-
-	static boolean isActive(XSharedPreferences prefs, String packageName, String sub) {
-		return prefs.getBoolean(packageName + Common.PREF_ACTIVE, false) && prefs.getBoolean(packageName + sub, false);
 	}
 }

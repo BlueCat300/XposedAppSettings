@@ -29,7 +29,6 @@ Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende
 \n- Berechtigungen entziehen</string>
     <string name="app_version">Version: %s</string>
     <string name="app_translation">Übersetzer: %s</string>
-    <string name="app_notactive_warning">Anmerkung: Obwohl die Einstellungs-Ansicht auch so genutzt werden kann, werden die Einstellungen nur übernommen, falls das Xposed-Framework installiert ist und dieses Modul aktiviert wurde!</string>
 
 
     <!-- main menu -->
