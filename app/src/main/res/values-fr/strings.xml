@@ -37,10 +37,10 @@ Garder résident en mémoire; Pas de plein écran IME; Orientation; Notification
     <string name="menu_about">A propos</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Réglages exportés vers: %s</string>
+    <string name="imp_exp_backup_completed">Réglages exportés vers</string>
     <string name="imp_exp_backup_error">Exportation échouée: %s</string>
     <string name="imp_exp_restore_error">Importation échouée: %s</string>
-    <string name="imp_exp_restored">Importation réussie; réglages replacés</string>
+    <string name="imp_exp_restored">Importation réussie</string>
 
 
     <!-- app-specific menu -->

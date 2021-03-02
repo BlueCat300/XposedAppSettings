@@ -131,8 +131,10 @@ public class ApplicationsActivity extends AppCompatActivity {
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		ActionBar bar = getSupportActionBar();
-		bar.setDisplayShowCustomEnabled(true);
-		bar.setDisplayHomeAsUpEnabled(true);
+		if (bar != null) {
+			bar.setDisplayShowCustomEnabled(true);
+			bar.setDisplayHomeAsUpEnabled(true);
+		}
 		toolbar.setTitle(R.string.settings_title);
 		toolbar.setNavigationOnClickListener(v -> onBackPressed());
 

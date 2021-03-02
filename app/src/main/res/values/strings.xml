@@ -56,10 +56,10 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="menu_about">About</string>
 
     <!-- Restore / Backup -->
-    <string name="imp_exp_backup_completed">Settings copied to file: %s</string>
+    <string name="imp_exp_backup_completed">Backup completed successfully</string>
     <string name="imp_exp_backup_error">Backup failed: %s</string>
     <string name="imp_exp_restore_error">Restore failed: %s</string>
-    <string name="imp_exp_restored">Restore completed successfully; settings replaced</string>
+    <string name="imp_exp_restored">Restore completed successfully</string>
     <string name="imp_exp_file_picker_error">Error opening system DocumentUI</string>
 
     <!-- app-specific menu -->

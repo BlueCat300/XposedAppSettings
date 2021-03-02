@@ -42,10 +42,10 @@
     <string name="menu_about">關於</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">設定已匯出至：%s</string>
+    <string name="imp_exp_backup_completed">設定已匯出至</string>
     <string name="imp_exp_backup_error">匯出失敗：%s</string>
     <string name="imp_exp_restore_error">匯入失敗：%s</string>
-    <string name="imp_exp_restored">匯入成功，設定已變更。</string>
+    <string name="imp_exp_restored">匯入成功</string>
 
 
     <!-- app-specific menu -->

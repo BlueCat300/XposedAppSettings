@@ -31,7 +31,8 @@ import ru.bluecat.android.xposed.mods.appsettings.SELinux;
 public class BackupActivity extends AppCompatActivity {
 
     static boolean restoreSuccessful;
-    private static String backupFileName;
+    static boolean backupSuccessful;
+    private static SharedPreferences prefs;
 
     static void startBackupActivity(MainActivity activity, boolean isRestore) {
         Intent i = new Intent(activity, BackupActivity.class);
@@ -59,8 +60,7 @@ public class BackupActivity extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("*/*");
             if(!isRestore) {
-                backupFileName = createUniqueBackupName();
-                intent.putExtra(Intent.EXTRA_TITLE, backupFileName);
+                intent.putExtra(Intent.EXTRA_TITLE, createUniqueBackupName());
             }
             startActivityForResult(intent, requestCode);
 
@@ -115,7 +115,7 @@ public class BackupActivity extends AppCompatActivity {
         @SuppressLint("WorldReadableFiles")
         @Override
         protected String doInBackground(Uri... params) {
-            boolean backupSuccessful = false;
+            backupSuccessful = false;
             BackupActivity activity = activityReference.get();
 
             ObjectOutputStream output = null;
@@ -151,16 +151,19 @@ public class BackupActivity extends AppCompatActivity {
                 }
             }
 
-            if(backupSuccessful) {
-                return activity.getResources().getString(R.string.imp_exp_backup_completed, backupFileName);
-            } else {
+            if(!backupSuccessful) {
                 return activity.getResources().getString(R.string.imp_exp_backup_error, error);
-            }
+            } else return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
+            if(!backupSuccessful) {
+                Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
+            } else {
+                backupSuccessful = false;
+                MainActivity.showBackupSnackbar(R.string.imp_exp_backup_completed);
+            }
         }
     }
 
@@ -174,6 +177,7 @@ public class BackupActivity extends AppCompatActivity {
         @SuppressLint("WorldReadableFiles")
         @Override
         protected String doInBackground(Uri... params) {
+            restoreSuccessful = false;
             BackupActivity activity = activityReference.get();
 
             ObjectInputStream input = null;
@@ -228,16 +232,18 @@ public class BackupActivity extends AppCompatActivity {
                 }
             }
 
-            if(restoreSuccessful) {
-                return activity.getResources().getString(R.string.imp_exp_restored);
-            } else {
+            if(!restoreSuccessful) {
                 return activity.getResources().getString(R.string.imp_exp_restore_error, error);
-            }
+            } else return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
+            if(!restoreSuccessful) {
+                Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
+            } else {
+                MainActivity.refreshAppsAfterImport();
+            }
         }
     }
 }

@@ -21,8 +21,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +53,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	private static List<SettingInfo> settings;
 
+	private static MainActivity activityContext;
 	private static SharedPreferences prefs;
 	private static Menu optionsMenu;
 	static boolean isSELinuxCheckerEnabled;
@@ -120,11 +124,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				}
 			}
 		}
+		activityContext = this;
 		setContentView(R.layout.activity_main);
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		setUpDrawer(toolbar);
-		restoreSuccessful = false;
 		loadSettings();
 		ListView list = findViewById(R.id.lstApps);
 		registerForContextMenu(list);
@@ -212,12 +216,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		refreshAppsAfterImport();
-	}
-
-	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
@@ -302,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	@SuppressLint("WorldReadableFiles")
-	private void refreshAppsAfterImport() {
+	static void refreshAppsAfterImport() {
 		if (restoreSuccessful) {
 			// Refresh preferences
 			if(prefs == null) {
@@ -318,10 +316,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				}
 			}
 			// Refresh listed apps (account for filters)
-			MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+			MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) activityContext.findViewById(R.id.lstApps)).getAdapter();
 			appListAdapter.getFilter().filter(nameFilter);
+			showBackupSnackbar(R.string.imp_exp_restored);
 			restoreSuccessful = false;
 		}
+	}
+
+	static void showBackupSnackbar(int stringId) {
+		new Handler().postDelayed(() -> {
+			Snackbar snackbar = Snackbar
+					.make(activityContext.findViewById(android.R.id.content), stringId, Snackbar.LENGTH_SHORT)
+					.setActionTextColor(ContextCompat.getColor(activityContext, R.color.white));
+			snackbar.getView().setBackgroundColor(ContextCompat.getColor(activityContext, R.color.blue_gray));
+			TextView centredMessage = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+			centredMessage.setGravity(Gravity.CENTER);
+			snackbar.show();
+		}, 500);
 	}
 
 	private void loadSettings() {

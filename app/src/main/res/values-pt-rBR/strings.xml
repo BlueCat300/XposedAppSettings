@@ -37,10 +37,10 @@ Permanecer na memória; No Fullscreen IME; Orientação; Notificações persiste
     <string name="menu_about">Sobre</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Configurações exportadas para o arquivo: %s</string>
+    <string name="imp_exp_backup_completed">Configurações exportadas para o arquivo</string>
     <string name="imp_exp_backup_error">Falha na exportação: %s</string>
     <string name="imp_exp_restore_error">Falha na importação: %s</string>
-    <string name="imp_exp_restored">Importação concluída; configurações substituídas</string>
+    <string name="imp_exp_restored">Importação concluída</string>
 
 
     <!-- app-specific menu -->

@@ -39,10 +39,10 @@ DPI; フォントスケール; 言語;全画面; タイトル非表示; 画面�
     <string name="menu_about">情報</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">設定の保存先: %s</string>
+    <string name="imp_exp_backup_completed">設定の保存先</string>
     <string name="imp_exp_backup_error">保存失敗: %s</string>
     <string name="imp_exp_restore_error">読み込み失敗: %s</string>
-    <string name="imp_exp_restored">読み込み成功; 設定を置換しました。</string>
+    <string name="imp_exp_restored">読み込み成功</string>
 
 
     <!-- app-specific menu -->

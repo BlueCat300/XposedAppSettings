@@ -35,10 +35,10 @@ DPI, Μέγεθος γραμματοσειράς, Αλλαγή φορτωμέν�
     <string name="menu_about">Σχετικά</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Οι ρυθμίσεις εξάχθηκαν στο αρχείο: %s</string>
+    <string name="imp_exp_backup_completed">Οι ρυθμίσεις εξάχθηκαν στο αρχείο</string>
     <string name="imp_exp_backup_error">Εξαγωγή απέτυχε: %s</string>
     <string name="imp_exp_restore_error">Εισαγωγή απέτυχε: %s</string>
-    <string name="imp_exp_restored">Εισαγωγή επιτυχής. Οι ρυθμίσεις αντικαταστάθηκαν.</string>
+    <string name="imp_exp_restored">Εισαγωγή επιτυχής</string>
 
 
     <!-- app-specific menu -->

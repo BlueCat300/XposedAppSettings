@@ -47,10 +47,10 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="menu_about">Hakkında</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Ayarlar şu dosyaya aktarıldı: %s</string>
+    <string name="imp_exp_backup_completed">Ayarlar şu dosyaya aktarıldı</string>
     <string name="imp_exp_backup_error">Dışa aktarılamadı: %s</string>
     <string name="imp_exp_restore_error">İçe aktarılamadı: %s</string>
-    <string name="imp_exp_restored">İçe aktarma başarılı; ayarlar değiştirildi</string>
+    <string name="imp_exp_restored">İçe aktarma başarılı</string>
 
     <!-- app-specific menu -->
     <string name="menu_save">Kaydet</string>

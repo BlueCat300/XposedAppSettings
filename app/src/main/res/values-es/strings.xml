@@ -40,10 +40,10 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
     <string name="menu_about">Acerca de...</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Configuración exportada al archivo: %s</string>
+    <string name="imp_exp_backup_completed">Configuración exportada al archivo</string>
     <string name="imp_exp_backup_error">Falló la exportación: %s</string>
     <string name="imp_exp_restore_error">Falló la importación: %s</string>
-    <string name="imp_exp_restored">Importación exitosa; valores reemplazados</string>
+    <string name="imp_exp_restored">Importación exitosa</string>
 
 
     <!-- app-specific menu -->

@@ -40,10 +40,10 @@ DPI, veľkosť písma, jazyk, načítať zdroje, zobraziť na celú obrazovku, b
     <string name="menu_about">O aplikácii</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Nastavenia exportované do súboru: %s</string>
+    <string name="imp_exp_backup_completed">Nastavenia exportované do súboru</string>
     <string name="imp_exp_backup_error">Export zlyhal: %s</string>
     <string name="imp_exp_restore_error">Import zlyhal: %s</string>
-    <string name="imp_exp_restored">Import úspešný; nastavenia prepísané</string>
+    <string name="imp_exp_restored">Import úspešný</string>
 
 
     <!-- app-specific menu -->

@@ -45,10 +45,10 @@ DPI; Заміна ресурсів; Мова; Повний екран;
     <string name="menu_about">Про додаток</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Налаштування скопійовані в файл: %s</string>
+    <string name="imp_exp_backup_completed">Резервне копіювання виявилась успішною</string>
     <string name="imp_exp_backup_error">Помилка резервного копіювання: %s</string>
     <string name="imp_exp_restore_error">Помилка відновлення: %s</string>
-    <string name="imp_exp_restored">Відновлення виконано успішно, налаштування замінені</string>
+    <string name="imp_exp_restored">Відновлення виконано успішно</string>
     <string name="imp_exp_file_picker_error">Помилка відкриття системного DocumentUI</string>
 
     <!-- app-specific menu -->

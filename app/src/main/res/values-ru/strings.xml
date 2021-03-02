@@ -54,10 +54,10 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="menu_about">О программе</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Настройки скопированы в файл: %s</string>
+    <string name="imp_exp_backup_completed">Резервное копирование выполнено успешно</string>
     <string name="imp_exp_backup_error">Ошибка резервного копирования: %s</string>
     <string name="imp_exp_restore_error">Ошибка восстановления: %s</string>
-    <string name="imp_exp_restored">Восстановление выполнено успешно; настройки заменены</string>
+    <string name="imp_exp_restored">Восстановление выполнено успешно</string>
     <string name="imp_exp_file_picker_error">Ошибка открытия системного DocumentUI</string>
 
     <!-- app-specific menu -->

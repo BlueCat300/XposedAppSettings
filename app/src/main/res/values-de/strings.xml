@@ -37,10 +37,10 @@ Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende
     <string name="menu_about">Über</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Einstellungen in Datei exportiert: %s</string>
+    <string name="imp_exp_backup_completed">Einstellungen in Datei exportiert</string>
     <string name="imp_exp_backup_error">Export fehlgeschlagen: %s</string>
     <string name="imp_exp_restore_error">Import fehlgeschlagen: %s</string>
-    <string name="imp_exp_restored">Import vollständig, Einstellungen überschrieben</string>
+    <string name="imp_exp_restored">Import vollständig</string>
 
 
     <!-- app-specific menu -->

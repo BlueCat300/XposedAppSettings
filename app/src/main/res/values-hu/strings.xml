@@ -38,10 +38,10 @@
     <string name="menu_about">Névjegy</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Beállítások exportálása fájlba: %s</string>
+    <string name="imp_exp_backup_completed">Beállítások exportálása fájlba</string>
     <string name="imp_exp_backup_error">Exportálás sikertelen: %s</string>
     <string name="imp_exp_restore_error">Importálás sikertelen: %s</string>
-    <string name="imp_exp_restored">Importálása sikeres; beállítások lecserélve</string>
+    <string name="imp_exp_restored">Importálása sikeres</string>
 
 
     <!-- app-specific menu -->

@@ -39,10 +39,10 @@ DPI; 글씨 크기; 특정 리소스만 사용; 언어;
     <string name="menu_about">어플리케이션 정보</string>
 
     <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">설정이 파일로 내보내짐 : %s</string>
+    <string name="imp_exp_backup_completed">설정이 파일로 내보내짐</string>
     <string name="imp_exp_backup_error">내보내기 실패 : %s</string>
     <string name="imp_exp_restore_error">가져오기 실패 : %s</string>
-    <string name="imp_exp_restored">가져오기가 완료되었습니다. 설정이 교체됩니다.</string>
+    <string name="imp_exp_restored">가져오기가 완료되었습니다</string>
 
 
     <!-- app-specific menu -->
