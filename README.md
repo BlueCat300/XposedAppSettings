@@ -3,6 +3,8 @@ App Settings Reborn
 
 ### Download: [Repository](https://repo.xposed.info/module/ru.bluecat.android.xposed.mods.appsettings)
 
+**Discussion/Support:** [XDA thread](https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339)
+
 **Original developers:** rovo89 and Tungstwenty.
 
 **Original module:** [Repository](https://repo.xposed.info/module/de.robv.android.xposed.mods.appsettings)
@@ -13,7 +15,7 @@ Using the function revoke/restore permissions: select the permissions and click 
 
 **Compatibility:**
 
-The application is tested only on Android 10 (Samsung firmware), but has theoretical support for earlier versions of the OS. I do not guarantee work on other firmware. I also note that not all applications will work with all functions.
+The application is tested only on Android 10/11 (Samsung firmware), but has theoretical support for earlier versions of the OS. I do not guarantee work on other firmware. I also note that not all applications will work with all functions.
 If you do not see errors in edxposed logs from this module, then your firmware requires additional hooks. I cannot provide development for such devices.
 
 **Previous Versions:**
