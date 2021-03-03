@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">允许为每个程序设置一些通用配置：\n
-DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏幕开启、在锁屏界面上显示、常驻内存、方向、持续通知、撤销权限等</string>
+    <string name="app_mod_summary">允许为每个程序设置一些通用配置：
+DPI、覆盖资源、区域、全屏、
+常驻内存、屏幕方向、撤销权限等 &#8230;</string>
 
 
     <!-- Main screen -->
-    <string name="app_loading">正在加载程序，请稍候</string>
+    <string name="app_loading">正在加载应用，请稍候</string>
     <string name="app_searchhint">名称或包名</string>
-    <string name="app_about">由<a href="http://forum.xda-developers.com/member.php?u=4419114"> rovo89 </a>和<a href="http://forum.xda-developers.com/member.php?u=4322181"> Tungstwenty </a>开发的<a href="http://forum.xda-developers.com/showthread.php?t=1574401"> Xposed </a>模块。
- \n您可访问<a href="http://forum.xda-developers.com/showthread.php?t=2437377">此帖</a>提问及建议。</string>
-    <string name="app_description">本模块允许您在不修改资源文件的情况下，修改应用程序的一些通用配置：
+    <string name="app_about">由<a href="http://forum.xda-developers.com/member.php?u=4419114"> rovo89 </a>
+和<a href="http://forum.xda-developers.com/member.php?u=4322181"> Tungstwenty </a>开发的<a href="http://forum.xda-developers.com/showthread.php?t=1574401"> Xposed </a>模块。
+Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>
+ \n您可访问<a href="https://forum.xda-developers.com/xposed/modules/mod-app-settings-reborn-t4141339">此帖</a>提问及建议。</string>
+    <string name="app_description">本模块允许您在不修改APK的情况下，修改应用程序的一些通用配置：
+\n- 截屏控制
 \n- 像素密度/DPI
 \n- 字体大小
 \n- 伪装屏幕尺寸以加载资源
-\n- 语言设置
+\n- 区域（语言）设置
 \n- 全屏模式
 \n- 隐藏标题栏
 \n- 程序运行时保持屏幕常亮
 \n- 在锁屏界面上面显示程序
-\n- 常驻内存
 \n- 禁止全屏键盘输入
 \n- 强制方向（纵向/横向/自动）
-\n- 持续通知（循环提示音）
-\n- 禁用大型（扩展）通知
-\n- 通知优先级
-\n- 在最近任务中隐藏
 \n- 静音（支持大多数应用）
-\n- 强制使用传统（导航栏）的菜单按钮
-\n- 撤销权限</string>
+\n- 持续通知（循环提示音，需要重启）
+\n- 强制或阻止永久通知（需要重启）
+\n- 通知静音（需要重启）
+\n- 常驻内存（需要重启）
+\n- 在最近任务中隐藏或显示（需要重启）
+\n- 最近任务访问权（需要重启）
+\n- 撤销权限（需要重启两次）
+\n- 强制使用传统（导航栏）的菜单按钮（不支持Android 10.0+）
+\n- 通知优先级（不支持Android 8.0+）
+\n- 禁用大型（扩展）通知
+    <string name="app_name">App Settings 重生版</string>
     <string name="app_version">版本: %s</string>
-    <string name="app_translation">翻者: %s</string>
+    <string name="app_translation">翻译: %s</string>
+    <string name="app_framework_warning_title">Xposed Framework</string>
+    <string name="app_framework_warning_message">模块没有激活！请确定Xposed框架已安装，并且在Xposed安装器中已经启用模块，然后重启设备。</string>
+    <string name="app_selinux_warning_message">这个模块要求SELinux为Permissive，EdXposed最低版本为 <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a></string>
 
 
     <!-- main menu -->
@@ -37,18 +48,28 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="menu_restore">导入</string>
     <string name="menu_about">关于</string>
 
-    <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">设置已导出到</string>
-    <string name="imp_exp_backup_error">导出失败：%s</string>
-    <string name="imp_exp_restore_error">导入失败：%s</string>
-    <string name="imp_exp_restored">导入成功</string>
+    <!-- drawer -->
+    <string name="menu_backup">备份</string>
+    <string name="menu_restore">还原</string>
+    <string name="menu_filter">筛选</string>
+    <string name="menu_permission">按权限筛选</string>
+    <string name="menu_about">关于</string>
 
+    <!-- Restore / Backup -->
+    <string name="imp_exp_backup_completed">备份成功完成</string>
+    <string name="imp_exp_backup_error">备份失败： %s</string>
+    <string name="imp_exp_restore_error">还原失败： %s</string>
+    <string name="imp_exp_restored">还原成功完成</string>
+    <string name="imp_exp_file_picker_error">打开系统DocumentUI时出错</string>
 
     <!-- app-specific menu -->
     <string name="menu_save">保存</string>
     <string name="menu_launch">启动</string>
     <string name="menu_settings">设置</string>
     <string name="menu_playstore">Play 商店</string>
+    <string name="menu_reboot">重启</string>
+    <string name="menu_reboot_confirm">确认</string>
+    <string name="menu_reboot_confirm_desc">设备即将重启。继续吗？</string>
 
 
     <!-- Settings screen -->
@@ -58,8 +79,8 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="settings_listres">资源列表</string>
     <string name="settings_screen">分辨率(dp)</string>
     <string name="settings_xlargeres">超大资源</string>
-    <string name="settings_screenshot">同时应用资源到小部件</string>
-    <string name="settings_locale">语言</string>
+    <string name="settings_screenshot">截图</string>
+    <string name="settings_locale">区域</string>
     <string name="settings_fullscreen">全屏</string>
     <string name="settings_notitle">隐藏标题</string>
     <string name="settings_screenon">屏幕常亮</string>
@@ -69,17 +90,20 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="settings_orientation">方向</string>
     <string name="settings_insistentnotif">常驻通知</string>
     <string name="settings_nobignotif">禁用扩展通知</string>
+    <string name="settings_ongoingnotif">永久通知</string>
     <string name="settings_notifpriority">通知优先级</string>
     <string name="settings_mute">静音</string>
     <string name="settings_legacy_menu">传统菜单按钮</string>
-    <string name="settings_permissions">权限管理</string>
+    <string name="settings_recent_tasks">最近任务访问权</string>    
+<string name="settings_permissions">权限管理</string>
     <string name="settings_recents_mode">在最近任务中显示</string>
 
-    <string name="settings_default">默认</string>
+    <string name="settings_default">（默认）</string>
 
     <string name="settings_force">强制</string>
     <string name="settings_prevent">阻止</string>
     <string name="settings_immersive">沉浸</string>
+    <string name="settings_allow">允许</string>
 
     <string name="settings_ori_normal">采用系统设置</string>
     <string name="settings_ori_portrait">强制正向竖屏</string>
@@ -90,12 +114,18 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="settings_ori_portrait_reverse">通过传感器反向竖屏</string>
     <string name="settings_ori_landscape_reverse">通过传感器反向横屏</string>
     <string name="settings_ori_forceauto_4way">强制四向自动旋转</string>
+    <string name="settings_ori_portrait_user">总是竖屏（用户设置）</string>
+    <string name="settings_ori_landscape_user">总是横屏（用户设置）</string>
+    <string name="settings_ori_user_4way">四向旋转（用户设置）</string>
 
     <string name="settings_npri_max">最高</string>
     <string name="settings_npri_high">较高</string>
     <string name="settings_npri_normal">普通</string>
     <string name="settings_npri_low">较低</string>
     <string name="settings_npri_min">最低</string>
+
+    <!-- Recent apps -->
+    <string name="recents_title">最近应用</string>
 
     <!-- List resources -->
     <string name="res_title">资源</string>
@@ -112,7 +142,8 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
 
     <!-- Saving settings -->
     <string name="settings_unsaved_title">警告</string>
-    <string name="settings_unsaved_detail">您尚未保存设置。\n确定放弃修改直接返回？</string>
+    <string name="settings_unsaved_detail">您尚未保存设置。
+确定放弃修改直接返回？</string>
     <string name="settings_apply_title">应用设置</string>
     <string name="settings_apply_detail">是否终止进程以便下次启动时采用新设置？</string>
 
@@ -126,6 +157,9 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="filter_user">用户</string>
     <string name="filter_system">系统</string>
     <string name="filter_settingsactive">设置状态</string>
+    <string name="filter_state">状态</string>
+    <string name="filter_enabled">已启用</string>
+    <string name="filter_disabled">已禁用</string>
     <string name="filter_active">已激活</string>
     <string name="filter_notactive">未激活</string>
     <string name="filter_resources">资源设置</string>
@@ -133,6 +167,5 @@ DPI、字体大小、覆盖资源、语言、全屏、隐藏标题、保持屏�
     <string name="filter_clear">清除</string>
     <string name="filter_apply">应用</string>
 
-
-    <string name="translator">qhq、liudongmiao、Felix2yu</string>
+    <string name="translator">HankAviator、qhq、liudongmiao、Felix2yu</string>
 </resources>
