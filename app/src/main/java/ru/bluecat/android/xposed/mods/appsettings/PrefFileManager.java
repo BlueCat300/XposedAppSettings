@@ -3,14 +3,13 @@ package ru.bluecat.android.xposed.mods.appsettings;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.FileObserver;
 
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.Objects;
-
-import static android.os.Build.VERSION.SDK_INT;
 
 // https://github.com/chiehmin/MinMinGuard/commit/0bd9e353c63a44d9c948b68365bf26675a3a3104
 public class PrefFileManager {
@@ -19,7 +18,7 @@ public class PrefFileManager {
     private boolean mSelfAttrChange;
 
     private PrefFileManager(Context context) {
-        mContext = SDK_INT >= 24 && !ContextCompat.isDeviceProtectedStorage(context)
+        mContext = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !ContextCompat.isDeviceProtectedStorage(context)
                 ? ContextCompat.createDeviceProtectedStorageContext(context) : context;
 
         mFileObserver = new FileObserver(Objects.requireNonNull(mContext).getFilesDir().

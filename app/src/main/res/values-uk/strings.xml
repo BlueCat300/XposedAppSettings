@@ -8,7 +8,7 @@ DPI; Заміна ресурсів; Мова; Повний екран;
     <!-- Main screen -->
     <string name="app_loading">Завантаження списку додатків, зачекайте..</string>
     <string name="app_searchhint">Ім\'я або пакет</string>
-    <string name="app_about"><a href="https://forum.xda-developers.com/xposed">Xposed</a> модуль від  <a href="https://forum.xda-developers.com/member.php?u=4419114">rovo89</a> и <a href="https://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.   Поддержка модуля на Android 8.0+ от Blue cat <a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>.   Вы можете открыть <a href="https://forum.xda-developers.com/xposed/modules/mod-app-settings-reborn-t4141339">этот топик</a> для вопросов и предложений (на английском).</string>
+    <string name="app_about"><a href="https://forum.xda-developers.com/xposed">Xposed</a> модуль від  <a href="https://forum.xda-developers.com/member.php?u=4419114">rovo89</a> и <a href="https://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.   Поддержка модуля на Android 8.0+ от Blue cat <a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>.   Вы можете открыть <a href="https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339">этот топик</a> для вопросов и предложений (на английском).</string>
     <string name="app_description">Цей модуль дозволяє змінити деякі загальні налаштування без необхідності редагування APK, для кожної програми:
 \n- Контроль скріншота
 \n- щільність/dpi

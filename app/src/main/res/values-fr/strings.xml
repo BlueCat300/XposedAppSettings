@@ -11,7 +11,7 @@ Garder résident en mémoire; Pas de plein écran IME; Orientation; Notification
     <string name="app_searchhint">nom ou packet</string>
     <string name="app_about">Un module <a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> écrit par
  <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> et <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
- \nVous pouvez utiliser <a href="http://forum.xda-developers.com/showthread.php?t=2437377">ce forum</a> pour vos questions ou suggestions.</string>
+ \nVous pouvez utiliser <a href="https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339">ce forum</a> pour vos questions ou suggestions.</string>
     <string name="app_description">Ce module permet de modifier certains points de configuration général pour des applis individuels, sans modification de fichier APK:
 \n- densité / dpi
 \n- taille des polices

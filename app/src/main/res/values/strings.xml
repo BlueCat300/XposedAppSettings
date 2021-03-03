@@ -11,7 +11,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="app_about">An <a href="https://forum.xda-developers.com/xposed">Xposed</a> module by
  <a href="https://forum.xda-developers.com/member.php?u=4419114">rovo89</a> and <a href="https://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
  \nSupport for the module on Android 8.0+ by Blue cat <a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>.
- \nYou can use <a href="https://forum.xda-developers.com/xposed/modules/mod-app-settings-reborn-t4141339">this thread</a> for questions or suggestions.</string>
+ \nYou can use <a href="https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339">this thread</a> for questions or suggestions.</string>
     <string name="app_description">This mod allows certain generic configurations to be changed on a per-app basis, without needing to edit APKs:
 \n- Screenshot control
 \n- density / dpi

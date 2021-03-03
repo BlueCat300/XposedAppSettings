@@ -32,17 +32,9 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
-
-import static android.os.Build.VERSION.SDK_INT;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.removeAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.setIntField;
-import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
@@ -77,7 +69,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 	@Override
 	public void handleLoadPackage(LoadPackageParam lpparam) {
 		if (lpparam.packageName.equals(Common.MY_PACKAGE_NAME)) {
-			findAndHookMethod(Common.MY_PACKAGE_NAME + ".ui.MainActivity",
+			XposedHelpers.findAndHookMethod(Common.MY_PACKAGE_NAME + ".ui.MainActivity",
 					lpparam.classLoader,
 					"isModuleActive",
 					XC_MethodReplacement.returnConstant(true));
@@ -91,7 +83,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 		if (isActive(prefs, lpparam.packageName, Common.PREF_LEGACY_MENU)) {
 			try {
-				findAndHookMethod(ViewConfiguration.class, "hasPermanentMenuKey",
+				XposedHelpers.findAndHookMethod(ViewConfiguration.class, "hasPermanentMenuKey",
 						XC_MethodReplacement.returnConstant(true));
 			} catch (Throwable t) {
 				XposedBridge.log(t);
@@ -148,7 +140,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 						n.flags |= Notification.FLAG_INSISTENT;
 					}
 					if (isActive(prefs, packageName, Common.PREF_NO_BIG_NOTIFICATIONS)) {
-						setObjectField(n, "bigContentView", null);
+						XposedHelpers.setObjectField(n, "bigContentView", null);
 					}
 					int ongoingNotif = prefs.getInt(packageName + Common.PREF_ONGOING_NOTIF,
 							Common.ONGOING_NOTIF_DEFAULT);
@@ -162,7 +154,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 						n.sound = null;
 						n.flags &= ~Notification.DEFAULT_SOUND;
 					}
-					if (SDK_INT < Build.VERSION_CODES.O && isActive(prefs, packageName) && prefs.contains(packageName + Common.PREF_NOTIF_PRIORITY)) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && isActive(prefs, packageName) && prefs.contains(packageName + Common.PREF_NOTIF_PRIORITY)) {
 						int priority = prefs.getInt(packageName + Common.PREF_NOTIF_PRIORITY, 0);
 						if (priority > 0 && priority < Common.notifPriCodes.length) {
 							n.flags &= ~Notification.FLAG_HIGH_PRIORITY;
@@ -173,12 +165,12 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 			};
 			String notificationHookedMethod = "enqueueNotificationInternal";
 			String notificationHookedClass = "com.android.server.notification.NotificationManagerService";
-			if (SDK_INT <= Build.VERSION_CODES.N_MR1) {
-				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
+			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+				XposedHelpers.findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
 						String.class, String.class, int.class, int.class, String.class, int.class, Notification.class, int[].class, int.class,
 						notifyHook);
 			} else {
-				findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
+				XposedHelpers.findAndHookMethod(notificationHookedClass, classLoader, notificationHookedMethod,
 						String.class, String.class, int.class, int.class, String.class, int.class, Notification.class, int.class,
 						notifyHook);
 			}
@@ -191,7 +183,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 		if (isActive(prefs, lpparam.packageName)) {
 			// Override settings used when loading resources
 			try {
-				findAndHookMethod(ContextWrapper.class, "attachBaseContext", Context.class, new XC_MethodHook() {
+				XposedHelpers.findAndHookMethod(ContextWrapper.class, "attachBaseContext", Context.class, new XC_MethodHook() {
 					@Override
 					protected void beforeHookedMethod(MethodHookParam param) {
 						if (param.args[0] != null && (param.args[0] instanceof Context)) {
@@ -245,7 +237,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 								if (dpi > 0) {
 									newMetrics.density = dpi / 160f;
 									newMetrics.densityDpi = dpi;
-									setIntField(config, "densityDpi", dpi);
+									XposedHelpers.setIntField(config, "densityDpi", dpi);
 								}
 								if (fontScale > 0) {
 									config.fontScale = fontScale / 100.0f;
@@ -280,10 +272,10 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 		if (isActive(prefs, lpparam.packageName, Common.PREF_MUTE)) {
 			try {
 				// Hook the AudioTrack API
-				findAndHookMethod(AudioTrack.class, "play", XC_MethodReplacement.returnConstant(null));
+				XposedHelpers.findAndHookMethod(AudioTrack.class, "play", XC_MethodReplacement.returnConstant(null));
 
 				// Hook the JetPlayer API
-				findAndHookMethod(JetPlayer.class, "play", XC_MethodReplacement.returnConstant(null));
+				XposedHelpers.findAndHookMethod(JetPlayer.class, "play", XC_MethodReplacement.returnConstant(null));
 
 				// Hook the MediaPlayer API
 				XC_MethodHook displayHook = new XC_MethodHook() {
@@ -291,17 +283,17 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 					protected void beforeHookedMethod(MethodHookParam param) {
 						// Detect if video will be used for this media
 						if (param.args[0] != null)
-							setAdditionalInstanceField(param.thisObject, "HasVideo", true);
+							XposedHelpers.setAdditionalInstanceField(param.thisObject, "HasVideo", true);
 						else
-							removeAdditionalInstanceField(param.thisObject, "HasVideo");
+							XposedHelpers.removeAdditionalInstanceField(param.thisObject, "HasVideo");
 					}
 				};
-				findAndHookMethod(MediaPlayer.class, "setSurface", Surface.class, displayHook);
-				findAndHookMethod(MediaPlayer.class, "setDisplay", SurfaceHolder.class, displayHook);
-				findAndHookMethod(MediaPlayer.class, "start", new XC_MethodHook() {
+				XposedHelpers.findAndHookMethod(MediaPlayer.class, "setSurface", Surface.class, displayHook);
+				XposedHelpers.findAndHookMethod(MediaPlayer.class, "setDisplay", SurfaceHolder.class, displayHook);
+				XposedHelpers.findAndHookMethod(MediaPlayer.class, "start", new XC_MethodHook() {
 					@Override
 					protected void beforeHookedMethod(MethodHookParam param) {
-						if (getAdditionalInstanceField(param.thisObject, "HasVideo") != null)
+						if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "HasVideo") != null)
 							// Video will be used - still start the media but with muted volume
 							((MediaPlayer) param.thisObject).setVolume(0, 0);
 						else
@@ -311,10 +303,10 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 				});
 
 				// Hook the SoundPool API
-				findAndHookMethod(SoundPool.class, "play", int.class, float.class, float.class,
+				XposedHelpers.findAndHookMethod(SoundPool.class, "play", int.class, float.class, float.class,
 						int.class, int.class, float.class,
 						XC_MethodReplacement.returnConstant(0));
-				findAndHookMethod(SoundPool.class, "resume", int.class, XC_MethodReplacement.returnConstant(null));
+				XposedHelpers.findAndHookMethod(SoundPool.class, "resume", int.class, XC_MethodReplacement.returnConstant(null));
 			} catch (Throwable t) {
 				XposedBridge.log(t);
 			}
@@ -353,7 +345,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 	private void dpiInSystem(XSharedPreferences prefs) {
 		// Hook to override DPI (globally, including resource load + rendering)
 		try {
-			findAndHookMethod(Display.class, "updateDisplayInfoLocked", new XC_MethodHook() {
+			XposedHelpers.findAndHookMethod(Display.class, "updateDisplayInfoLocked", new XC_MethodHook() {
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
 					String packageName = AndroidAppHelper.currentPackageName();
@@ -367,8 +359,8 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 							prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
 					if (packageDPI > 0) {
 						// Density for this package is overridden, change density
-						Object mDisplayInfo = getObjectField(param.thisObject, "mDisplayInfo");
-						setIntField(mDisplayInfo, "logicalDensityDpi", packageDPI);
+						Object mDisplayInfo = XposedHelpers.getObjectField(param.thisObject, "mDisplayInfo");
+						XposedHelpers.setIntField(mDisplayInfo, "logicalDensityDpi", packageDPI);
 					}
 				}
 			});

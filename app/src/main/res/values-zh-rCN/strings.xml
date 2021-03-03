@@ -11,7 +11,7 @@ DPI、覆盖资源、区域、全屏、
     <string name="app_about">由<a href="http://forum.xda-developers.com/member.php?u=4419114"> rovo89 </a>
 和<a href="http://forum.xda-developers.com/member.php?u=4322181"> Tungstwenty </a>开发的<a href="http://forum.xda-developers.com/showthread.php?t=1574401"> Xposed </a>模块。
 Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-developers.com/member.php?u=4798036">XDA</a> / <a href="http://4pda.ru/forum/index.php?showuser=2084748">4PDA</a>
- \n您可访问<a href="https://forum.xda-developers.com/xposed/modules/mod-app-settings-reborn-t4141339">此帖</a>提问及建议。</string>
+ \n您可访问<a href="https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339">此帖</a>提问及建议。</string>
     <string name="app_description">本模块允许您在不修改APK的情况下，修改应用程序的一些通用配置：
 \n- 截屏控制
 \n- 像素密度/DPI
@@ -34,7 +34,7 @@ Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-develo
 \n- 撤销权限（需要重启两次）
 \n- 强制使用传统（导航栏）的菜单按钮（不支持Android 10.0+）
 \n- 通知优先级（不支持Android 8.0+）
-\n- 禁用大型（扩展）通知
+\n- 禁用大型（扩展）通知</string>
     <string name="app_name">App Settings 重生版</string>
     <string name="app_version">版本: %s</string>
     <string name="app_translation">翻译: %s</string>
@@ -44,9 +44,7 @@ Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-develo
 
 
     <!-- main menu -->
-    <string name="menu_backup">导出</string>
-    <string name="menu_restore">导入</string>
-    <string name="menu_about">关于</string>
+
 
     <!-- drawer -->
     <string name="menu_backup">备份</string>

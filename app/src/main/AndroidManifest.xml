@@ -43,13 +43,13 @@
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
-            android:name="xposedsharedprefs"
-            android:value="true" />
-        <meta-data
             android:name="xposeddescription"
             android:value="@string/app_mod_summary" />
         <meta-data
             android:name="xposedminversion"
             android:value="90" />
+        <meta-data
+            android:name="xposedsharedprefs"
+            android:value="true" />
     </application>
 </manifest>

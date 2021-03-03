@@ -17,21 +17,9 @@ import java.lang.reflect.Method;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
-
-import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
-import static de.robv.android.xposed.XposedBridge.hookMethod;
-import static de.robv.android.xposed.XposedHelpers.callMethod;
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.findMethodExact;
-import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.getStaticIntField;
-import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
-import static de.robv.android.xposed.XposedHelpers.setIntField;
 
 
 class Activities {
@@ -44,7 +32,7 @@ class Activities {
 	private static final String PROP_ORIENTATION = "AppSettings-Orientation";
 
 	private static final int FLAG_NEEDS_MENU_KEY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 ?
-			0 : getStaticIntField(WindowManager.LayoutParams.class, "FLAG_NEEDS_MENU_KEY");
+			0 : XposedHelpers.getStaticIntField(WindowManager.LayoutParams.class, "FLAG_NEEDS_MENU_KEY");
     private static final String CLASS_PHONEWINDOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ?
 			"com.android.internal.policy.PhoneWindow" : "com.android.internal.policy.impl.PhoneWindow";
 
@@ -58,7 +46,7 @@ class Activities {
 			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.impl.PhoneWindow.DecorView";
 		}
 		try {
-			findAndHookMethod(CLASS_PHONEWINDOW, null, "generateLayout",
+			XposedHelpers.findAndHookMethod(CLASS_PHONEWINDOW, null, "generateLayout",
 					CLASS_PHONEWINDOW_DECORVIEW, new XC_MethodHook() {
 
 				protected void beforeHookedMethod(MethodHookParam param) {
@@ -81,14 +69,14 @@ class Activities {
 					}
 					if (fullscreen == Common.FULLSCREEN_FORCE) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
+						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
 					} else if (fullscreen == Common.FULLSCREEN_PREVENT) {
 						window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.FALSE);
+						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.FALSE);
 					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-						setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
-						setAdditionalInstanceField(decorView, PROP_IMMERSIVE, Boolean.TRUE);
+						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
+						XposedHelpers.setAdditionalInstanceField(decorView, PROP_IMMERSIVE, Boolean.TRUE);
 						decorView.setSystemUiVisibility(
 								View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 								| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -105,17 +93,17 @@ class Activities {
 
 					if (prefs.getBoolean(packageName + Common.PREF_SCREEN_ON, false)) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-						setAdditionalInstanceField(window, PROP_KEEP_SCREEN_ON, Boolean.TRUE);
+						XposedHelpers.setAdditionalInstanceField(window, PROP_KEEP_SCREEN_ON, Boolean.TRUE);
 					}
 
 					if (prefs.getBoolean(packageName + Common.PREF_LEGACY_MENU, false)) {
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 						     // NEEDS_MENU_SET_TRUE = 1
-						     callMethod(window, "setNeedsMenuKey", 1);
+							XposedHelpers.callMethod(window, "setNeedsMenuKey", 1);
 						}
 						else {
 						     window.setFlags(FLAG_NEEDS_MENU_KEY, FLAG_NEEDS_MENU_KEY);
-						     setAdditionalInstanceField(window, PROP_LEGACY_MENU, Boolean.TRUE);							
+							XposedHelpers.setAdditionalInstanceField(window, PROP_LEGACY_MENU, Boolean.TRUE);
 						}
 					}
 
@@ -130,12 +118,12 @@ class Activities {
 					int orientation = prefs.getInt(packageName + Common.PREF_ORIENTATION, prefs.getInt(Common.PREF_DEFAULT + Common.PREF_ORIENTATION, 0));
 					if (orientation > 0 && orientation < Common.orientationCodes.length && context instanceof Activity) {
 						((Activity) context).setRequestedOrientation(Common.orientationCodes[orientation]);
-						setAdditionalInstanceField(context, PROP_ORIENTATION, orientation);
+						XposedHelpers.setAdditionalInstanceField(context, PROP_ORIENTATION, orientation);
 					}
 				}
 			});
 
-			findAndHookMethod(Window.class, "setFlags", int.class, int.class,
+			XposedHelpers.findAndHookMethod(Window.class, "setFlags", int.class, int.class,
 					new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
@@ -143,7 +131,7 @@ class Activities {
 					int flags = (Integer) param.args[0];
 					int mask = (Integer) param.args[1];
 					if ((mask & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
-						Boolean fullscreen = (Boolean) getAdditionalInstanceField(param.thisObject, PROP_FULLSCREEN);
+						Boolean fullscreen = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_FULLSCREEN);
 						if (fullscreen != null) {
 							if (fullscreen) {    //fullscreen.booleanValue())
 								flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
@@ -154,7 +142,7 @@ class Activities {
 						}
 					}
 					if ((mask & WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0) {
-						Boolean keepScreenOn = (Boolean) getAdditionalInstanceField(param.thisObject, PROP_KEEP_SCREEN_ON);
+						Boolean keepScreenOn = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_KEEP_SCREEN_ON);
 						if (keepScreenOn != null) {
 							if (keepScreenOn) {
 								flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
@@ -163,7 +151,7 @@ class Activities {
 						}
 					}
 					if ((mask & FLAG_NEEDS_MENU_KEY) != 0) {
-						Boolean menu = (Boolean) getAdditionalInstanceField(param.thisObject, PROP_LEGACY_MENU);
+						Boolean menu = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_LEGACY_MENU);
 						if (menu != null) {
 							if (menu) {   //menu.booleanValue())
 								flags |= FLAG_NEEDS_MENU_KEY;
@@ -174,7 +162,7 @@ class Activities {
 				}
 			});
 
-			findAndHookMethod("android.view.ViewRootImpl", null,
+			XposedHelpers.findAndHookMethod("android.view.ViewRootImpl", null,
 					"dispatchSystemUiVisibilityChanged", int.class, int.class, int.class, int.class, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
@@ -184,8 +172,8 @@ class Activities {
 						return;
 
 					// Should it be hidden?
-					View decorView = (View) getObjectField(param.thisObject, "mView");
-					Boolean immersive = (decorView == null) ? null : (Boolean) getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
+					View decorView = (View) XposedHelpers.getObjectField(param.thisObject, "mView");
+					Boolean immersive = (decorView == null) ? null : (Boolean) XposedHelpers.getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
 					if (immersive == null || !immersive) //immersive.booleanValue())
 						return;
 
@@ -199,17 +187,17 @@ class Activities {
 			});
 
 			// force orientation
-			findAndHookMethod(Activity.class, "setRequestedOrientation", int.class, new XC_MethodHook() {
+			XposedHelpers.findAndHookMethod(Activity.class, "setRequestedOrientation", int.class, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
-					Integer orientation = (Integer) getAdditionalInstanceField(param.thisObject, PROP_ORIENTATION);
+					Integer orientation = (Integer) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_ORIENTATION);
 					if (orientation != null)
 						param.args[0] = Common.orientationCodes[orientation];
 				}
 			});
 
 			// fullscreen keyboard input
-			findAndHookMethod(InputMethodService.class, "doStartInput",
+			XposedHelpers.findAndHookMethod(InputMethodService.class, "doStartInput",
 					InputConnection.class, EditorInfo.class, boolean.class, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
@@ -231,16 +219,16 @@ class Activities {
 			ClassLoader classLoader = lpparam.classLoader;
 			Method mthRealStartActivityLocked;
 			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-				mthRealStartActivityLocked = findMethodExact("com.android.server.am.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
+				mthRealStartActivityLocked = XposedHelpers.findMethodExact("com.android.server.am.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
 						"com.android.server.am.ActivityRecord", "com.android.server.am.ProcessRecord",
 						boolean.class, boolean.class);
 			} else {
-				mthRealStartActivityLocked = findMethodExact("com.android.server.wm.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
+				mthRealStartActivityLocked = XposedHelpers.findMethodExact("com.android.server.wm.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
 						"com.android.server.wm.ActivityRecord", "com.android.server.wm.WindowProcessController",
 						boolean.class, boolean.class);
 			}
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                findAndHookConstructor("com.android.server.am.ProcessRecord", classLoader, "com.android.server.am.ActivityManagerService",
+				XposedHelpers.findAndHookConstructor("com.android.server.am.ProcessRecord", classLoader, "com.android.server.am.ActivityManagerService",
 						"android.content.pm.ApplicationInfo", String.class, int.class, new XC_MethodHook() {
 					@Override
 					protected void afterHookedMethod(MethodHookParam param) {
@@ -250,28 +238,28 @@ class Activities {
             }
 
             // Resident
-			hookMethod(mthRealStartActivityLocked, new XC_MethodHook() {
+			XposedBridge.hookMethod(mthRealStartActivityLocked, new XC_MethodHook() {
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
-					String pkgName = (String) getObjectField(param.args[0], "packageName");
+					String pkgName = (String) XposedHelpers.getObjectField(param.args[0], "packageName");
 					if (XposedMod.isActive(prefs, pkgName, Common.PREF_RESIDENT)) {
 						int adj = -12;
-						Object proc = getObjectField(param.args[0], "app");
+						Object proc = XposedHelpers.getObjectField(param.args[0], "app");
 
 						// Override the *Adj values if meant to be resident in memory
 						if (proc != null) {
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 								proc = processRecord;
 							}
-							setIntField(proc, "maxAdj", adj);
+							XposedHelpers.setIntField(proc, "maxAdj", adj);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-								setIntField(proc, "mCurRawAdj", adj);
+								XposedHelpers.setIntField(proc, "mCurRawAdj", adj);
 							} else {
-								setIntField(proc, "curRawAdj", adj);
+								XposedHelpers.setIntField(proc, "curRawAdj", adj);
 							}
-							setIntField(proc, "setRawAdj", adj);
-							setIntField(proc, "curAdj", adj);
-							setIntField(proc, "setAdj", adj);
+							XposedHelpers.setIntField(proc, "setRawAdj", adj);
+							XposedHelpers.setIntField(proc, "curAdj", adj);
+							XposedHelpers.setIntField(proc, "setAdj", adj);
 						}
 					}
 				}
@@ -282,10 +270,10 @@ class Activities {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 				activityRecordClass = "com.android.server.wm.ActivityRecord";
 			}
-			hookAllConstructors(findClass(activityRecordClass, classLoader), new XC_MethodHook() {
+			XposedBridge.hookAllConstructors(XposedHelpers.findClass(activityRecordClass, classLoader), new XC_MethodHook() {
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
-					ActivityInfo aInfo = (ActivityInfo) getObjectField(param.thisObject, "info");
+					ActivityInfo aInfo = (ActivityInfo) XposedHelpers.getObjectField(param.thisObject, "info");
 					if (aInfo == null)
 						return;
 					String pkgName = aInfo.packageName;
@@ -293,7 +281,7 @@ class Activities {
 						int recentsMode = prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT);
 						if (recentsMode == Common.PREF_RECENTS_DEFAULT)
 							return;
-						Intent intent = (Intent) getObjectField(param.thisObject, "intent");
+						Intent intent = (Intent) XposedHelpers.getObjectField(param.thisObject, "intent");
 						if (recentsMode == Common.PREF_RECENTS_FORCE) {
 							int flags = (intent.getFlags() & ~Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 							intent.setFlags(flags);
@@ -310,11 +298,11 @@ class Activities {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 				recentTasksClass = "com.android.server.wm.ActivityTaskManagerService";
 			}
-			findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",
+			XposedHelpers.findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",
 					String.class, int.class, int.class, new XC_MethodHook() {
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
-					Context mContext = (Context) getObjectField(param.thisObject, "mContext");
+					Context mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
 					String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
 					if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(prefs, callingApp, Common.PREF_RECENT_TASKS)) {
 						param.setResult(true);

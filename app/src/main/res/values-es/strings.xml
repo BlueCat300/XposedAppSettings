@@ -10,7 +10,7 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
     <string name="app_searchhint">nombre o paquete</string>
     <string name="app_about">Un módulo <a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> creado por
  <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> y <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
- \nPuede ingresar a <a href="http://forum.xda-developers.com/showthread.php?t=2437377">este hilo</a> para realizar preguntas o sugerencias.</string>
+ \nPuede ingresar a <a href="https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339">este hilo</a> para realizar preguntas o sugerencias.</string>
     <string name="app_description">Este módulo permite cambiar ciertos ajustes genéricos para cada aplicación sin la necesidad de editar APKs:
 \n- densidad / dpi
 \n- escala de la fuente

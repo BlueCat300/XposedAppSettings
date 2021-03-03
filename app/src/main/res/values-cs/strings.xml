@@ -9,7 +9,7 @@ DPI, velikost písma, jazyk, načítání zdrojů, zobrazení na celou obrazovku
     <string name="app_searchhint">Jméno nebo balíček</string>
     <string name="app_about"><a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> modul od
  <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> a <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
- \nMůžete použít <a href="http://forum.xda-developers.com/showthread.php?t=2437377">toto vlákno</a> pro otázky a návrhy.</string>
+ \nMůžete použít <a href="https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339">toto vlákno</a> pro otázky a návrhy.</string>
     <string name="app_description">Tento modul vám umožní změnit několik základních nastavení pro jednotlivé aplikace bez nutnosti upravovat APK:
 \n- DPI
 \n- velikost písma
