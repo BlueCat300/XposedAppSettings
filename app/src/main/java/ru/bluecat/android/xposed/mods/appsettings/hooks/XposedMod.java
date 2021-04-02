@@ -225,6 +225,7 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 								int hdp = Common.hdp[screen];
 
 								boolean xlarge = prefs.getBoolean(packageName + Common.PREF_XLARGE, false);
+								boolean ltr = prefs.getBoolean(packageName + Common.PREF_LTR, false);
 
 								if (swdp > 0) {
 									config.smallestScreenWidthDp = swdp;
@@ -248,6 +249,10 @@ public class XposedMod implements IXposedHookLoadPackage, IXposedHookZygoteInit 
 
 								if (loc != null) {
 									config.setLocale(loc);
+								}
+
+								if (ltr) {
+									config.setLayoutDirection(new Locale("en-us"));
 								}
 								context = context.createConfigurationContext(config);
 							}

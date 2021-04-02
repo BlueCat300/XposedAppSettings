@@ -205,6 +205,9 @@ public class ApplicationsActivity extends AppCompatActivity {
 		// Update Tablet field
 		((CheckBox) findViewById(R.id.chkXlarge)).setChecked(prefs.getBoolean(pkgName + Common.PREF_XLARGE, false));
 
+		// Update Layout field
+		((CheckBox) findViewById(R.id.chkLTR)).setChecked(prefs.getBoolean(pkgName + Common.PREF_LTR, false));
+
 		// Update Screenshot field
 		{
 			int screenshot = prefs.getInt(pkgName + Common.PREF_SCREENSHOT, Common.PREF_SCREENSHOT_DEFAULT);
@@ -460,6 +463,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		settingKeys.add(pkgName + Common.PREF_FONT_SCALE);
 		settingKeys.add(pkgName + Common.PREF_SCREEN);
 		settingKeys.add(pkgName + Common.PREF_XLARGE);
+		settingKeys.add(pkgName + Common.PREF_LTR);
 		settingKeys.add(pkgName + Common.PREF_SCREENSHOT);
 		settingKeys.add(pkgName + Common.PREF_LOCALE);
 		settingKeys.add(pkgName + Common.PREF_FULLSCREEN);
@@ -518,6 +522,9 @@ public class ApplicationsActivity extends AppCompatActivity {
 
 			if (((CheckBox) findViewById(R.id.chkXlarge)).isChecked())
 				settings.put(pkgName + Common.PREF_XLARGE, true);
+
+			if (((CheckBox) findViewById(R.id.chkLTR)).isChecked())
+				settings.put(pkgName + Common.PREF_LTR, true);
 
 			int screenshot = ((Spinner) findViewById(R.id.spnScreenshot)).getSelectedItemPosition();
 			if (screenshot > 0)
