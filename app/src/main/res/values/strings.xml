@@ -23,6 +23,8 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 \n- keep screen on while app is visible
 \n- show app above lockscreen
 \n- disable fullscreen keyboard input
+\n- Force LTR
+\n- Auto hide fullscreen
 \n- force orientation (portrait/landscape/auto)
 \n- mute audio (for most apps)
 \n- insistent notifications (loop the sound / reboot required)
