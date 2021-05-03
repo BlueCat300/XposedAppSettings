@@ -79,6 +79,7 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="settings_listres">Ресурсы</string>
     <string name="settings_screen">Экран (dp)</string>
     <string name="settings_xlargeres">xlarge рес.</string>
+    <string name="settings_ltr">Всегда LTR</string>
     <string name="settings_screenshot">Скриншот</string>
     <string name="settings_locale">Язык</string>
     <string name="settings_fullscreen">Полный экран</string>
