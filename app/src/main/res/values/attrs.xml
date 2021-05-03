@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="about" format="reference|color" />
+    <attr name="drawer_background" format="reference|color" />
+    <attr name="drawer_header" format="reference|color" />
+    <attr name="package_name" format="reference|color" />
+    <attr name="app_settings" format="reference|color" />
+    <attr name="app_list_item" format="reference|color" />
+    <attr name="dialog_background" format="reference|color" />
+    <attr name="spinner" format="reference|color" />
 
     <declare-styleable name="FilterItemComponent">
         <attr name="label" format="string" />
@@ -7,5 +15,4 @@
         <attr name="overridden_label" format="string" />
         <attr name="unchanged_label" format="string" />
     </declare-styleable>
-
 </resources>

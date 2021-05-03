@@ -4,5 +4,5 @@
     android:viewportHeight="24"
     android:viewportWidth="24"
     android:tint="?colorControlNormal">
-    <path android:fillColor="@color/ic_vector" android:pathData="M10,16.5l6,-4.5 -6,-4.5v9zM12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8z"/>
+    <path android:fillColor="@color/ic_vector" android:pathData="M9.5,2c-1.82,0 -3.53,0.5 -5,1.35c2.99,1.73 5,4.95 5,8.65s-2.01,6.92 -5,8.65C5.97,21.5 7.68,22 9.5,22c5.52,0 10,-4.48 10,-10S15.02,2 9.5,2z"/>
 </vector>

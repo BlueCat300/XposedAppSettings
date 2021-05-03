@@ -1,29 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Main" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/blue_gray</item>
-        <item name="colorPrimaryDark">@color/dark_blue_gray</item>
-        <item name="colorAccent">@color/light_blue</item>
-        <item name="android:windowBackground">@color/black_gray</item>
-        <item name="android:itemBackground">@color/dark_blue_gray</item>
-        <item name="android:navigationBarColor">@color/dark_blue_gray</item>
-        <item name="android:alertDialogTheme">@style/Theme.Main.Dialog</item>
+    <style name="Theme.Main.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:navigationBarColor">@color/navigation</item>
+        <item name="android:itemBackground">@color/options_menu</item>
+        <item name="android:itemTextAppearance">@style/Theme.Main.Light.OptionsMenu</item>
+        <item name="colorPrimary">@color/navigation</item>
+        <item name="colorPrimaryDark">@color/status_bar</item>
+        <item name="colorAccent">@color/control_text</item>
+        <item name="about">@color/about</item>
+        <item name="drawer_background">@color/drawer_background</item>
+        <item name="drawer_header">@color/drawer_header</item>
+        <item name="package_name">@color/package_name</item>
+        <item name="app_settings">@color/app_settings</item>
+        <item name="app_list_item">@color/app_list_item</item>
+        <item name="dialog_background">@color/dialog_background</item>
+        <item name="spinner">@color/spinner</item>
+    </style>
+    <style name="Theme.Main.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:navigationBarColor">@color/navigation_dark</item>
+        <item name="android:itemBackground">@color/options_menu_dark</item>
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="colorPrimary">@color/toolbar_dark</item>
+        <item name="colorPrimaryDark">@color/status_bar_dark</item>
+        <item name="colorAccent">@color/control_text</item>
+        <item name="alertDialogTheme">@style/Theme.Main.Dialog</item>
+        <item name="about">@color/about_dark</item>
+        <item name="drawer_background">@color/drawer_background_dark</item>
+        <item name="drawer_header">@color/drawer_header_dark</item>
+        <item name="package_name">@color/package_name_dark</item>
+        <item name="app_settings">@color/app_settings_dark</item>
+        <item name="app_list_item">@color/app_list_item_dark</item>
+        <item name="dialog_background">@color/dialog_background_dark</item>
+        <item name="spinner">@color/spinner_dark</item>
+    </style>
+    <style name="Theme.Main.Light.OptionsMenu">
+        <item name="android:textColor">@color/options_menu_item</item>
     </style>
     <style name="Theme.Main.Dialog" parent="@style/Theme.AppCompat.Dialog.Alert">
         <item name="android:textColorPrimary">@color/dialog_text_color</item>
         <item name="android:textColorSecondary">@color/dialog_text_color</item>
-        <item name="android:background">@color/blue_gray</item>
-        <item name="android:textColorAlertDialogListItem">@color/white</item>
-        <item name="colorAccent">@color/light_blue</item>
+        <item name="android:background">@color/dialog_background_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/dialog_text_dark</item>
+        <item name="colorAccent">@color/control_text</item>
     </style>
-    <style name="Theme.Legacy.Dialog" parent="Theme.Main">
-        <item name="android:textColorPrimary">@color/dialog_text_color</item>
-        <item name="android:textColorSecondary">@color/dialog_text_color</item>
-        <item name="android:background">@color/blue_gray</item>
-        <item name="android:textColorAlertDialogListItem">@color/white</item>
-        <item name="colorAccent">@color/light_blue</item>
+    <style name="Theme.Main.Dialog.Light.ProgressDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColorPrimary">@color/dialog_text</item>
+        <item name="android:textColorSecondary">@color/dialog_text</item>
+        <item name="colorAccent">@color/control_text</item>
+    </style>
+    <style name="LegacyDialog">
         <item name="android:windowNoTitle">false</item>
         <item name="android:windowIsFloating">true</item>
+        <item name="android:windowBackground">?attr/dialog_background</item>
     </style>
     <style name="Theme.AppCompat.Translucent">
         <item name="android:windowNoTitle">true</item>

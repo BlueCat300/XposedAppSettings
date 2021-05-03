@@ -146,6 +146,11 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="settings_apply_title">Применить</string>
     <string name="settings_apply_detail">Так же, убить приложение, чтобы оно подхватило новые настройки?</string>
 
+    <!-- Theme -->
+    <string name="theme_title">Тема</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_auto">Системная</string>
 
     <!-- Filter dialog -->
     <string name="filter_title">Фильтр</string>
@@ -153,7 +158,7 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="filter_overridden">Изменен</string>
     <string name="filter_unchanged">Не изменен</string>
     <string name="filter_type">Тип</string>
-    <string name="filter_user">Пользовательские</string>
+    <string name="filter_user">Пользов-ские</string>
     <string name="filter_system">Системные</string>
     <string name="filter_state">Состояние</string>
     <string name="filter_enabled">Рабочее</string>

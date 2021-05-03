@@ -75,6 +75,7 @@ import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterStat
 import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
 import ru.bluecat.android.xposed.mods.appsettings.R;
 import ru.bluecat.android.xposed.mods.appsettings.SELinux;
+import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
 
 import static ru.bluecat.android.xposed.mods.appsettings.ui.BackupActivity.restoreSuccessful;
 
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				}
 			}
 		}
+		ThemeUtil.setTheme(this, prefs);
 		activityContext = this;
 		setContentView(R.layout.activity_main);
 		Toolbar toolbar = findViewById(R.id.toolbar);
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	public static void frameworkWarning(Activity context, int warningType) {
-		AlertDialog.Builder dialog = new AlertDialog.Builder(context, R.style.Theme_Main_Dialog);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 		dialog.setTitle(R.string.app_framework_warning_title);
 		int message = R.string.app_framework_warning_message;
 		if(warningType == 2) {
@@ -197,6 +199,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			appFilter();
 		} else if (id == R.id.drawer_permission) {
 			permissionFilter();
+		} else if (id == R.id.drawer_theme) {
+			ThemeUtil.setThemeDialog(this, prefs);
 		} else if (id == R.id.drawer_about) {
 			showAboutDialog();
 		}
@@ -257,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			getMenuInflater().inflate(R.menu.menu_app, menu);
 			menu.findItem(R.id.menu_save).setVisible(false);
 
-			ApplicationsActivity.updateMenuEntries(getApplicationContext(), menu, appInfo.packageName);
+			ApplicationsActivity.updateMenuEntries(this, menu, appInfo.packageName);
 		} else {
 			super.onCreateContextMenu(menu, v, menuInfo);
 		}
@@ -324,11 +328,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	static void showBackupSnackbar(int stringId) {
-		new Handler().postDelayed(() -> {
+		new Handler(Looper.getMainLooper()).postDelayed(() -> {
+			int background = R.color.snackbar_background;
+			int text = R.color.snackbar_text;
+			if(ThemeUtil.isNightTheme(activityContext, prefs)) {
+				background = R.color.snackbar_background_dark;
+				text = R.color.snackbar_text_dark;
+			}
+
 			Snackbar snackbar = Snackbar
 					.make(activityContext.findViewById(android.R.id.content), stringId, Snackbar.LENGTH_SHORT)
-					.setActionTextColor(ContextCompat.getColor(activityContext, R.color.white));
-			snackbar.getView().setBackgroundColor(ContextCompat.getColor(activityContext, R.color.blue_gray));
+					.setTextColor(ContextCompat.getColor(activityContext, text));
+			snackbar.getView().setBackgroundColor(ContextCompat.getColor(activityContext, background));
 			TextView centredMessage = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
 			centredMessage.setGravity(Gravity.CENTER);
 			snackbar.show();
@@ -410,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			return false;
 		});
 
-		new AlertDialog.Builder(this, R.style.Theme_Main_Dialog)
+		new AlertDialog.Builder(this)
 			.setTitle(R.string.recents_title)
 			.setAdapter(adapter, (dialog, which) -> {
 				Intent i = new Intent(getApplicationContext(), ApplicationsActivity.class);
@@ -448,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		}
 
 		// Prepare and show the dialog
-		AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+		AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
 		dlgBuilder.setTitle(R.string.app_name);
 		dlgBuilder.setCancelable(true);
 		dlgBuilder.setIcon(R.drawable.ic_launcher);
@@ -546,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		Dialog filterDialog;
 		Map<String, FilterItemComponent> filterComponents;
 
-		filterDialog = new Dialog(this, R.style.Theme_Legacy_Dialog);
+		filterDialog = new Dialog(this, R.style.LegacyDialog);
 		filterDialog.setContentView(R.layout.filter_dialog);
 		filterDialog.setTitle(R.string.filter_title);
 		filterDialog.setCancelable(true);
@@ -606,7 +617,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
 		appListAdapter.getFilter().filter(nameFilter);
 
-		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+		AlertDialog.Builder bld = new AlertDialog.Builder(this);
 		bld.setCancelable(true);
 		bld.setTitle(R.string.perms_filter_title);
 
@@ -623,7 +634,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				items.add(unknownPerm);
 			}
 		}
-		PermissionsListAdapter adapter = new PermissionsListAdapter(this, items, new HashSet<>(), false);
+		PermissionsListAdapter adapter = new PermissionsListAdapter(this, items, new HashSet<>(), false, prefs);
 		bld.setAdapter(adapter, (dialog, which) -> {
 			filterPermissionUsage = Objects.requireNonNull(adapter.getItem(which)).name;
 			appListAdapter.getFilter().filter(nameFilter);
@@ -904,9 +915,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 			final ApplicationInfo app = filteredAppList.get(position);
 
+			int pkgColor = R.color.package_name;
+			if(ThemeUtil.isNightTheme(activityContext, prefs)) pkgColor = R.color.package_name_dark;
+
 			holder.app_name.setText(app.name == null ? "" : app.name);
 			holder.app_package.setTextColor(prefs.getBoolean(app.packageName + Common.PREF_ACTIVE, false)
-					? Color.RED : Color.parseColor("#0099CC"));
+					? Color.RED : ContextCompat.getColor(mContext, pkgColor));
 			holder.app_package.setText(app.packageName);
 			holder.app_icon.setImageDrawable(defaultIcon);
 

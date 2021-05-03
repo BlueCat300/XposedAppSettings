@@ -3,6 +3,7 @@ package ru.bluecat.android.xposed.mods.appsettings.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -20,6 +21,7 @@ import java.util.Set;
 
 import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
 import ru.bluecat.android.xposed.mods.appsettings.R;
+import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
 
 
 /**
@@ -40,8 +42,9 @@ public class PermissionSettings {
 	 * Prepare a dialog for editing the permissions for the supplied package,
 	 * with the provided owner activity and initial settings
 	 */
-	PermissionSettings(Activity owner, String pkgName, boolean revoking, Set<String> disabledPermissions) throws NameNotFoundException {
-		dialog = new Dialog(owner, R.style.Theme_Legacy_Dialog);
+	PermissionSettings(Activity owner, String pkgName, boolean revoking,
+					   Set<String> disabledPermissions, SharedPreferences prefs) throws NameNotFoundException {
+		dialog = new Dialog(owner, R.style.LegacyDialog);
 		dialog.setContentView(R.layout.permissions_dialog);
 		dialog.setTitle(R.string.perms_title);
 		dialog.setCancelable(true);
@@ -59,18 +62,28 @@ public class PermissionSettings {
 		// Load the list of permissions for the package and present them
 		loadPermissionsList(pkgName);
 
-		final PermissionsListAdapter appListAdapter = new PermissionsListAdapter(owner, permsList, disabledPerms, true);
+		final PermissionsListAdapter appListAdapter = new PermissionsListAdapter(owner, permsList, disabledPerms, true, prefs);
 		appListAdapter.setCanEdit(revokeActive);
 		((ListView) dialog.findViewById(R.id.lstPermissions)).setAdapter(appListAdapter);
 
 		// Track changes to the Revoke checkbox to lock or unlock the list of
 		// permissions
+		int tempNotActive = Color.GRAY;
+		int tempActive = Color.WHITE;
+		if (ThemeUtil.isNightTheme(owner, prefs)) {
+			tempNotActive = Color.DKGRAY;
+			tempActive = Color.BLACK;
+		}
+		int activePermissions = tempActive;
+		int notActivePermissions = tempNotActive;
+
 		swtRevoke.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			revokeActive = isChecked;
-			dialog.findViewById(R.id.lstPermissions).setBackgroundColor(revokeActive ? Color.BLACK : Color.DKGRAY);
+
+			dialog.findViewById(R.id.lstPermissions).setBackgroundColor(revokeActive ? activePermissions : notActivePermissions);
 			appListAdapter.setCanEdit(revokeActive);
 		});
-		dialog.findViewById(R.id.lstPermissions).setBackgroundColor(revokeActive ? Color.BLACK : Color.DKGRAY);
+		dialog.findViewById(R.id.lstPermissions).setBackgroundColor(revokeActive ? activePermissions : notActivePermissions);
 
 		dialog.findViewById(R.id.btnPermsCancel).setOnClickListener(v -> {
 			if (onCancelListener != null)

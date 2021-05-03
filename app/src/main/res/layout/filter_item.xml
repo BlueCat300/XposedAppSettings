@@ -9,7 +9,8 @@
         android:id="@+id/txtFilterName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray" >
+        android:textColor="@color/filter_item_text"
+        android:background="@color/filter_item" >
     </TextView>
 
     <RadioGroup

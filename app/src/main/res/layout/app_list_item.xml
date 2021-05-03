@@ -22,7 +22,7 @@
             android:id="@+id/app_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white_gray"
+            android:textColor="?attr/app_list_item"
             android:gravity="start" />
 
         <TextView
@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:textColor="@color/blue" />
+            android:textColor="?attr/package_name" />
     </LinearLayout>
 
 </LinearLayout>

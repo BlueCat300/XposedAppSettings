@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,6 +62,7 @@ import ru.bluecat.android.xposed.mods.appsettings.LocaleList;
 import ru.bluecat.android.xposed.mods.appsettings.PrefFileManager;
 import ru.bluecat.android.xposed.mods.appsettings.R;
 import ru.bluecat.android.xposed.mods.appsettings.SELinux;
+import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
 
 import static ru.bluecat.android.xposed.mods.appsettings.ui.MainActivity.isSELinuxCheckerEnabled;
 
@@ -127,6 +130,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 				return;
 			}
 		}
+		ThemeUtil.setTheme(this, prefs);
 		setContentView(R.layout.app_settings);
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
@@ -245,7 +249,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 
 		// Helper to list all apk folders under /res
 		findViewById(R.id.btnListRes).setOnClickListener(v -> {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 			ScrollView scrollPane = new ScrollView(this);
 			TextView txtPane = new TextView(this);
@@ -437,7 +441,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		btnPermissions.setOnClickListener(v -> {
 			// set up permissions editor
 			try {
-				final PermissionSettings permsDlg = new PermissionSettings(this, pkgName, allowRevoking, disabledPermissions);
+				final PermissionSettings permsDlg = new PermissionSettings(this, pkgName, allowRevoking, disabledPermissions, prefs);
 				permsDlg.setOnOkListener(obj -> {
 					allowRevoking = permsDlg.getRevokeActive();
 					disabledPermissions.clear();
@@ -611,7 +615,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		}
 
 		// Require confirmation to exit the screen and lose configuration changes
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.settings_unsaved_title);
 		builder.setIconAttribute(android.R.attr.alertDialogIcon);
 		builder.setMessage(R.string.settings_unsaved_detail);
@@ -630,16 +634,20 @@ public class ApplicationsActivity extends AppCompatActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_app, menu);
-		updateMenuEntries(getApplicationContext(), menu, pkgName);
+		updateMenuEntries(this, menu, pkgName);
 		return true;
 	}
 
-	public static void updateMenuEntries(Context context, Menu menu, String pkgName) {
+	public static void updateMenuEntries(Activity context, Menu menu, String pkgName) {
 		if (context.getPackageManager().getLaunchIntentForPackage(pkgName) == null) {
 			menu.findItem(R.id.menu_app_launch).setEnabled(false);
-			Drawable icon = menu.findItem(R.id.menu_app_launch).getIcon().mutate();
-			icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
-			menu.findItem(R.id.menu_app_launch).setIcon(icon);
+			if (!ThemeUtil.isNightTheme(context, prefs)) {
+				setItemDisabled(menu, 1);
+			} else {
+				Drawable icon = menu.findItem(R.id.menu_app_launch).getIcon().mutate();
+				icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
+				menu.findItem(R.id.menu_app_launch).setIcon(icon);
+			}
 		}
 
 		boolean hasMarketLink = false;
@@ -652,17 +660,30 @@ public class ApplicationsActivity extends AppCompatActivity {
 		}
 
 		menu.findItem(R.id.menu_app_store).setEnabled(hasMarketLink);
-		try {
-			Resources res = context.createPackageContext("com.android.vending", 0).getResources();
-			int id = res.getIdentifier("ic_launcher_play_store", "mipmap", "com.android.vending");
-			Drawable icon = ResourcesCompat.getDrawable(context.getResources(), id, null);
-			if (!hasMarketLink) {
-				icon = Objects.requireNonNull(icon).mutate();
-				icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
+
+		if (!hasMarketLink) {
+			if (!ThemeUtil.isNightTheme(context, prefs)) {
+				setItemDisabled(menu, 3);
+			} else {
+				try {
+					Resources res = context.createPackageContext("com.android.vending", 0).getResources();
+					int id = res.getIdentifier("ic_launcher_play_store", "mipmap", "com.android.vending");
+					Drawable icon = ResourcesCompat.getDrawable(context.getResources(), id, null);
+					icon = Objects.requireNonNull(icon).mutate();
+					icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
+
+					menu.findItem(R.id.menu_app_store).setIcon(icon);
+				} catch (Exception ignored) {
+				}
 			}
-			menu.findItem(R.id.menu_app_store).setIcon(icon);
-		} catch (Exception ignored) {
 		}
+	}
+
+	private static void setItemDisabled (Menu menu, int id) {
+		MenuItem item = menu.getItem(id);
+		SpannableString spanString = new SpannableString(item.getTitle().toString());
+		spanString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, spanString.length(), 0);
+		item.setTitle(spanString);
 	}
 
 	@Override
@@ -684,7 +705,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 	}
 
 	private void confirmReboot () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.menu_reboot_confirm);
 		builder.setMessage(R.string.menu_reboot_confirm_desc);
 		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
@@ -733,7 +754,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		initialSettings = newSettings;
 
 		// Check if in addition to saving the settings, the app should also be killed
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_Main_Dialog);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.settings_apply_title);
 		builder.setMessage(R.string.settings_apply_detail);
 		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {

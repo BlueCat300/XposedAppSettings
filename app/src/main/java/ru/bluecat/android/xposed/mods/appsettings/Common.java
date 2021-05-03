@@ -26,6 +26,7 @@ public class Common {
 
 	public static String PREFS = "ModSettings";
 
+	public static String PREF_THEME = "app-theme";
 	public static String PREF_DEFAULT = "default";
 	public static String PREF_ACTIVE = "/active";
 	public static String PREF_DPI = "/dpi";

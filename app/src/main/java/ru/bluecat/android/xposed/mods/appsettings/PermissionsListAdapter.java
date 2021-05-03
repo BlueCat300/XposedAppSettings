@@ -1,6 +1,7 @@
 package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +30,18 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 	private final List<PermissionInfo> originalPermsList;
 	private final Set<String> disabledPerms;
 	private final boolean allowEdits;
+	private final SharedPreferences prefs;
 	private boolean canEdit;
 	private Filter mFilter;
 
-	public PermissionsListAdapter(Activity context, List<PermissionInfo> items, Set<String> disabledPerms, boolean allowEdits) {
+	public PermissionsListAdapter(Activity context, List<PermissionInfo> items, Set<String> disabledPerms,
+								  boolean allowEdits, SharedPreferences prefs) {
 		super(context, R.layout.app_permission_item, items);
 		this.context = context;
 		originalPermsList = new ArrayList<>(items);
 		this.disabledPerms = disabledPerms;
 		this.allowEdits = allowEdits;
+		this.prefs = prefs;
 		canEdit = false;
 	}
 
@@ -88,7 +93,9 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 			vHolder.tvDescription.setTextColor(Color.YELLOW);
 			break;
 		default:
-			vHolder.tvDescription.setTextColor(Color.parseColor("#0099CC"));
+			int descBaseColor = R.color.permission_desc;
+			if (ThemeUtil.isNightTheme(context, prefs)) descBaseColor = R.color.permission_desc_dark;
+			vHolder.tvDescription.setTextColor(ContextCompat.getColor(context, descBaseColor));
 			break;
 		}
 
@@ -98,7 +105,8 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 			vHolder.tvName.setTextColor(Color.MAGENTA);
 		} else {
 			vHolder.tvName.setPaintFlags(vHolder.tvName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-			vHolder.tvName.setTextColor(Color.WHITE);
+			if (!ThemeUtil.isNightTheme(context, prefs)) vHolder.tvName.setTextColor(Color.BLACK);
+			else vHolder.tvName.setTextColor(Color.WHITE);
 		}
 		if (allowEdits) {
 			row.setOnClickListener(v -> {
@@ -111,7 +119,8 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 					//noinspection SuspiciousMethodCalls
 					disabledPerms.remove(tv.getTag());
 					tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-					tv.setTextColor(Color.WHITE);
+					if (!ThemeUtil.isNightTheme(context, prefs)) tv.setTextColor(Color.BLACK);
+					else tv.setTextColor(Color.WHITE);
 				} else {
 					disabledPerms.add((String) tv.getTag());
 					tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);

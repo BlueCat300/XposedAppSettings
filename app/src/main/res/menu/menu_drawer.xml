@@ -27,6 +27,10 @@
             android:title="@string/menu_permission" />
     </group>
     <item
+        android:id="@+id/drawer_theme"
+        android:icon="@drawable/ic_drawer_theme"
+        android:title="@string/theme_title" />
+    <item
         android:id="@+id/drawer_about"
         android:icon="@drawable/ic_drawer_about"
         android:title="@string/menu_about" />

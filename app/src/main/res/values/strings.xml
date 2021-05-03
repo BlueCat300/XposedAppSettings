@@ -148,6 +148,15 @@ Really go back and discard changes?</string>
     <string name="settings_apply_title">Apply settings</string>
     <string name="settings_apply_detail">Also kill the application so when it\'s relaunched it uses the new settings?</string>
 
+    <!-- Common dialog buttons -->
+    <string name="common_button_ok">@android:string/ok</string>
+    <string name="common_button_cancel">@android:string/cancel</string>
+
+    <!-- Theme -->
+    <string name="theme_title">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_auto">Follow system</string>
 
     <!-- Filter dialog -->
     <string name="filter_title">Filter</string>

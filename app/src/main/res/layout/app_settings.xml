@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/app_label"
             android:layout_toStartOf="@id/app_icon"
-            android:textColor="@color/blue" />
+            android:textColor="?attr/package_name" />
     </RelativeLayout>
 
     <ScrollView
@@ -57,7 +57,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_dpi" >
                 </TextView>
 
@@ -76,7 +76,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_fontscale" >
                 </TextView>
 
@@ -108,11 +108,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_screenshot" />
 
                 <Spinner
                     android:id="@+id/spnScreenshot"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -126,12 +127,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_screen" >
                 </TextView>
 
                 <Spinner
                     android:id="@+id/spnScreen"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -152,11 +154,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_locale" />
 
                 <Spinner
                     android:id="@+id/spnLocale"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -171,11 +174,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_fullscreen" />
 
                 <Spinner
                     android:id="@+id/spnFullscreen"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -233,11 +237,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_orientation" />
 
                 <Spinner
                     android:id="@+id/spnOrientation"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -271,11 +276,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_ongoingnotif" />
 
                 <Spinner
                     android:id="@+id/spnOngoingNotifications"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -291,11 +297,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_notifpriority" />
 
                 <Spinner
                     android:id="@+id/spnNotifPriority"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -309,11 +316,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="?attr/app_settings"
                     android:text="@string/settings_recents_mode" />
 
                 <Spinner
                     android:id="@+id/spnRecentsMode"
+                    android:popupBackground="?attr/spinner"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
