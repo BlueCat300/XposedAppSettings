@@ -7,31 +7,32 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 import ru.bluecat.android.xposed.mods.appsettings.R;
 import ru.bluecat.android.xposed.mods.appsettings.SELinux;
 
 public class BackupActivity extends AppCompatActivity {
 
-    static boolean restoreSuccessful;
-    static boolean backupSuccessful;
     private static SharedPreferences prefs;
 
     static void startBackupActivity(MainActivity activity, boolean isRestore) {
@@ -78,13 +79,13 @@ public class BackupActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             Uri treeUri = resultData.getData();
             if (treeUri != null) {
-                new BackupTask(this).execute(treeUri);
+                backupTask(this, treeUri);
             }
         }
         if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
             Uri documentUri = resultData.getData();
             if (documentUri != null) {
-                new RestoreTask(this).execute(documentUri);
+                restoreTask(this, documentUri);
             }
         }
         finish();
@@ -104,146 +105,104 @@ public class BackupActivity extends AppCompatActivity {
         prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
     }
 
-    private static class BackupTask extends AsyncTask<Uri, String, String> {
-
-        private final WeakReference<BackupActivity> activityReference;
-
-        BackupTask(BackupActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @SuppressLint("WorldReadableFiles")
-        @Override
-        protected String doInBackground(Uri... params) {
-            backupSuccessful = false;
-            BackupActivity activity = activityReference.get();
-
-            ObjectOutputStream output = null;
-            String error = null;
+    @SuppressLint("WorldReadableFiles")
+    private static void backupTask(BackupActivity activity, Uri treeUri) {
+        Observable.fromCallable(() -> {
+            ObjectOutputStream output;
             try {
-                try {
-                    //noinspection deprecation
-                    prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-                } catch (SecurityException e) {
-                    if(SELinux.isSELinuxPermissive()) {
-                        getLegacyPrefs(activity);
-                    } else {
-                        MainActivity.frameworkWarning(activity, 2);
-                    }
-                }
-                if(prefs != null) {
-                    output = new ObjectOutputStream(activity.getContentResolver().openOutputStream(params[0]));
-                    output.writeObject(prefs.getAll());
-                    backupSuccessful = true;
-                }
-            } catch (IOException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (output != null) {
-                        output.flush();
-                        output.close();
-                    }
-                } catch (IOException e) {
-                    error = e.getMessage();
-                    e.printStackTrace();
+                //noinspection deprecation
+                prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+            } catch (SecurityException e) {
+                if(SELinux.isSELinuxPermissive()) {
+                    getLegacyPrefs(activity);
                 }
             }
-
-            if(!backupSuccessful) {
-                return activity.getResources().getString(R.string.imp_exp_backup_error, error);
-            } else return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if(!backupSuccessful) {
-                Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
-            } else {
-                backupSuccessful = false;
-                MainActivity.showBackupSnackbar(R.string.imp_exp_backup_completed);
+            if(prefs != null) {
+                output = new ObjectOutputStream(activity.getContentResolver().openOutputStream(treeUri));
+                output.writeObject(prefs.getAll());
+                output.flush();
+                output.close();
             }
-        }
+            return true;
+
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Observer<Boolean>() {
+                @Override
+                public void onSubscribe(@NonNull Disposable d) { }
+
+                @Override
+                public void onNext(@NonNull Boolean progress) { }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+                    Toast.makeText(activity, activity.getResources().getString(R.string.imp_exp_backup_error,
+                            e.getMessage()), Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onComplete() {
+                    MainActivity.showBackupSnackbar(R.string.imp_exp_backup_completed);
+                }
+            });
     }
 
-    private static class RestoreTask extends AsyncTask<Uri, String, String> {
-        private final WeakReference<BackupActivity> activityReference;
-
-        RestoreTask(BackupActivity context) {
-            activityReference = new WeakReference<>(context);
-        }
-
-        @SuppressLint("WorldReadableFiles")
-        @Override
-        protected String doInBackground(Uri... params) {
-            restoreSuccessful = false;
-            BackupActivity activity = activityReference.get();
-
-            ObjectInputStream input = null;
-            String error = null;
+    @SuppressLint("WorldReadableFiles")
+    private static void restoreTask(BackupActivity activity, Uri treeUri) {
+        Observable.fromCallable(() -> {
+            ObjectInputStream input;
             try {
-                try {
-                    //noinspection deprecation
-                    prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-                } catch (SecurityException ignored) {
-                    if(SELinux.isSELinuxPermissive()) {
-                        getLegacyPrefs(activity);
-                    } else {
-                        MainActivity.frameworkWarning(activity, 2);
-                    }
-                }
-                if(prefs != null) {
-                    input = new ObjectInputStream(activity.getContentResolver().openInputStream(params[0]));
-                    SharedPreferences.Editor prefEdit = prefs.edit();
-                    prefEdit.clear();
-
-                    @SuppressWarnings("unchecked")
-                    Map<String, ?> entries = (Map<String, ?>) input.readObject();
-                    for (Map.Entry<String, ?> entry : entries.entrySet()) {
-                        Object v = entry.getValue();
-                        String key = entry.getKey();
-
-                        if (v instanceof Boolean)
-                            prefEdit.putBoolean(key, (Boolean) v);
-                        else if (v instanceof Float)
-                            prefEdit.putFloat(key, (Float) v);
-                        else if (v instanceof Integer)
-                            prefEdit.putInt(key, (Integer) v);
-                        else if (v instanceof Long)
-                            prefEdit.putLong(key, (Long) v);
-                        else if (v instanceof String)
-                            prefEdit.putString(key, ((String) v));
-                    }
-                    prefEdit.apply();
-                    restoreSuccessful = true;
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                error = e.getMessage();
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    error = e.getMessage();
-                    e.printStackTrace();
+                //noinspection deprecation
+                prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+            } catch (SecurityException ignored) {
+                if(SELinux.isSELinuxPermissive()) {
+                    getLegacyPrefs(activity);
                 }
             }
+            if(prefs != null) {
+                input = new ObjectInputStream(activity.getContentResolver().openInputStream(treeUri));
+                SharedPreferences.Editor prefEdit = prefs.edit();
+                prefEdit.clear();
 
-            if(!restoreSuccessful) {
-                return activity.getResources().getString(R.string.imp_exp_restore_error, error);
-            } else return null;
-        }
+                @SuppressWarnings("unchecked")
+                Map<String, ?> entries = (Map<String, ?>) input.readObject();
+                for (Map.Entry<String, ?> entry : entries.entrySet()) {
+                    Object v = entry.getValue();
+                    String key = entry.getKey();
 
-        @Override
-        protected void onPostExecute(String result) {
-            if(!restoreSuccessful) {
-                Toast.makeText(activityReference.get(), result, Toast.LENGTH_LONG).show();
-            } else {
-                MainActivity.refreshAppsAfterImport();
+                    if (v instanceof Boolean)
+                        prefEdit.putBoolean(key, (Boolean) v);
+                    else if (v instanceof Float)
+                        prefEdit.putFloat(key, (Float) v);
+                    else if (v instanceof Integer)
+                        prefEdit.putInt(key, (Integer) v);
+                    else if (v instanceof Long)
+                        prefEdit.putLong(key, (Long) v);
+                    else if (v instanceof String)
+                        prefEdit.putString(key, ((String) v));
+                }
+                prefEdit.apply();
+                input.close();
             }
-        }
+            return true;
+
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Observer<Boolean>() {
+                @Override
+                public void onSubscribe(@NonNull Disposable d) { }
+
+                @Override
+                public void onNext(@NonNull Boolean progress) { }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+                    Toast.makeText(activity, activity.getResources().getString(R.string.imp_exp_restore_error,
+                                e.getMessage()), Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onComplete() {
+                    MainActivity.refreshAppsAfterImport();
+                }
+            });
     }
 }

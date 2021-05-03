@@ -18,10 +18,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -55,7 +55,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,6 +68,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent;
 import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
@@ -76,8 +80,6 @@ import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
 import ru.bluecat.android.xposed.mods.appsettings.R;
 import ru.bluecat.android.xposed.mods.appsettings.SELinux;
 import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
-
-import static ru.bluecat.android.xposed.mods.appsettings.ui.BackupActivity.restoreSuccessful;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -160,8 +162,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			message = R.string.app_selinux_warning_message;
 		}
 		dialog.setMessage(message);
-		dialog.setPositiveButton("Ok", (dialog1, id) -> {
-			dialog1.dismiss();
+		dialog.setPositiveButton(R.string.common_button_ok, (dialogInterface, which) -> {
+			dialogInterface.dismiss();
 			context.finish();
 		});
 		AlertDialog alert = dialog.create();
@@ -300,31 +302,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	private void refreshApps() {
 		appList.clear();
 		// (re)load the list of apps in the background
-		new PrepareAppsAdapter(this).execute();
+		prepareAppsAdapter(this);
 	}
 
 	@SuppressLint("WorldReadableFiles")
 	static void refreshAppsAfterImport() {
-		if (restoreSuccessful) {
-			// Refresh preferences
-			if(prefs == null) {
-				try {
-					//noinspection deprecation
-					prefs = activityContext.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-				} catch (SecurityException ignored) {
-					if(SELinux.isSELinuxPermissive()) {
-						getLegacyPrefs(activityContext);
-					} else {
-						frameworkWarning(activityContext, 2);
-					}
+		// Refresh preferences
+		if(prefs == null) {
+			try {
+				//noinspection deprecation
+				prefs = activityContext.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			} catch (SecurityException ignored) {
+				if(SELinux.isSELinuxPermissive()) {
+					getLegacyPrefs(activityContext);
 				}
 			}
-			// Refresh listed apps (account for filters)
-			MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) activityContext.findViewById(R.id.lstApps)).getAdapter();
-			appListAdapter.getFilter().filter(nameFilter);
-			showBackupSnackbar(R.string.imp_exp_restored);
-			restoreSuccessful = false;
 		}
+		// Refresh listed apps (account for filters)
+		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) activityContext.findViewById(R.id.lstApps)).getAdapter();
+		appListAdapter.getFilter().filter(nameFilter);
+		showBackupSnackbar(R.string.imp_exp_restored);
 	}
 
 	static void showBackupSnackbar(int stringId) {
@@ -365,18 +362,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		settings.add(new SettingInfo(Common.PREF_NO_FULLSCREEN_IME, getString(R.string.settings_nofullscreenime)));
 		settings.add(new SettingInfo(Common.PREF_ORIENTATION, getString(R.string.settings_orientation)));
 		settings.add(new SettingInfo(Common.PREF_INSISTENT_NOTIF, getString(R.string.settings_insistentnotif)));
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			settings.add(new SettingInfo(Common.PREF_NO_BIG_NOTIFICATIONS, getString(R.string.settings_nobignotif)));
-		}
 		settings.add(new SettingInfo(Common.PREF_ONGOING_NOTIF, getString(R.string.settings_ongoingnotif)));
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
 			settings.add(new SettingInfo(Common.PREF_NOTIF_PRIORITY, getString(R.string.settings_notifpriority)));
-		}
 		settings.add(new SettingInfo(Common.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
 		settings.add(new SettingInfo(Common.PREF_MUTE, getString(R.string.settings_mute)));
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
 			settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
-		}
 		settings.add(new SettingInfo(Common.PREF_RECENT_TASKS, getString(R.string.settings_recent_tasks)));
 		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
 	}
@@ -463,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		dlgBuilder.setTitle(R.string.app_name);
 		dlgBuilder.setCancelable(true);
 		dlgBuilder.setIcon(R.drawable.ic_launcher);
-		dlgBuilder.setPositiveButton(android.R.string.ok, null);
+		dlgBuilder.setPositiveButton(R.string.common_button_ok, null);
 		dlgBuilder.setView(vAbout);
 		dlgBuilder.show();
 	}
@@ -658,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		});
 		//bld.setView(permsView);
 
-		bld.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+		bld.setNegativeButton(R.string.common_button_cancel, (dialog, which) -> {
 			filterPermissionUsage = null;
 			appListAdapter.getFilter().filter(nameFilter);
 		});
@@ -670,44 +664,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	// Handle background loading of apps
-	private static class PrepareAppsAdapter extends AsyncTask<Void,Void,AppListAdapter> {
-		ProgressDialog dialog;
-		private final WeakReference<MainActivity> activityReference;
+	private static void prepareAppsAdapter(MainActivity activity) {
+    	int progressDialogTheme = R.style.Theme_Main_Dialog;
+    	if (!ThemeUtil.isNightTheme(activity, prefs)) progressDialogTheme = R.style.Theme_Main_Dialog_Light_ProgressDialog;
+		ProgressDialog dialog = new ProgressDialog(activity.findViewById(R.id.lstApps).getContext(), progressDialogTheme);
+		dialog.setMessage(activity.getResources().getString(R.string.app_loading));
+		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		dialog.setCancelable(false);
 
-		PrepareAppsAdapter(MainActivity context) {
-			activityReference = new WeakReference<>(context);
-		}
-
-		@Override
-		protected void onPreExecute() {
-			MainActivity activity = activityReference.get();
-			dialog = new ProgressDialog(activity.findViewById(R.id.lstApps).getContext());
-			dialog.setMessage(activity.getResources().getString(R.string.app_loading));
-			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			dialog.setCancelable(false);
-			dialog.show();
-		}
-
-		@Override
-		protected AppListAdapter doInBackground(Void... params) {
+		Observable.fromCallable(() -> {
 			if (appList.size() == 0) {
-				loadApps(dialog, activityReference.get());
+				loadApps(dialog, activity);
 			}
-			return null;
-		}
+			return true;
 
-		@Override
-		protected void onPostExecute(final AppListAdapter result) {
-			prepareAppList(activityReference.get());
+		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Observer<Boolean>() {
+				@Override
+				public void onSubscribe(@NonNull Disposable d) {
+					dialog.show();
+				}
 
-			try {
-				dialog.dismiss();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+				@Override
+				public void onNext(@NonNull Boolean progress) { }
+
+				@Override
+				public void onError(@NonNull Throwable e) { }
+
+				@Override
+				public void onComplete() {
+					prepareAppList(activity);
+					dialog.dismiss();
+				}
+			});
 	}
-
 
 	/** Hold filter state and other info for each setting key */
 	private static class SettingInfo {
@@ -843,8 +833,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		TextView app_name;
 		TextView app_package;
 		ImageView app_icon;
-
-		AsyncTask<AppListViewHolder, Void, Drawable> imageLoader;
 	}
 
 	static class AppListAdapter extends ArrayAdapter<ApplicationInfo> implements SectionIndexer {
@@ -910,7 +898,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				row.setTag(holder);
 			} else {
 				holder = (AppListViewHolder) row.getTag();
-				holder.imageLoader.cancel(true);
 			}
 
 			final ApplicationInfo app = filteredAppList.get(position);
@@ -932,31 +919,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				holder.app_package.setPaintFlags(holder.app_package.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 			}
 
-			holder.imageLoader = new ImageLoadTask(app, mContext).execute(holder);
+			imageLoadTask(mContext, app, holder);
 
 			return row;
 		}
 
-		private static class ImageLoadTask extends AsyncTask<AppListViewHolder, Void, Drawable> {
-			private AppListViewHolder v;
-			private final ApplicationInfo app;
-			private final WeakReference<MainActivity> activityReference;
+		private static void imageLoadTask (MainActivity activity, ApplicationInfo appInfo, AppListViewHolder holder) {
+			Observable.fromCallable(() -> appInfo.loadIcon(activity.getPackageManager()))
+				.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+				    .subscribe(new Observer<Drawable>() {
+					    @Override
+					    public void onSubscribe(@NonNull Disposable d) { }
 
-			private ImageLoadTask(ApplicationInfo appInfo, MainActivity activity) {
-				app = appInfo;
-				activityReference = new WeakReference<>(activity);
-			}
+					    @Override
+					    public void onNext(@NonNull Drawable appIcon) {
+						    holder.app_icon.setImageDrawable(appIcon);
+					    }
 
-			@Override
-			protected Drawable doInBackground(AppListViewHolder... params) {
-				v = params[0];
-				return app.loadIcon(activityReference.get().getPackageManager());
-			}
+					    @Override
+					    public void onError(@NonNull Throwable e) { }
 
-			@Override
-			protected void onPostExecute(Drawable result) {
-				v.app_icon.setImageDrawable(result);
-			}
+					    @Override
+					    public void onComplete() { }
+				    });
 		}
 
 		@Override
@@ -995,6 +980,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			if (section >= sections.length)
 				return filteredAppList.size() - 1;
 
+			//noinspection ConstantConditions
 			return alphaIndexer.get(sections[section]);
 		}
 
@@ -1007,6 +993,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			int latestDelta = Integer.MAX_VALUE;
 
 			for (int i = 0; i < sections.length; i++) {
+				//noinspection ConstantConditions
 				int current = alphaIndexer.get(sections[i]);
 				if (current == position) {
 					// If position matches an index, return it immediately

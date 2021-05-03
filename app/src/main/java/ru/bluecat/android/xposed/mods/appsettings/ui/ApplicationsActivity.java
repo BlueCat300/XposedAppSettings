@@ -479,19 +479,16 @@ public class ApplicationsActivity extends AppCompatActivity {
 		settingKeys.add(pkgName + Common.PREF_ORIENTATION);
 		settingKeys.add(pkgName + Common.PREF_RESIDENT);
 		settingKeys.add(pkgName + Common.PREF_NO_FULLSCREEN_IME);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			settingKeys.add(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS);
-		}
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+		    settingKeys.add(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS);
 		settingKeys.add(pkgName + Common.PREF_INSISTENT_NOTIF);
 		settingKeys.add(pkgName + Common.PREF_ONGOING_NOTIF);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			settingKeys.add(pkgName + Common.PREF_NOTIF_PRIORITY);
-		}
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+		    settingKeys.add(pkgName + Common.PREF_NOTIF_PRIORITY);
 		settingKeys.add(pkgName + Common.PREF_RECENTS_MODE);
 		settingKeys.add(pkgName + Common.PREF_MUTE);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-			settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
-		}
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+		    settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
 		settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
 		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
 		settingKeys.add(pkgName + Common.PREF_REVOKELIST);
@@ -563,10 +560,8 @@ public class ApplicationsActivity extends AppCompatActivity {
 			if (((CheckBox) findViewById(R.id.chkNoFullscreenIME)).isChecked())
 				settings.put(pkgName + Common.PREF_NO_FULLSCREEN_IME, true);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-				if (((CheckBox) findViewById(R.id.chkNoBigNotifications)).isChecked())
-					settings.put(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, true);
-			}
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && ((CheckBox) findViewById(R.id.chkNoBigNotifications)).isChecked())
+                settings.put(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, true);
 
 			if (((CheckBox) findViewById(R.id.chkInsistentNotifications)).isChecked())
 				settings.put(pkgName + Common.PREF_INSISTENT_NOTIF, true);
@@ -616,8 +611,8 @@ public class ApplicationsActivity extends AppCompatActivity {
 		builder.setTitle(R.string.settings_unsaved_title);
 		builder.setIconAttribute(android.R.attr.alertDialogIcon);
 		builder.setMessage(R.string.settings_unsaved_detail);
-		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> this.finish());
-		builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
+		builder.setPositiveButton(R.string.common_button_ok, (dialog, which) -> this.finish());
+		builder.setNegativeButton(R.string.common_button_cancel, (dialog, which) -> {
 		});
 		builder.show();
 	}
@@ -650,7 +645,14 @@ public class ApplicationsActivity extends AppCompatActivity {
 		boolean hasMarketLink = false;
 		try {
 			PackageManager pm = context.getPackageManager();
-			String installer = pm.getInstallerPackageName(pkgName);
+			String installer;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				installer = pm.getInstallSourceInfo(pkgName).getInitiatingPackageName();
+			} else {
+				//noinspection deprecation
+				installer = pm.getInstallerPackageName(pkgName);
+			}
+
 			if (installer != null)
 				hasMarketLink = installer.equals("com.android.vending") || installer.contains("google");
 		} catch (Exception ignored) {
@@ -701,11 +703,12 @@ public class ApplicationsActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@SuppressLint("MissingPermission")
 	private void confirmReboot () {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.menu_reboot_confirm);
 		builder.setMessage(R.string.menu_reboot_confirm_desc);
-		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+		builder.setPositiveButton(R.string.common_button_ok, (dialog, which) -> {
 			try {
 				((PowerManager) Objects.requireNonNull(this.
 						getSystemService(Context.POWER_SERVICE))).reboot(null);
@@ -714,7 +717,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 				e.printStackTrace();
 			}
 		});
-		builder.setNegativeButton(android.R.string.no, (null));
+		builder.setNegativeButton(R.string.common_button_cancel, (null));
 		builder.create().show();
 	}
 
@@ -754,7 +757,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.settings_apply_title);
 		builder.setMessage(R.string.settings_apply_detail);
-		builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+		builder.setPositiveButton(R.string.common_button_ok, (dialog, which) -> {
 			// Send the broadcast requesting to kill the app
 			Intent applyIntent = new Intent(Common.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS");
 			applyIntent.putExtra("action", Common.ACTION_PERMISSIONS);
@@ -763,7 +766,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 			sendBroadcast(applyIntent, Common.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION");
 			dialog.dismiss();
 		});
-		builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
+		builder.setNegativeButton(R.string.common_button_cancel, (dialog, which) -> {
 			// Send the broadcast but not requesting kill
 			Intent applyIntent = new Intent(Common.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS");
 			applyIntent.putExtra("action", Common.ACTION_PERMISSIONS);

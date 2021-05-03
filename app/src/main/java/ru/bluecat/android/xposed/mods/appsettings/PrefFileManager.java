@@ -2,7 +2,6 @@ package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.FileObserver;
 
@@ -10,6 +9,10 @@ import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.Objects;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 // https://github.com/chiehmin/MinMinGuard/commit/0bd9e353c63a44d9c948b68365bf26675a3a3104
 public class PrefFileManager {
@@ -42,7 +45,7 @@ public class PrefFileManager {
     @SuppressLint("SetWorldReadable")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void fixFolderPermissionsAsync() {
-        AsyncTask.execute(() -> {
+        Observable.fromCallable(() -> {
             File pkgFolder = mContext.getFilesDir().getParentFile();
             if (Objects.requireNonNull(pkgFolder).exists()) {
                 pkgFolder.setExecutable(true, false);
@@ -62,7 +65,9 @@ public class PrefFileManager {
                     f.setReadable(true, false);
                 }
             }
-        });
+            return true;
+
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
     public void onPause() {

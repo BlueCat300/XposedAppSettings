@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ru.bluecat.android.xposed.mods.appsettings">
 
     <permission-tree android:name="ru.bluecat.android.xposed.mods.appsettings" />
@@ -11,6 +12,7 @@
 
     <uses-permission android:name="ru.bluecat.android.xposed.mods.appsettings.BROADCAST_PERMISSION" />
     <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:theme="@style/Theme.Main.Dark"
@@ -46,7 +48,7 @@
             android:value="@string/app_mod_summary" />
         <meta-data
             android:name="xposedminversion"
-            android:value="90" />
+            android:value="89" />
         <meta-data
             android:name="xposedsharedprefs"
             android:value="true" />
