@@ -163,6 +163,12 @@
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/chkLTR"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_ltr" />
             </LinearLayout>
 
             <LinearLayout

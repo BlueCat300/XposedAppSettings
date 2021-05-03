@@ -34,6 +34,7 @@ public class Common {
 	public static String PREF_LOCALE = "/locale";
 	public static String PREF_SCREEN = "/screen";
 	public static String PREF_XLARGE = "/tablet";
+	public static String PREF_LTR = "/layout";
 	public static String PREF_SCREENSHOT = "/screenshot";
 	public static String PREF_RESIDENT = "/resident";
 	public static String PREF_NO_FULLSCREEN_IME = "/no-fullscreen-ime";

@@ -350,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		settings.add(new SettingInfo(Common.PREF_FONT_SCALE, getString(R.string.settings_fontscale)));
 		settings.add(new SettingInfo(Common.PREF_SCREEN, getString(R.string.settings_screen)));
 		settings.add(new SettingInfo(Common.PREF_XLARGE, getString(R.string.settings_xlargeres)));
+		settings.add(new SettingInfo(Common.PREF_LTR, getString(R.string.settings_ltr)));
 		settings.add(new SettingInfo(Common.PREF_SCREENSHOT, getString(R.string.settings_screenshot)));
 		settings.add(new SettingInfo(Common.PREF_LOCALE, getString(R.string.settings_locale)));
 		settings.add(new SettingInfo(Common.PREF_FULLSCREEN, getString(R.string.settings_fullscreen)));

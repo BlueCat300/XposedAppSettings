@@ -80,6 +80,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="settings_listres">List res.</string>
     <string name="settings_screen">Screen (dp)</string>
     <string name="settings_xlargeres">xlarge res.</string>
+    <string name="settings_ltr">Force LTR</string>
     <string name="settings_screenshot">Screenshot</string>
     <string name="settings_locale">Locale</string>
     <string name="settings_fullscreen">Fullscreen</string>
