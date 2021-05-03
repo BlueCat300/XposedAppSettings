@@ -37,8 +37,10 @@ DPI; Замена ресурсов; Язык; Полный экран;
 \n- отключение увеличенных уведомлений (не доступно на ОС 6.0+)</string>
     <string name="app_version">Версия: %s</string>
     <string name="app_translation">Перевод: %s</string>
-    <string name="app_framework_warning_message">Модуль не включён! Убедитесь что Xposed framework установлен и модуль включён в Xposed installer после чего перезагрузите устройство.</string>
-    <string name="app_selinux_warning_message">Для работы модуля требуется permissive SELinux или EdXposed Framework минимальной версии <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a>.</string>
+    <string name="app_framework_warning_title">Модуль не включён!</string>
+    <string name="app_framework_warning_message">Убедитесь что EdXposed/LSPosed framework установлен и модуль включён в менеджере EdXposed/LSPosed после чего перезагрузите устройство.</string>
+    <string name="app_selinux_warning_message">Для работы модуля требуется permissive SELinux или EdXposed Framework минимальной версии <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a>.
+        Любая версия <a href="https://github.com/LSPosed/LSPosed/releases">LSposed</a> так же подойдёт.</string>
 
 
     <!-- main menu -->

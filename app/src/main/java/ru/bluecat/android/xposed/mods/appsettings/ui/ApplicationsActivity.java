@@ -125,10 +125,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 				//Setting permission for reading xposed settings
 				prefFileManager.fixFolderPermissionsAsync();
 				getLegacyPrefs(this);
-			} else {
-				MainActivity.frameworkWarning(this, 2);
-				return;
-			}
+			} else return;
 		}
 		ThemeUtil.setTheme(this, prefs);
 		setContentView(R.layout.app_settings);
