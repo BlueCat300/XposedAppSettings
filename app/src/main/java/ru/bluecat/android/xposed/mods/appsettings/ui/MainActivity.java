@@ -345,6 +345,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		settings.add(new SettingInfo(Common.PREF_SCREENSHOT, getString(R.string.settings_screenshot)));
 		settings.add(new SettingInfo(Common.PREF_LOCALE, getString(R.string.settings_locale)));
 		settings.add(new SettingInfo(Common.PREF_FULLSCREEN, getString(R.string.settings_fullscreen)));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+			settings.add(new SettingInfo(Common.PREF_AUTO_HIDE_FULLSCREEN, getString(R.string.settings_autofullscreen)));
 		settings.add(new SettingInfo(Common.PREF_NO_TITLE, getString(R.string.settings_notitle)));
 		settings.add(new SettingInfo(Common.PREF_SCREEN_ON, getString(R.string.settings_screenon)));
 		settings.add(new SettingInfo(Common.PREF_ALLOW_ON_LOCKSCREEN, getString(R.string.settings_showwhenlocked)));

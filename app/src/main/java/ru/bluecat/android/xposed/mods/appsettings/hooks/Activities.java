@@ -8,6 +8,8 @@ import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -54,6 +56,10 @@ class Activities {
 					View decorView = (View) param.args[0];
 					Context context = window.getContext();
 					String packageName = context.getPackageName();
+					WindowInsetsController controller = null;
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+						controller = window.getInsetsController();
+					}
 
 					if (!XposedMod.isActive(prefs, packageName))
 						return;
@@ -67,20 +73,42 @@ class Activities {
 						fullscreen = prefs.getBoolean(packageName + Common.PREF_FULLSCREEN, false)
                                 ? Common.FULLSCREEN_FORCE : Common.FULLSCREEN_DEFAULT;
 					}
+					boolean autoHideFullscreen = prefs.getBoolean(packageName + Common.PREF_AUTO_HIDE_FULLSCREEN, false);
 					if (fullscreen == Common.FULLSCREEN_FORCE) {
-						window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+							if(autoHideFullscreen)
+								controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
+							controller.hide(WindowInsets.Type.statusBars());
+						} else {
+							//noinspection deprecation
+							window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						}
 					} else if (fullscreen == Common.FULLSCREEN_PREVENT) {
-						window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.FALSE);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+							controller.show(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+						} else {
+							//noinspection deprecation
+							window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+						}
 					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE) {
-						window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
 						XposedHelpers.setAdditionalInstanceField(decorView, PROP_IMMERSIVE, Boolean.TRUE);
-						decorView.setSystemUiVisibility(
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+							if(autoHideFullscreen)
+								controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+							controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+						} else {
+							//noinspection deprecation
+							window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+							//noinspection deprecation
+							decorView.setSystemUiVisibility(
 								View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-								| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-								| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+									| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+									| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+						}
 					}
 
 					if (prefs.getBoolean(packageName + Common.PREF_NO_TITLE, false))
@@ -127,20 +155,25 @@ class Activities {
 					new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
-
 					int flags = (Integer) param.args[0];
 					int mask = (Integer) param.args[1];
-					if ((mask & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
-						Boolean fullscreen = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_FULLSCREEN);
-						if (fullscreen != null) {
-							if (fullscreen) {    //fullscreen.booleanValue())
-								flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-							} else {
-								flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+						//noinspection deprecation
+						if ((mask & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
+							Boolean fullscreen = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_FULLSCREEN);
+							if (fullscreen != null) {
+								if (fullscreen) {    //fullscreen.booleanValue())
+									//noinspection deprecation
+									flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+								} else {
+									//noinspection deprecation
+									flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+								}
+								param.args[0] = flags;
 							}
-							param.args[0] = flags;
 						}
 					}
+
 					if ((mask & WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0) {
 						Boolean keepScreenOn = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_KEEP_SCREEN_ON);
 						if (keepScreenOn != null) {
@@ -150,6 +183,7 @@ class Activities {
 							param.args[0] = flags;
 						}
 					}
+
 					if ((mask & FLAG_NEEDS_MENU_KEY) != 0) {
 						Boolean menu = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_LEGACY_MENU);
 						if (menu != null) {
@@ -162,29 +196,35 @@ class Activities {
 				}
 			});
 
-			XposedHelpers.findAndHookMethod("android.view.ViewRootImpl", null,
-					"dispatchSystemUiVisibilityChanged", int.class, int.class, int.class, int.class, new XC_MethodHook() {
-				@Override
-				protected void beforeHookedMethod(MethodHookParam param) {
-					// Has the navigation bar been shown?
-					int localChanges = (Integer) param.args[3];
-					if ((localChanges & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0)
-						return;
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+				XposedHelpers.findAndHookMethod("android.view.ViewRootImpl", null,
+						"dispatchSystemUiVisibilityChanged", int.class, int.class, int.class, int.class, new XC_MethodHook() {
+					@Override
+					protected void beforeHookedMethod(MethodHookParam param) {
+						// Has the navigation bar been shown?
+						int localChanges = (Integer) param.args[3];
+						//noinspection deprecation
+						if ((localChanges & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0)
+							return;
 
-					// Should it be hidden?
-					View decorView = (View) XposedHelpers.getObjectField(param.thisObject, "mView");
-					Boolean immersive = (decorView == null) ? null : (Boolean) XposedHelpers.getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
-					if (immersive == null || !immersive) //immersive.booleanValue())
-						return;
+						// Should it be hidden?
+						View decorView = (View) XposedHelpers.getObjectField(param.thisObject, "mView");
+						Boolean immersive = (decorView == null) ? null : (Boolean) XposedHelpers.getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
+						if (immersive == null || !immersive) //immersive.booleanValue())
+							return;
 
-					// Enforce SYSTEM_UI_FLAG_HIDE_NAVIGATION and hide changes to this flag
-					int globalVisibility = (Integer) param.args[1];
-					int localValue = (Integer) param.args[2];
-					param.args[1] = globalVisibility | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-					param.args[2] = localValue | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-					param.args[3] = localChanges & ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-				}
-			});
+						// Enforce SYSTEM_UI_FLAG_HIDE_NAVIGATION and hide changes to this flag
+						int globalVisibility = (Integer) param.args[1];
+						int localValue = (Integer) param.args[2];
+						//noinspection deprecation
+						param.args[1] = globalVisibility | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+						//noinspection deprecation
+						param.args[2] = localValue | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+						//noinspection deprecation
+						param.args[3] = localChanges & ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+					}
+				});
+			}
 
 			// force orientation
 			XposedHelpers.findAndHookMethod(Activity.class, "setRequestedOrientation", int.class, new XC_MethodHook() {

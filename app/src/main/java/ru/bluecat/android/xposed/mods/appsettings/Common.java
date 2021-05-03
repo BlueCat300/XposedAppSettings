@@ -43,6 +43,7 @@ public class Common {
 	public static String PREF_REVOKEPERMS = "/revoke-perms";
 	public static String PREF_REVOKELIST = "/revoke-list";
 	public static String PREF_FULLSCREEN = "/fullscreen";
+	public static String PREF_AUTO_HIDE_FULLSCREEN = "/auto-hide-fullscreen";
 	public static String PREF_NO_TITLE = "/no-title";
 	public static String PREF_ALLOW_ON_LOCKSCREEN = "/allow-on-lockscreen";
 	public static String PREF_SCREEN_ON = "/screen-on";

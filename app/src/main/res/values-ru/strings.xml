@@ -80,6 +80,7 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="settings_screenshot">Скриншот</string>
     <string name="settings_locale">Язык</string>
     <string name="settings_fullscreen">Полный экран</string>
+    <string name="settings_autofullscreen">Авто скрытие полн. экрана</string>
     <string name="settings_notitle">Нет титла</string>
     <string name="settings_screenon">Держать экран</string>
     <string name="settings_showwhenlocked">Показ. заблок.</string>

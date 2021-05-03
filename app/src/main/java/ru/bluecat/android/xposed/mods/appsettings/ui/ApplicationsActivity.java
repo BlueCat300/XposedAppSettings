@@ -316,6 +316,13 @@ public class ApplicationsActivity extends AppCompatActivity {
 			spnFullscreen.setSelection(fullscreenSelection);
 		}
 
+        // Update Auto Hide field
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ((CheckBox) findViewById(R.id.chkAutoHide)).setChecked(prefs.getBoolean(pkgName + Common.PREF_AUTO_HIDE_FULLSCREEN, false));
+        } else {
+            findViewById(R.id.chkAutoHide).setVisibility(View.GONE);
+        }
+
 		// Update No Title field
 		((CheckBox) findViewById(R.id.chkNoTitle)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_TITLE, false));
 
@@ -463,6 +470,8 @@ public class ApplicationsActivity extends AppCompatActivity {
 		settingKeys.add(pkgName + Common.PREF_SCREENSHOT);
 		settingKeys.add(pkgName + Common.PREF_LOCALE);
 		settingKeys.add(pkgName + Common.PREF_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            settingKeys.add(pkgName + Common.PREF_AUTO_HIDE_FULLSCREEN);
 		settingKeys.add(pkgName + Common.PREF_NO_TITLE);
 		settingKeys.add(pkgName + Common.PREF_ALLOW_ON_LOCKSCREEN);
 		settingKeys.add(pkgName + Common.PREF_SCREEN_ON);
@@ -530,6 +539,9 @@ public class ApplicationsActivity extends AppCompatActivity {
 			int fullscreen = ((Spinner) findViewById(R.id.spnFullscreen)).getSelectedItemPosition();
 			if (fullscreen > 0)
 				settings.put(pkgName + Common.PREF_FULLSCREEN, fullscreen);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ((CheckBox) findViewById(R.id.chkAutoHide)).isChecked())
+                settings.put(pkgName + Common.PREF_AUTO_HIDE_FULLSCREEN, true);
 
 			if (((CheckBox) findViewById(R.id.chkNoTitle)).isChecked())
 				settings.put(pkgName + Common.PREF_NO_TITLE, true);

@@ -82,6 +82,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="settings_screenshot">Screenshot</string>
     <string name="settings_locale">Locale</string>
     <string name="settings_fullscreen">Fullscreen</string>
+    <string name="settings_autofullscreen">Auto hide fullscreen</string>
     <string name="settings_notitle">No title</string>
     <string name="settings_screenon">Keep screen on</string>
     <string name="settings_showwhenlocked">Show when locked</string>
