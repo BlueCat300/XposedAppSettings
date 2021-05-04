@@ -2,8 +2,6 @@
 <resources>
     <style name="Theme.Main.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:navigationBarColor">@color/navigation</item>
-        <item name="android:itemBackground">@color/options_menu</item>
-        <item name="android:itemTextAppearance">@style/Theme.Main.Light.OptionsMenu</item>
         <item name="colorPrimary">@color/navigation</item>
         <item name="colorPrimaryDark">@color/status_bar</item>
         <item name="colorAccent">@color/control_text</item>
@@ -15,10 +13,11 @@
         <item name="app_list_item">@color/app_list_item</item>
         <item name="dialog_background">@color/dialog_background</item>
         <item name="spinner">@color/spinner</item>
+        <item name="options_menu">@color/options_menu</item>
+        <item name="options_menu_item">@color/options_menu_item</item>
     </style>
     <style name="Theme.Main.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="android:navigationBarColor">@color/navigation_dark</item>
-        <item name="android:itemBackground">@color/options_menu_dark</item>
         <item name="android:windowBackground">@color/background_dark</item>
         <item name="colorPrimary">@color/toolbar_dark</item>
         <item name="colorPrimaryDark">@color/status_bar_dark</item>
@@ -32,9 +31,16 @@
         <item name="app_list_item">@color/app_list_item_dark</item>
         <item name="dialog_background">@color/dialog_background_dark</item>
         <item name="spinner">@color/spinner_dark</item>
+        <item name="options_menu">@color/options_menu_dark</item>
+        <item name="options_menu_item">@color/options_menu_item_dark</item>
     </style>
-    <style name="Theme.Main.Light.OptionsMenu">
-        <item name="android:textColor">@color/options_menu_item</item>
+    <style name="Theme.Main.Toolbar" parent="ThemeOverlay.AppCompat.Light">
+        <item name="queryHint">@string/app_searchhint</item>
+        <item name="android:itemBackground">?attr/options_menu</item>
+        <item name="android:textColor">?attr/options_menu_item</item>
+        <item name="android:textColorPrimary">@color/toolbar_text</item>
+        <item name="android:textColorSecondary">@color/toolbar_text</item>
+        <item name="android:textColorHint">@color/toolbar_hint</item>
     </style>
     <style name="Theme.Main.Dialog" parent="@style/Theme.AppCompat.Dialog.Alert">
         <item name="android:textColorPrimary">@color/dialog_text_color</item>

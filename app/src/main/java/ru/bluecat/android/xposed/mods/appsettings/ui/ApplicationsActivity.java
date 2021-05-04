@@ -136,7 +136,6 @@ public class ApplicationsActivity extends AppCompatActivity {
 			bar.setDisplayShowCustomEnabled(true);
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
-		toolbar.setTitle(R.string.settings_title);
 		toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
 		swtActive = new SwitchCompat(this);

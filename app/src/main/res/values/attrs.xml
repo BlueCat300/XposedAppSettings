@@ -8,6 +8,8 @@
     <attr name="app_list_item" format="reference|color" />
     <attr name="dialog_background" format="reference|color" />
     <attr name="spinner" format="reference|color" />
+    <attr name="options_menu" format="reference|color" />
+    <attr name="options_menu_item" format="reference|color" />
 
     <declare-styleable name="FilterItemComponent">
         <attr name="label" format="string" />

@@ -5,6 +5,8 @@
     <color name="ic_vector">#ffffff</color>
     <color name="filter_item">#191919</color>
     <color name="filter_item_text">#ffffff</color>
+    <color name="toolbar_text">#ffffff</color>
+    <color name="toolbar_hint">#dddddd</color>
 
     <!-- Light Theme -->
     <color name="navigation">#3f51b5</color>
@@ -28,6 +30,7 @@
     <color name="navigation_dark">#161c20</color>
     <color name="status_bar_dark">#161c20</color>
     <color name="options_menu_dark">#161c20</color>
+    <color name="options_menu_item_dark">#ffffff</color>
     <color name="snackbar_background_dark">#263238</color>
     <color name="snackbar_text_dark">#ffffff</color>
     <color name="toolbar_dark">#263238</color>

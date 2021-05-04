@@ -523,15 +523,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		((ListView) activity.findViewById(R.id.lstApps)).setAdapter(appListAdapter);
 		appListAdapter.getFilter().filter(nameFilter);
 
-		MenuItem searchItem = optionsMenu.findItem(R.id.menu_searchApp);
-		View searchView = searchItem.getActionView();
-		((SearchView) searchView.findViewById(R.id.menu_searchApp)).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+		SearchView search = ((SearchView) optionsMenu.findItem(R.id.menu_searchApp).getActionView())
+				.findViewById(R.id.menu_searchApp);
+
+		search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				nameFilter = query;
 				appListAdapter.getFilter().filter(nameFilter);
-				searchView.findViewById(R.id.menu_searchApp).clearFocus();
+				search.clearFocus();
 				return false;
 			}
 
