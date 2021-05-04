@@ -164,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		dialog.setMessage(message);
 		dialog.setPositiveButton(R.string.common_button_ok, (dialogInterface, which) -> {
 			dialogInterface.dismiss();
-			context.finish();
+			if(warningType == 2) System.exit(0);
+			else context.finish();
 		});
 		AlertDialog alert = dialog.create();
 		alert.setCancelable(false);
@@ -743,8 +744,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				} catch (SecurityException ignored) {
 					if(SELinux.isSELinuxPermissive()) {
 						getLegacyPrefs(activityReference);
-					} else {
-						frameworkWarning(activityReference, 2);
 					}
 				}
 			}
@@ -982,7 +981,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			if (section >= sections.length)
 				return filteredAppList.size() - 1;
 
-			//noinspection ConstantConditions
 			return alphaIndexer.get(sections[section]);
 		}
 
@@ -995,7 +993,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			int latestDelta = Integer.MAX_VALUE;
 
 			for (int i = 0; i < sections.length; i++) {
-				//noinspection ConstantConditions
+
 				int current = alphaIndexer.get(sections[i]);
 				if (current == position) {
 					// If position matches an index, return it immediately

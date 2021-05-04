@@ -1,7 +1,9 @@
 package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
+import android.content.res.Configuration;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
@@ -108,5 +110,9 @@ public class Common {
     public static int PREF_SCREENSHOT_DEFAULT = 0;
     public static int PREF_SCREENSHOT_ALLOW = 1;
     public static int PREF_SCREENSHOT_PREVENT = 2;
+
+    public static boolean isPortrait (Activity context) {
+		return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+	}
 
 }

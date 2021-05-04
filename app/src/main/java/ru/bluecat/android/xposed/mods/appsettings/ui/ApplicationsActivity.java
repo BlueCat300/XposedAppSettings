@@ -9,7 +9,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -38,7 +37,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.BlendModeColorFilterCompat;
 import androidx.core.graphics.BlendModeCompat;
 
@@ -639,7 +637,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 	public static void updateMenuEntries(Activity context, Menu menu, String pkgName) {
 		if (context.getPackageManager().getLaunchIntentForPackage(pkgName) == null) {
 			menu.findItem(R.id.menu_app_launch).setEnabled(false);
-			if (!ThemeUtil.isNightTheme(context, prefs)) {
+			if (Common.isPortrait(context)) {
 				setItemDisabled(menu, 1);
 			} else {
 				Drawable icon = menu.findItem(R.id.menu_app_launch).getIcon().mutate();
@@ -653,7 +651,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 			PackageManager pm = context.getPackageManager();
 			String installer;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				installer = pm.getInstallSourceInfo(pkgName).getInitiatingPackageName();
+				installer = pm.getInstallSourceInfo(pkgName).getInstallingPackageName();
 			} else {
 				//noinspection deprecation
 				installer = pm.getInstallerPackageName(pkgName);
@@ -667,20 +665,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		menu.findItem(R.id.menu_app_store).setEnabled(hasMarketLink);
 
 		if (!hasMarketLink) {
-			if (!ThemeUtil.isNightTheme(context, prefs)) {
-				setItemDisabled(menu, 3);
-			} else {
-				try {
-					Resources res = context.createPackageContext("com.android.vending", 0).getResources();
-					int id = res.getIdentifier("ic_launcher_play_store", "mipmap", "com.android.vending");
-					Drawable icon = ResourcesCompat.getDrawable(context.getResources(), id, null);
-					icon = Objects.requireNonNull(icon).mutate();
-					icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
-
-					menu.findItem(R.id.menu_app_store).setIcon(icon);
-				} catch (Exception ignored) {
-				}
-			}
+			setItemDisabled(menu, 3);
 		}
 	}
 
