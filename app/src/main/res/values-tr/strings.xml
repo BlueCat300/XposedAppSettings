@@ -22,6 +22,8 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
 \n- uygulama görünürken ekranı açık tutma
 \n- uygulamayı kilit ekranının üstünde gösterme
 \n- tam ekran klavye girişini devre dışı bırakma
+\n- LTR'yi zorlama
+\n- Tam ekranı otomatik gizleme
 \n- dikey/yatay/otomatik yönü zorlama
 \n- sesi (çoğu uygulama için) kapatma
 \n- ısrarlı bildirimler (sesi tekrar tekrar çalma / yeniden başlatma gerekir)
@@ -37,20 +39,30 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="app_name">App Settings Reborn</string>
     <string name="app_version">Sürüm: %s</string>
     <string name="app_translation">Çevirmen: %s</string>
+    <string name="app_framework_warning_title">Modül aktif değil!</string>
+    <string name="app_framework_warning_message">"EdXposed/LSPosed framework'ün kurulu olduğundan ve modülün EdXposed/LSPosed yöneticisinde etkinleştirildiğinden emin olun ve ardından cihazı yeniden başlatın."</string>
+    <string name="app_selinux_warning_message">"Modül, permissive SELinux veya EdXposed Framework'ün minimum sürümünü gerektirir"<a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a>.
+        Herhangi bir <a href="https://github.com/LSPosed/LSPosed/releases">LSposed</a> sürümü de çalışacaktır.</string>
 
 
     <!-- main menu -->
+    <string name="menu_search">Ara</string>
     <string name="menu_refresh">Yenile</string>
     <string name="menu_recents">Son uygulamalar</string>
-    <string name="menu_backup">Dışa aktar</string>
-    <string name="menu_restore">İçe aktar</string>
+
+    <!-- drawer -->
+    <string name="menu_backup">Yedekle</string>
+    <string name="menu_restore">Geri yükle</string>
+    <string name="menu_filter">Filtrele</string>
+    <string name="menu_permission">İzne göre filtrele</string>
     <string name="menu_about">Hakkında</string>
 
-    <!-- Import / Export -->
-    <string name="imp_exp_backup_completed">Ayarlar şu dosyaya aktarıldı</string>
-    <string name="imp_exp_backup_error">Dışa aktarılamadı: %s</string>
-    <string name="imp_exp_restore_error">İçe aktarılamadı: %s</string>
-    <string name="imp_exp_restored">İçe aktarma başarılı</string>
+    <!-- Restore / Backup -->
+    <string name="imp_exp_backup_completed">Yedekleme başarıyla tamamlandı</string>
+    <string name="imp_exp_backup_error">Yedekleme başarısız: %s</string>
+    <string name="imp_exp_restore_error">Geri yükleme başarısız: %s</string>
+    <string name="imp_exp_restored">Geri yükleme başarıyla tamamlandı</string>
+    <string name="imp_exp_file_picker_error">Sistem Belge Kullanıcı Arabirimi açılırken hata oluştu</string>
 
     <!-- app-specific menu -->
     <string name="menu_save">Kaydet</string>
@@ -69,9 +81,11 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="settings_listres">Kaynak listesi</string>
     <string name="settings_screen">Ekran (dp)</string>
     <string name="settings_xlargeres">xlarge çöz.</string>
+    <string name="settings_ltr">"LTR'yi zorla"</string>
     <string name="settings_screenshot">Ekran görüntüsü</string>
     <string name="settings_locale">Dil</string>
     <string name="settings_fullscreen">Tam ekran</string>
+    <string name="settings_autofullscreen">Tam ekranı otomatik gizle</string>
     <string name="settings_notitle">Başlık yok</string>
     <string name="settings_screenon">Ekranı açık tut</string>
     <string name="settings_showwhenlocked">Kilitliyken göster</string>
@@ -135,6 +149,12 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="settings_unsaved_detail">Yapılandırma kaydedilmedi. Geri dönülecek ve değişiklikler uygulanmayacak!</string>
     <string name="settings_apply_title">Ayarları uygula</string>
     <string name="settings_apply_detail">Uygulama sonlandırılacak ve yeniden başlatıldığında yeni ayarlar kullanılacak!</string>
+    
+        <!-- Theme -->
+    <string name="theme_title">Tema</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="theme_auto">Sisteme göre</string>
 
 
     <!-- Filter dialog -->
