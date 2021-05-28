@@ -45,13 +45,16 @@
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
-            android:name="xposeddescription"
-            android:value="@string/app_mod_summary" />
+            android:name="xposedsharedprefs"
+            android:value="true" />
         <meta-data
             android:name="xposedminversion"
             android:value="89" />
         <meta-data
-            android:name="xposedsharedprefs"
-            android:value="true" />
+            android:name="xposeddescription"
+            android:value="@string/app_module_summary" />
+        <meta-data
+            android:name="xposedscope"
+            android:resource="@array/module_scope" />
     </application>
 </manifest>

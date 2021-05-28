@@ -5,4 +5,7 @@
         <item>@string/theme_dark</item>
         <item>@string/theme_auto</item>
     </string-array>
+    <string-array name="module_scope" translatable="false">
+        <item>android</item>
+    </string-array>
 </resources>
