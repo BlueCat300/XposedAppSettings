@@ -40,7 +40,7 @@ Using the function revoke/restore permissions: select the permissions and click 
 - notifications priority (not available on OS 8.0+)
 - disable big (expanded) notifications (not available on OS 6.0+)
 
-**Previous Versions and original developers:**
+**Previous versions and original developers:**
 - https://github.com/Phoenix09/XposedAppSettings
 - https://github.com/cooldroid/XposedAppSettings
 - https://github.com/rovo89/XposedAppSettings
