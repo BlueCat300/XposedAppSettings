@@ -8,8 +8,8 @@ android {
         applicationId "ru.bluecat.android.xposed.mods.appsettings"
         minSdkVersion 21
         targetSdkVersion 30
-        versionName "1.5"
-        versionCode 17
+        versionName "1.5.1"
+        versionCode 20
         archivesBaseName = "App Settings Reborn v${versionName}"
     }
 
@@ -18,7 +18,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    lintOptions{
+    lintOptions {
         disable 'MissingTranslation'
     }
 
@@ -41,8 +41,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
     implementation 'com.google.android.material:material:1.3.0'
     implementation "com.github.topjohnwu.libsu:core:3.1.2"

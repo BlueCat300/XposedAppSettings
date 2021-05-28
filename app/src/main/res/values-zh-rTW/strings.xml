@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">針對每個程式設定環境變數，包括：
+    <string name="app_module_summary">針對每個程式設定環境變數，包括：
     DPI、字體大小、資源存取、語言、
     全螢幕、有無標題列、保持螢幕開啟、顯示在鎖定螢幕、
     常駐背景、關閉全螢幕輸入、橫/豎介面、常駐通知、關閉大型通知、存取權限</string>

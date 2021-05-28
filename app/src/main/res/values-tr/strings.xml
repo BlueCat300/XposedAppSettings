@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Uygulama bazında genel yapılandırmaları ayarlayın:
+    <string name="app_module_summary">Uygulama bazında genel yapılandırmaları ayarlayın:
 DPI; Yüklenen kaynakları geçersiz kılma; Dil; Tam ekran;
 Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
 

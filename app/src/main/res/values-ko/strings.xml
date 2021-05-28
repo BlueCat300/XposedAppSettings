@@ -2,7 +2,7 @@
 <resources>
     <!-- App name must be static to English. -->
 
-    <string name="app_mod_summary">앱마다 다른 설정을 적용시켜줍니다. :
+    <string name="app_module_summary">앱마다 다른 설정을 적용시켜줍니다. :
 DPI; 글씨 크기; 특정 리소스만 사용; 언어;
 전체 화면 여부; 타이틀바 여부; 화면 계속 켜기 여부; 잠금 화면에서 보이기;
 메모리에 유지; 풀스크린 IME 방지; 화면 방향; 집요한 알림; 알림 확장 가능 여부; 권한 수정</string>

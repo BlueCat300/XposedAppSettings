@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Möglichkeit einige Einstellungen auf Pro-App-Basis zu setzen:
+    <string name="app_module_summary">Möglichkeit einige Einstellungen auf Pro-App-Basis zu setzen:
 DPI; Schriftgröße; geladene Resourcen überschreiben; Sprache ändern;
 Vollbild; Kein Titel; Bildschirm anbehalten; Über Sperrbildschirm anzeigen;
 Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende Benachrichtigungen; keine erweiterten Benachrichtigungen; Berechtigungen bearbeiten</string>

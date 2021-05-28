@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Capaz de definir uma série de configurações comuns individualmente por app:
+    <string name="app_module_summary">Capaz de definir uma série de configurações comuns individualmente por app:
 DPI; Escala de fonte; Substituir recursos carregados; Localidade;
 Tela cheia; Remover barra de título; Manter tela ligada; Exibir sobre a tela de bloqueio;
 Permanecer na memória; No Fullscreen IME; Orientação; Notificações persistentes; Sem notificações grandes; Revogar permissões</string>

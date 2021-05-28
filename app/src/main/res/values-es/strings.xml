@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Ajustar configuraciones genéricas por aplicación:
+    <string name="app_module_summary">Ajustar configuraciones genéricas por aplicación:
 DPI; sobreescribir recursos cargados; lenguaje; pantalla completa;
 residente en memoria; orientación; revocar permisos; &#8230;</string>
 

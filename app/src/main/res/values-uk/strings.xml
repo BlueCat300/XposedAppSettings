@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Зміна налаштувань для кожного додатку:
+    <string name="app_module_summary">Зміна налаштувань для кожного додатку:
 DPI; Заміна ресурсів; Мова; Повний екран;
 Утримання в пам\'яті; Орієнтація; Зміна прав; &#8230;</string>
 

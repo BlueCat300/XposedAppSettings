@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Possibilité de modifier plusieurs points de configuration générale pour des applis individuels
+    <string name="app_module_summary">Possibilité de modifier plusieurs points de configuration générale pour des applis individuels
 DPI; Taille des polices; Remplacement des ressouces; Locale;
 Plein écran; Sans titre; Garder l\'écran allumé; Montrer au dessus de l\'écran de verrouillage;
 Garder résident en mémoire; Pas de plein écran IME; Orientation; Notifications persistentes; Pas de notifications agrandies; Refuser Permissions</string>

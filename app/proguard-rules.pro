@@ -1,6 +1,5 @@
 -dontobfuscate
 -keep class ru.bluecat.android.xposed.mods.appsettings.hooks.XposedMod
--keepattributes LineNumberTable
 
 # Add project specific ProGuard rules here.
 # You can control the set of applied configuration files using the
@@ -18,7 +17,7 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.

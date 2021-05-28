@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">允许为每个程序设置一些通用配置：
+    <string name="app_module_summary">允许为每个程序设置一些通用配置：
 DPI、覆盖资源、区域、全屏、
 常驻内存、屏幕方向、撤销权限等 &#8230;</string>
 

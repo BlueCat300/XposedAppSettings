@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_mod_summary">Možnost nastavit několik základních nastavení pro jednotlivé aplikace:
+    <string name="app_module_summary">Možnost nastavit několik základních nastavení pro jednotlivé aplikace:
 DPI, velikost písma, jazyk, načítání zdrojů, zobrazení na celou obrazovku, skrýt záhlaví, ponechat obrazovku zapnutou, zobrazit nad uzamykací obrazovkou, ponechat v paměti, no fullscreen IME, orientace, neústupné oznámení, zrušit povolení</string>
 
 

@@ -82,7 +82,6 @@ class Activities {
 
 							controller.hide(WindowInsets.Type.statusBars());
 						} else {
-							//noinspection deprecation
 							window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						}
 					} else if (fullscreen == Common.FULLSCREEN_PREVENT) {
@@ -90,7 +89,6 @@ class Activities {
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 							controller.show(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
 						} else {
-							//noinspection deprecation
 							window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						}
 					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE) {
@@ -101,9 +99,7 @@ class Activities {
 								controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 							controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
 						} else {
-							//noinspection deprecation
 							window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-							//noinspection deprecation
 							decorView.setSystemUiVisibility(
 								View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 									| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -158,15 +154,12 @@ class Activities {
 					int flags = (Integer) param.args[0];
 					int mask = (Integer) param.args[1];
 					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-						//noinspection deprecation
 						if ((mask & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
 							Boolean fullscreen = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_FULLSCREEN);
 							if (fullscreen != null) {
 								if (fullscreen) {    //fullscreen.booleanValue())
-									//noinspection deprecation
 									flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
 								} else {
-									//noinspection deprecation
 									flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
 								}
 								param.args[0] = flags;
@@ -203,7 +196,6 @@ class Activities {
 					protected void beforeHookedMethod(MethodHookParam param) {
 						// Has the navigation bar been shown?
 						int localChanges = (Integer) param.args[3];
-						//noinspection deprecation
 						if ((localChanges & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0)
 							return;
 
@@ -216,11 +208,8 @@ class Activities {
 						// Enforce SYSTEM_UI_FLAG_HIDE_NAVIGATION and hide changes to this flag
 						int globalVisibility = (Integer) param.args[1];
 						int localValue = (Integer) param.args[2];
-						//noinspection deprecation
 						param.args[1] = globalVisibility | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-						//noinspection deprecation
 						param.args[2] = localValue | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-						//noinspection deprecation
 						param.args[3] = localChanges & ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 					}
 				});
