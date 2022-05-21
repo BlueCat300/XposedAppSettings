@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Main" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="alertDialogTheme">@style/Theme.Main.Dialog.Alert</item>
+        <item name="colorPrimary">@color/blue_gray_900</item>
+        <item name="colorPrimaryDark">@color/blue_gray_950</item>
+        <item name="colorAccent">@color/dark_blue</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+    </style>
+    <style name="Theme.Main.Dialog.Alert" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/dark_blue</item>
+        <item name="android:background">@color/blue_gray_900</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Theme.Main.Dialog.Alert.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Theme.Main.Dialog.Alert.Button</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Theme.Main.Dialog.Alert.Button</item>
+    </style>
+    <style name="Theme.Main.Dialog.Alert.Button" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/dark_blue</item>
+    </style>
+</resources>

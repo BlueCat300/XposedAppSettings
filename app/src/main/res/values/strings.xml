@@ -4,7 +4,6 @@
 DPI; Override loaded resouces; Locale; Fullscreen;
 Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 
-
     <!-- Main screen -->
     <string name="app_loading">Loading apps, please wait</string>
     <string name="app_searchhint">name or package</string>
@@ -34,17 +33,12 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
 \n- force or exclude app from recents (reboot required)
 \n- access to recent tasks (reboot required)
 \n- revoke permissions (double reboot required)
-\n- force using legacy (navbar) menu button (not available on OS 10.0+)
-\n- notifications priority (not available on OS 8.0+)
-\n- disable big (expanded) notifications (not available on OS 6.0+)</string>
+\n- force using legacy (navbar) menu button</string>
     <string name="app_name">App Settings Reborn</string>
     <string name="app_version">Version: %s</string>
     <string name="app_translation">Translator: %s</string>
     <string name="app_framework_warning_title">The module is not active!</string>
-    <string name="app_framework_warning_message">Make sure EdXposed/LSPosed framework is installed and module enabled on EdXposed/LSPosed manager then reboot device.</string>
-    <string name="app_selinux_warning_message">The module requires permissive SELinux or EdXposed Framework minimum version<a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a>.
-        Any version of <a href="https://github.com/LSPosed/LSPosed/releases">LSposed</a> will work as well.</string>
-
+    <string name="app_framework_warning_message">Make sure LSPosed framework is installed and module enabled on LSPosed manager then reboot device.</string>
 
     <!-- main menu -->
     <string name="menu_search">Search</string>
@@ -52,11 +46,11 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="menu_recents">Recent apps</string>
 
     <!-- drawer -->
-    <string name="menu_backup">Backup</string>
-    <string name="menu_restore">Restore</string>
-    <string name="menu_filter">Filter</string>
-    <string name="menu_permission">Filter by permission</string>
-    <string name="menu_about">About</string>
+    <string name="drawer_backup">Backup</string>
+    <string name="drawer_restore">Restore</string>
+    <string name="drawer_filter">Filter</string>
+    <string name="drawer_permission">Filter by permission</string>
+    <string name="drawer_about">About</string>
 
     <!-- Restore / Backup -->
     <string name="imp_exp_backup_completed">Backup completed successfully</string>
@@ -94,9 +88,7 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="settings_nofullscreenime">No Fullscreen IME</string>
     <string name="settings_orientation">Orientation</string>
     <string name="settings_insistentnotif">Insistent notifications</string>
-    <string name="settings_nobignotif">No big notifications</string>
     <string name="settings_ongoingnotif">Ongoing notifications</string>
-    <string name="settings_notifpriority">Notifications priority</string>
     <string name="settings_mute">Mute audio</string>
     <string name="settings_legacy_menu">Legacy menu button</string>
     <string name="settings_recent_tasks">Access to recent tasks</string>
@@ -122,12 +114,6 @@ Resident in memory; Orientation; Revoke Permissions; &#8230;</string>
     <string name="settings_ori_portrait_user">Always portrait (user setting)</string>
     <string name="settings_ori_landscape_user">Always landscape (user setting)</string>
     <string name="settings_ori_user_4way">4-way rotation (user setting)</string>
-
-    <string name="settings_npri_max">Max</string>
-    <string name="settings_npri_high">High</string>
-    <string name="settings_npri_normal">Normal</string>
-    <string name="settings_npri_low">Low</string>
-    <string name="settings_npri_min">Min</string>
 
     <!-- Recent apps -->
     <string name="recents_title">Recent Applications</string>
@@ -155,12 +141,6 @@ Really go back and discard changes?</string>
     <!-- Common dialog buttons -->
     <string name="common_button_ok">@android:string/ok</string>
     <string name="common_button_cancel">@android:string/cancel</string>
-
-    <!-- Theme -->
-    <string name="theme_title">Theme</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark">Dark</string>
-    <string name="theme_auto">Follow system</string>
 
     <!-- Filter dialog -->
     <string name="filter_title">Filter</string>

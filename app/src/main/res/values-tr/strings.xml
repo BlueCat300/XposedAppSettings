@@ -41,9 +41,6 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="app_translation">Çevirmen: %s</string>
     <string name="app_framework_warning_title">Modül aktif değil!</string>
     <string name="app_framework_warning_message">"EdXposed/LSPosed framework'ün kurulu olduğundan ve modülün EdXposed/LSPosed yöneticisinde etkinleştirildiğinden emin olun ve ardından cihazı yeniden başlatın."</string>
-    <string name="app_selinux_warning_message">"Modül, permissive SELinux veya EdXposed Framework'ün minimum sürümünü gerektirir"<a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a>.
-        Herhangi bir <a href="https://github.com/LSPosed/LSPosed/releases">LSposed</a> sürümü de çalışacaktır.</string>
-
 
     <!-- main menu -->
     <string name="menu_search">Ara</string>
@@ -51,11 +48,11 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="menu_recents">Son uygulamalar</string>
 
     <!-- drawer -->
-    <string name="menu_backup">Yedekle</string>
-    <string name="menu_restore">Geri yükle</string>
-    <string name="menu_filter">Filtrele</string>
-    <string name="menu_permission">İzne göre filtrele</string>
-    <string name="menu_about">Hakkında</string>
+    <string name="drawer_backup">Yedekle</string>
+    <string name="drawer_restore">Geri yükle</string>
+    <string name="drawer_filter">Filtrele</string>
+    <string name="drawer_permission">İzne göre filtrele</string>
+    <string name="drawer_about">Hakkında</string>
 
     <!-- Restore / Backup -->
     <string name="imp_exp_backup_completed">Yedekleme başarıyla tamamlandı</string>
@@ -93,9 +90,7 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="settings_nofullscreenime">Tam ekran klavye yok</string>
     <string name="settings_orientation">Yönlendirme</string>
     <string name="settings_insistentnotif">Israrcı bildirimler</string>
-    <string name="settings_nobignotif">Büyük bildirim yok</string>
     <string name="settings_ongoingnotif">Devam eden bildirimler</string>
-    <string name="settings_notifpriority">Bildirim önceliği</string>
     <string name="settings_mute">Sesi kapat</string>
     <string name="settings_legacy_menu">Eski menü düğmesi</string>
     <string name="settings_recent_tasks">Son uygulamalara erişim</string>
@@ -122,12 +117,6 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="settings_ori_landscape_user">Her zaman yatay (kullanıcı ayarı)</string>
     <string name="settings_ori_user_4way">4-yöne döndür (kullanıcı ayarı)</string>
 
-    <string name="settings_npri_max">Maksimum</string>
-    <string name="settings_npri_high">Yüksek</string>
-    <string name="settings_npri_normal">Normal</string>
-    <string name="settings_npri_low">Düşük</string>
-    <string name="settings_npri_min">Minimum</string>
-
     <!-- Recent apps -->
     <string name="recents_title">Son Uygulamalar</string>
 
@@ -149,13 +138,6 @@ Bellekte tutma; Yönlendirme; İzinleri iptal etme; &#8230;</string>
     <string name="settings_unsaved_detail">Yapılandırma kaydedilmedi. Geri dönülecek ve değişiklikler uygulanmayacak!</string>
     <string name="settings_apply_title">Ayarları uygula</string>
     <string name="settings_apply_detail">Uygulama sonlandırılacak ve yeniden başlatıldığında yeni ayarlar kullanılacak!</string>
-    
-        <!-- Theme -->
-    <string name="theme_title">Tema</string>
-    <string name="theme_light">Açık</string>
-    <string name="theme_dark">Koyu</string>
-    <string name="theme_auto">Sisteme göre</string>
-
 
     <!-- Filter dialog -->
     <string name="filter_title">Filtrele</string>

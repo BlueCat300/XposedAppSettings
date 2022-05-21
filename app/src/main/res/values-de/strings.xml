@@ -32,9 +32,9 @@ Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende
 
 
     <!-- main menu -->
-    <string name="menu_backup">Exportieren</string>
-    <string name="menu_restore">Importieren</string>
-    <string name="menu_about">Über</string>
+    <string name="drawer_backup">Exportieren</string>
+    <string name="drawer_restore">Importieren</string>
+    <string name="drawer_about">Über</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Einstellungen in Datei exportiert</string>
@@ -66,7 +66,6 @@ Im Speicher behalten; keine Eingabeauswahl bei Vollbild; Orientierung; bleibende
     <string name="settings_nofullscreenime">Keine Vollbild-Eingabe</string>
     <string name="settings_orientation">Ausrichtung</string>
     <string name="settings_insistentnotif">Dauerhafte Beanchrichtigung</string>
-    <string name="settings_nobignotif">Keine großen Benachrichtigungen</string>
     <string name="settings_permissions">Berechtigungen</string>
 
     <string name="settings_default">(Standard)</string>

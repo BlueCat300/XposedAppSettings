@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings.ui;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,6 +14,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.PermissionInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
@@ -41,19 +42,25 @@ import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,15 +80,11 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import ru.bluecat.android.xposed.mods.appsettings.Common;
-import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent;
-import ru.bluecat.android.xposed.mods.appsettings.FilterItemComponent.FilterState;
-import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
-import ru.bluecat.android.xposed.mods.appsettings.R;
-import ru.bluecat.android.xposed.mods.appsettings.SELinux;
-import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
+import ru.bluecat.android.xposed.mods.appsettings.ui.FilterItemComponent;
+import ru.bluecat.android.xposed.mods.appsettings.ui.FilterItemComponent.FilterState;
+import ru.bluecat.android.xposed.mods.appsettings.ui.PermissionsListAdapter;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
 	private static final ArrayList<ApplicationInfo> appList = new ArrayList<>();
 	private static ArrayList<ApplicationInfo> filteredAppList = new ArrayList<>();
@@ -102,137 +105,151 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	private static MainActivity activityContext;
 	private static SharedPreferences prefs;
 	private static Menu optionsMenu;
-	static boolean isSELinuxCheckerEnabled;
+	private Drawer drawer;
+	private int mPosition;
+	private ActivityResultLauncher<Intent> onActivityResult;
 
-    @SuppressLint("WorldReadableFiles")
+	@SuppressLint("WorldReadableFiles")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if(!isModuleActive()) {
-			frameworkWarning(this, 1);
+			frameworkWarning(this);
 			return;
 		}
-		if(prefs == null) {
-			try {
-				//noinspection deprecation
-				prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-				isSELinuxCheckerEnabled = false;
-			} catch (SecurityException ignored) {
-				if(SELinux.isSELinuxPermissive()) {
-					isSELinuxCheckerEnabled = true;
-					getLegacyPrefs(this);
-				} else {
-					frameworkWarning(this, 2);
-					return;
-				}
-			}
+		try {
+			//noinspection deprecation
+			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+		} catch (SecurityException e) {
+			Toasts.showToast(this, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+			finish();
 		}
-		ThemeUtil.setTheme(this, prefs);
 		activityContext = this;
-		setContentView(R.layout.activity_main);
-		Toolbar toolbar = findViewById(R.id.toolbar);
+		setContentView(R.layout.main_activity);
+		Toolbar toolbar = findViewById(R.id.listToolbar);
 		setSupportActionBar(toolbar);
-		setUpDrawer(toolbar);
+		setTitle(null);
+		setUpDrawer();
 		loadSettings();
+		registerActivityAction();
 		ListView list = findViewById(R.id.lstApps);
 		registerForContextMenu(list);
 		list.setOnItemClickListener((parent, view, position, id) -> {
 			// Open settings activity when clicking on an application
 			String pkgName = ((TextView) view.findViewById(R.id.app_package)).getText().toString();
-			Intent i = new Intent(getApplicationContext(), ApplicationsActivity.class);
+			Intent i = new Intent(getApplicationContext(), AppSettingsActivity.class);
 			i.putExtra("package", pkgName);
-			startActivityForResult(i, position);
+			mPosition = position;
+			onActivityResult.launch(i);
 		});
 		refreshApps();
 	}
 
-	private static void getLegacyPrefs (Activity context) {
-		Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
-		if (ctx == null) {
-			ctx = context;
-		}
-		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+	private void registerActivityAction() {
+		onActivityResult = registerForActivityResult(
+				new ActivityResultContracts.StartActivityForResult(), result -> {
+			if (result.getResultCode() == Activity.RESULT_OK) {
+				ListView list = findViewById(R.id.lstApps);
+				if (mPosition >= list.getFirstVisiblePosition() && mPosition <= list.getLastVisiblePosition()) {
+					View v = list.getChildAt(mPosition - list.getFirstVisiblePosition());
+					list.getAdapter().getView(mPosition, v, list);
+				} else if (mPosition == 2000) {
+					list.invalidateViews();
+				}
+			}
+		});
 	}
 
-	public static void frameworkWarning(Activity context, int warningType) {
+	private void frameworkWarning(Activity context) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 		dialog.setTitle(R.string.app_framework_warning_title);
-		int message = R.string.app_framework_warning_message;
-		if(warningType == 2) {
-			message = R.string.app_selinux_warning_message;
-		}
-		dialog.setMessage(message);
+		dialog.setMessage(R.string.app_framework_warning_message);
 		dialog.setPositiveButton(R.string.common_button_ok, (dialogInterface, which) -> {
 			dialogInterface.dismiss();
-			if(warningType == 2) System.exit(0);
-			else context.finish();
+			System.exit(0);
 		});
 		AlertDialog alert = dialog.create();
 		alert.setCancelable(false);
 		alert.setCanceledOnTouchOutside(false);
 		alert.show();
-
-		if(warningType == 2) {
-			TextView msgText = alert.findViewById(android.R.id.message);
-			if (msgText != null) {
-				msgText.setMovementMethod(LinkMovementMethod.getInstance());
-			}
-		}
 	}
 
-	private void setUpDrawer(Toolbar toolbar) {
-		DrawerLayout drawer = findViewById(R.id. drawer_layout);
-		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-				this, drawer, toolbar, 0,
-				0);
-		drawer.addDrawerListener(toggle);
-		toggle.syncState();
-		NavigationView navigationView = findViewById(R.id.nav_view);
-		navigationView.setNavigationItemSelectedListener(this);
+	public static boolean isNightTheme(Activity context) {
+		return ((context.getResources().getConfiguration().uiMode
+				& Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES);
 	}
 
-	@Override
-	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.drawer_backup) {
-			BackupActivity.startBackupActivity(this, false);
-		} else if (id == R.id.drawer_restore) {
-			BackupActivity.startBackupActivity(this, true);
-		} else if (id == R.id.drawer_filter) {
-			appFilter();
-		} else if (id == R.id.drawer_permission) {
-			permissionFilter();
-		} else if (id == R.id.drawer_theme) {
-			ThemeUtil.setThemeDialog(this, prefs);
-		} else if (id == R.id.drawer_about) {
-			showAboutDialog();
+	private void setUpDrawer() {
+		PrimaryDrawerItem backup = new PrimaryDrawerItem().withName(R.string.drawer_backup)
+				.withIcon(R.drawable.ic_drawer_backup).withIdentifier(1).withSelectable(false);
+		PrimaryDrawerItem restore = new PrimaryDrawerItem().withName(R.string.drawer_restore)
+				.withIcon(R.drawable.ic_drawer_restore).withIdentifier(2).withSelectable(false);
+
+		PrimaryDrawerItem filter = new PrimaryDrawerItem().withName(R.string.drawer_filter)
+				.withIcon(R.drawable.ic_drawer_filter).withIdentifier(3).withSelectable(false);
+		PrimaryDrawerItem permission = new PrimaryDrawerItem().withName(R.string.drawer_permission)
+				.withIcon(R.drawable.ic_drawer_filter_permission).withIdentifier(4).withSelectable(false);
+
+		PrimaryDrawerItem about = new PrimaryDrawerItem().withName(R.string.drawer_about)
+				.withIcon(R.drawable.ic_drawer_about).withIdentifier(5).withSelectable(false);
+
+		//noinspection rawtypes
+		IDrawerItem[] itemsList = {backup, restore, new DividerDrawerItem(), filter, permission,
+				new DividerDrawerItem(), about};
+
+		DrawerBuilder drawerBuilder = new DrawerBuilder()
+				.withActivity(this)
+				.withHeader(R.layout.drawer_header)
+				.withRootView(R.id.drawerLayout)
+				.withToolbar(findViewById(R.id.listToolbar))
+				.withActionBarDrawerToggle(true)
+				.withActionBarDrawerToggleAnimated(true)
+				.withHasStableIds(true)
+				.withHeaderDivider(false)
+				.withSelectedItem(-1)
+				.addDrawerItems(itemsList)
+				.withOnDrawerItemClickListener((view, position, drawerItem) -> {
+					if (drawerItem != null) {
+						long id = drawerItem.getIdentifier();
+						if (id == 1) BackupActivity.startActivity(this, false);
+						if (id == 2) BackupActivity.startActivity(this, true);
+						if (id == 3) appFilter();
+						if (id == 4) permissionFilter();
+						if (id == 5) showAboutDialog();
+					}
+					return false;
+				});
+		drawer = drawerBuilder.build();
+	}
+
+	private boolean closeDrawer() {
+		if (drawer.isDrawerOpen()) {
+			drawer.closeDrawer();
+			return true;
 		}
-		DrawerLayout drawer = findViewById(R.id.drawer_layout);
-		drawer.closeDrawer(GravityCompat.START);
-		return true;
+		return false;
+	}
+
+	private void clearAllFilters() {
+		filterAppType = FilterState.ALL;
+		filterAppState = FilterState.ALL;
+		filterActive = FilterState.ALL;
+		for (SettingInfo setting : settings) {
+			setting.filter = FilterState.ALL;
+		}
+
+		SearchView searchV = findViewById(R.id.menu_searchApp);
+		if (searchV.isShown()) {
+			searchV.onActionViewCollapsed();
+		}
+		getListAdapter().getFilter().filter(nameFilter);
 	}
 
 	@Override
 	public void onBackPressed() {
-		DrawerLayout drawer = findViewById(R.id.drawer_layout);
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			drawer.closeDrawer(GravityCompat.START);
-		} else {
+		if (!closeDrawer()) {
+			clearAllFilters();
 			super.onBackPressed();
-		}
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		// Refresh the app that was just edited, if it's visible in the list
-		ListView list = findViewById(R.id.lstApps);
-		if (requestCode >= list.getFirstVisiblePosition() && requestCode <= list.getLastVisiblePosition()) {
-			View v = list.getChildAt(requestCode - list.getFirstVisiblePosition());
-			list.getAdapter().getView(requestCode, v, list);
-		} else if (requestCode == 2000) {
-			list.invalidateViews();
 		}
 	}
 
@@ -264,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			getMenuInflater().inflate(R.menu.menu_app, menu);
 			menu.findItem(R.id.menu_save).setVisible(false);
 
-			ApplicationsActivity.updateMenuEntries(this, menu, appInfo.packageName);
+			AppSettingsActivity.updateMenuEntries(this, menu, appInfo.packageName);
 		} else {
 			super.onCreateContextMenu(menu, v, menuInfo);
 		}
@@ -279,7 +296,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			startActivity(LaunchIntent);
 			return true;
 		} else if (item.getItemId() == R.id.menu_app_settings) {
-			startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkgName)));
+			startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+					Uri.parse("package:" + pkgName)));
 			return true;
 		} else if (item.getItemId() == R.id.menu_app_store) {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
@@ -307,38 +325,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	@SuppressLint("WorldReadableFiles")
-	static void refreshAppsAfterImport() {
+	static void refreshAppsAfterChanges(boolean isRestored) {
 		// Refresh preferences
-		if(prefs == null) {
-			try {
-				//noinspection deprecation
-				prefs = activityContext.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-			} catch (SecurityException ignored) {
-				if(SELinux.isSELinuxPermissive()) {
-					getLegacyPrefs(activityContext);
-				}
-			}
+		try {
+			//noinspection deprecation
+			prefs = activityContext.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+		} catch (SecurityException e) {
+			Toasts.showToast(activityContext, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+			activityContext.finish();
 		}
 		// Refresh listed apps (account for filters)
-		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) activityContext.findViewById(R.id.lstApps)).getAdapter();
-		appListAdapter.getFilter().filter(nameFilter);
-		showBackupSnackbar(R.string.imp_exp_restored);
+		getListAdapter().getFilter().filter(nameFilter);
+		if(isRestored) showBackupSnackbar(R.string.imp_exp_restored);
 	}
 
 	static void showBackupSnackbar(int stringId) {
 		new Handler(Looper.getMainLooper()).postDelayed(() -> {
-			int background = R.color.snackbar_background;
-			int text = R.color.snackbar_text;
-			if(ThemeUtil.isNightTheme(activityContext, prefs)) {
-				background = R.color.snackbar_background_dark;
-				text = R.color.snackbar_text_dark;
-			}
-
 			Snackbar snackbar = Snackbar
-					.make(activityContext.findViewById(android.R.id.content), stringId, Snackbar.LENGTH_SHORT)
-					.setTextColor(ContextCompat.getColor(activityContext, text));
-			snackbar.getView().setBackgroundColor(ContextCompat.getColor(activityContext, background));
+					.make(activityContext.findViewById(android.R.id.content), stringId, Snackbar.LENGTH_SHORT);
+			snackbar.getView().setBackgroundColor(ContextCompat.getColor(activityContext, R.color.snackbar_background));
 			TextView centredMessage = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+			centredMessage.setTextColor(ContextCompat.getColor(activityContext, R.color.day_night_text));
 			centredMessage.setGravity(Gravity.CENTER);
 			snackbar.show();
 		}, 500);
@@ -364,15 +371,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		settings.add(new SettingInfo(Common.PREF_NO_FULLSCREEN_IME, getString(R.string.settings_nofullscreenime)));
 		settings.add(new SettingInfo(Common.PREF_ORIENTATION, getString(R.string.settings_orientation)));
 		settings.add(new SettingInfo(Common.PREF_INSISTENT_NOTIF, getString(R.string.settings_insistentnotif)));
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-			settings.add(new SettingInfo(Common.PREF_NO_BIG_NOTIFICATIONS, getString(R.string.settings_nobignotif)));
 		settings.add(new SettingInfo(Common.PREF_ONGOING_NOTIF, getString(R.string.settings_ongoingnotif)));
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-			settings.add(new SettingInfo(Common.PREF_NOTIF_PRIORITY, getString(R.string.settings_notifpriority)));
 		settings.add(new SettingInfo(Common.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
 		settings.add(new SettingInfo(Common.PREF_MUTE, getString(R.string.settings_mute)));
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
-			settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
+		settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
 		settings.add(new SettingInfo(Common.PREF_RECENT_TASKS, getString(R.string.settings_recent_tasks)));
 		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
 	}
@@ -420,9 +422,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		new AlertDialog.Builder(this)
 			.setTitle(R.string.recents_title)
 			.setAdapter(adapter, (dialog, which) -> {
-				Intent i = new Intent(getApplicationContext(), ApplicationsActivity.class);
+				Intent i = new Intent(getApplicationContext(), AppSettingsActivity.class);
 				i.putExtra("package", (String) data.get(which).get("package"));
-				startActivityForResult(i, 2000);
+				mPosition = 2000;
+				onActivityResult.launch(i);
 			}).show();
 	}
 
@@ -464,8 +467,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		dlgBuilder.show();
 	}
 
-	private static void loadApps(ProgressDialog dialog, MainActivity activity) {
 
+	@SuppressWarnings("deprecation")
+	private static void loadApps(ProgressDialog dialog, MainActivity activity) {
 		appList.clear();
 		permUsage.clear();
 		sharedUsers.clear();
@@ -488,27 +492,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			String[] perms = pkgInfo.requestedPermissions;
 			if (perms != null)
 				for (String perm : perms) {
-					Set<String> permUsers = permUsage.get(perm);
-					if (permUsers == null) {
-						permUsers = new TreeSet<>();
-						permUsage.put(perm, permUsers);
-					}
+					Set<String> permUsers = permUsage.computeIfAbsent(perm, k -> new TreeSet<>());
 					permUsers.add(pkgInfo.packageName);
 				}
 
 			if (pkgInfo.sharedUserId != null) {
-				Set<String> sharedUserPackages = sharedUsers.get(pkgInfo.sharedUserId);
-				if (sharedUserPackages == null) {
-					sharedUserPackages = new TreeSet<>();
-					sharedUsers.put(pkgInfo.sharedUserId, sharedUserPackages);
-				}
+				Set<String> sharedUserPackages = sharedUsers.computeIfAbsent(pkgInfo.sharedUserId, k -> new TreeSet<>());
 				sharedUserPackages.add(pkgInfo.packageName);
 
 				pkgSharedUsers.put(pkgInfo.packageName, pkgInfo.sharedUserId);
 			}
 		}
 
-		Collections.sort(appList, (lhs, rhs) -> {
+		appList.sort((lhs, rhs) -> {
 			if (lhs.name == null) {
 				return -1;
 			} else if (rhs.name == null) {
@@ -520,11 +516,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	private static void prepareAppList(MainActivity activity) {
-		final AppListAdapter appListAdapter = new AppListAdapter(activity, appList);
+		AppListAdapter appListAdapter = new AppListAdapter(activity, appList);
 		((ListView) activity.findViewById(R.id.lstApps)).setAdapter(appListAdapter);
 		appListAdapter.getFilter().filter(nameFilter);
 
-		SearchView search = ((SearchView) optionsMenu.findItem(R.id.menu_searchApp).getActionView())
+		SearchView search = optionsMenu.findItem(R.id.menu_searchApp).getActionView()
 				.findViewById(R.id.menu_searchApp);
 
 		search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -547,8 +543,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		});
 	}
 
-	private void appFilter () {
-		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+	private static AppListAdapter getListAdapter() {
+		return (AppListAdapter) ((ListView) activityContext.findViewById(R.id.lstApps)).getAdapter();
+	}
+
+	private void appFilter() {
+		AppListAdapter appListAdapter = getListAdapter();
 		appListAdapter.getFilter().filter(nameFilter);
 
 		Dialog filterDialog;
@@ -610,8 +610,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			component.setEnabled(enable);
 	}
 
-	private void permissionFilter () {
-		MainActivity.AppListAdapter appListAdapter = (MainActivity.AppListAdapter) ((ListView) this.findViewById(R.id.lstApps)).getAdapter();
+	private void permissionFilter() {
+		AppListAdapter appListAdapter = getListAdapter();
 		appListAdapter.getFilter().filter(nameFilter);
 
 		AlertDialog.Builder bld = new AlertDialog.Builder(this);
@@ -631,7 +631,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				items.add(unknownPerm);
 			}
 		}
-		PermissionsListAdapter adapter = new PermissionsListAdapter(this, items, new HashSet<>(), false, prefs);
+		PermissionsListAdapter adapter = new PermissionsListAdapter(this, items, new HashSet<>(), false);
 		bld.setAdapter(adapter, (dialog, which) -> {
 			filterPermissionUsage = Objects.requireNonNull(adapter.getItem(which)).name;
 			appListAdapter.getFilter().filter(nameFilter);
@@ -667,10 +667,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	// Handle background loading of apps
+	@SuppressWarnings("deprecation")
 	private static void prepareAppsAdapter(MainActivity activity) {
-    	int progressDialogTheme = R.style.Theme_Main_Dialog;
-    	if (!ThemeUtil.isNightTheme(activity, prefs)) progressDialogTheme = R.style.Theme_Main_Dialog_Light_ProgressDialog;
-		ProgressDialog dialog = new ProgressDialog(activity.findViewById(R.id.lstApps).getContext(), progressDialogTheme);
+		ProgressDialog dialog = new ProgressDialog(activity, R.style.Theme_Main_Dialog_Alert);
 		dialog.setMessage(activity.getResources().getString(R.string.app_loading));
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		dialog.setCancelable(false);
@@ -682,17 +681,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			return true;
 
 		}).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-			.subscribe(new Observer<Boolean>() {
+			.subscribe(new Observer<>() {
 				@Override
 				public void onSubscribe(@NonNull Disposable d) {
 					dialog.show();
 				}
 
 				@Override
-				public void onNext(@NonNull Boolean progress) { }
+				public void onNext(@NonNull Boolean progress) {
+				}
 
 				@Override
-				public void onError(@NonNull Throwable e) { }
+				public void onError(@NonNull Throwable e) {
+				}
 
 				@Override
 				public void onComplete() {
@@ -737,33 +738,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			synchronized (this) {
 				items = new ArrayList<>(appList);
 			}
-			if(prefs == null) {
-				try {
-					//noinspection deprecation
-					prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-				} catch (SecurityException ignored) {
-					if(SELinux.isSELinuxPermissive()) {
-						getLegacyPrefs(activityReference);
-					}
-				}
+			try {
+				//noinspection deprecation
+				prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			} catch (SecurityException e) {
+				Toasts.showToast(activityReference, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+				activityReference.finish();
 			}
 
 			FilterResults result = new FilterResults();
 			if (constraint != null && constraint.length() > 0) {
 				Pattern regexp = Pattern.compile(constraint.toString(), Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
-				for (Iterator<ApplicationInfo> i = items.iterator(); i.hasNext(); ) {
-					ApplicationInfo app = i.next();
-					if (!regexp.matcher(app.name == null ? "" : app.name).find()
-							&& !regexp.matcher(app.packageName).find()) {
-						i.remove();
-					}
-				}
+				items.removeIf(app -> !regexp.matcher(app.name == null ? "" : app.name).find()
+						&& !regexp.matcher(app.packageName).find());
 			}
-			for (Iterator<ApplicationInfo> i = items.iterator(); i.hasNext(); ) {
-				ApplicationInfo app = i.next();
-				if (prefs != null && filteredOut(prefs, app))
-					i.remove();
-			}
+			items.removeIf(app -> filteredOut(prefs, app));
 
 			result.values = items;
 			result.count = items.size();
@@ -901,14 +890,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				holder = (AppListViewHolder) row.getTag();
 			}
 
-			final ApplicationInfo app = filteredAppList.get(position);
-
-			int pkgColor = R.color.package_name;
-			if(ThemeUtil.isNightTheme(activityContext, prefs)) pkgColor = R.color.package_name_dark;
+			ApplicationInfo app = filteredAppList.get(position);
 
 			holder.app_name.setText(app.name == null ? "" : app.name);
 			holder.app_package.setTextColor(prefs.getBoolean(app.packageName + Common.PREF_ACTIVE, false)
-					? Color.RED : ContextCompat.getColor(mContext, pkgColor));
+					? Color.RED : ContextCompat.getColor(mContext, R.color.package_name));
 			holder.app_package.setText(app.packageName);
 			holder.app_icon.setImageDrawable(defaultIcon);
 
@@ -925,24 +911,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			return row;
 		}
 
-		private static void imageLoadTask (MainActivity activity, ApplicationInfo appInfo, AppListViewHolder holder) {
+		private static void imageLoadTask(MainActivity activity, ApplicationInfo appInfo, AppListViewHolder holder) {
 			Observable.fromCallable(() -> appInfo.loadIcon(activity.getPackageManager()))
 				.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-				    .subscribe(new Observer<Drawable>() {
-					    @Override
-					    public void onSubscribe(@NonNull Disposable d) { }
+				    .subscribe(new Observer<>() {
+						@Override
+						public void onSubscribe(@NonNull Disposable d) { }
 
-					    @Override
-					    public void onNext(@NonNull Drawable appIcon) {
-						    holder.app_icon.setImageDrawable(appIcon);
-					    }
+						@Override
+						public void onNext(@NonNull Drawable appIcon) {
+							holder.app_icon.setImageDrawable(appIcon);
+						}
 
-					    @Override
-					    public void onError(@NonNull Throwable e) { }
+						@Override
+						public void onError(@NonNull Throwable e) { }
 
-					    @Override
-					    public void onComplete() { }
-				    });
+						@Override
+						public void onComplete() { }
+					});
 		}
 
 		@Override
@@ -981,6 +967,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			if (section >= sections.length)
 				return filteredAppList.size() - 1;
 
+			//noinspection ConstantConditions
 			return alphaIndexer.get(sections[section]);
 		}
 
@@ -994,6 +981,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 			for (int i = 0; i < sections.length; i++) {
 
+				//noinspection ConstantConditions
 				int current = alphaIndexer.get(sections[i]);
 				if (current == position) {
 					// If position matches an index, return it immediately
@@ -1007,7 +995,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 					}
 				}
 			}
-
 			return closestIndex;
 		}
 

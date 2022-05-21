@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings.ui;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,15 +29,14 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import ru.bluecat.android.xposed.mods.appsettings.Common;
-import ru.bluecat.android.xposed.mods.appsettings.R;
-import ru.bluecat.android.xposed.mods.appsettings.SELinux;
 
 public class BackupActivity extends AppCompatActivity {
 
     private static SharedPreferences prefs;
+    private boolean job;
+    private ActivityResultLauncher<Intent> onActivityResult;
 
-    static void startBackupActivity(MainActivity activity, boolean isRestore) {
+    public static void startActivity(MainActivity activity, boolean isRestore) {
         Intent i = new Intent(activity, BackupActivity.class);
         i.putExtra("backup", isRestore);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -45,64 +46,47 @@ public class BackupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        showFilePicker(getIntent().getBooleanExtra("backup", false));
+        job = getIntent().getBooleanExtra("backup", false);
+        registerActivityAction();
+        showFilePicker();
     }
 
-    private void showFilePicker(boolean isRestore) {
-        try {
-            String action = Intent.ACTION_CREATE_DOCUMENT;
-            int requestCode = 1;
-            if(isRestore) {
-                action = Intent.ACTION_OPEN_DOCUMENT;
-                requestCode = 2;
+    public void registerActivityAction() {
+        onActivityResult = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    Uri treeUri = data.getData();
+                    if(job) restoreTask(this, treeUri);
+                    else backupTask(this, treeUri);
+                }
             }
+            finish();
+        });
+    }
 
+    private void showFilePicker() {
+        try {
+            String action;
+            if(job) action = Intent.ACTION_OPEN_DOCUMENT;
+            else action = Intent.ACTION_CREATE_DOCUMENT;
             Intent intent = new Intent(action);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("*/*");
-            if(!isRestore) {
-                intent.putExtra(Intent.EXTRA_TITLE, createUniqueBackupName());
-            }
-            startActivityForResult(intent, requestCode);
-
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.imp_exp_file_picker_error, Toast.LENGTH_LONG).show();
-            Log.e(Common.TAG, e.toString());
-            e.printStackTrace();
+            if(!job) intent.putExtra(Intent.EXTRA_TITLE, createUniqueBackupName());
+            onActivityResult.launch(intent);
+        } catch(ActivityNotFoundException e) {
+            Toasts.showToast(this, Pair.of(null,
+                    R.string.imp_exp_file_picker_error), null, Toast.LENGTH_LONG);
             finish();
         }
-    }
-
-    @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final Intent resultData) {
-        super.onActivityResult(requestCode, resultCode, resultData);
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            Uri treeUri = resultData.getData();
-            if (treeUri != null) {
-                backupTask(this, treeUri);
-            }
-        }
-        if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
-            Uri documentUri = resultData.getData();
-            if (documentUri != null) {
-                restoreTask(this, documentUri);
-            }
-        }
-        finish();
     }
 
     private static String createUniqueBackupName() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US);
         Date formatedDate = new Date(System.currentTimeMillis());
         return "AppSettings_" + formatter.format(formatedDate) + ".backup";
-    }
-
-    private static void getLegacyPrefs (Activity context) {
-        Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
-        if (ctx == null) {
-            ctx = context;
-        }
-        prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
     }
 
     @SuppressLint("WorldReadableFiles")
@@ -113,9 +97,8 @@ public class BackupActivity extends AppCompatActivity {
                 //noinspection deprecation
                 prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
             } catch (SecurityException e) {
-                if(SELinux.isSELinuxPermissive()) {
-                    getLegacyPrefs(activity);
-                }
+                Toasts.showToast(activity, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+                activity.finish();
             }
             if(prefs != null) {
                 output = new ObjectOutputStream(activity.getContentResolver().openOutputStream(treeUri));
@@ -126,17 +109,19 @@ public class BackupActivity extends AppCompatActivity {
             return true;
 
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<Boolean>() {
+            .subscribe(new Observer<>() {
                 @Override
-                public void onSubscribe(@NonNull Disposable d) { }
+                public void onSubscribe(@NonNull Disposable d) {
+                }
 
                 @Override
-                public void onNext(@NonNull Boolean progress) { }
+                public void onNext(@NonNull Boolean progress) {
+                }
 
                 @Override
                 public void onError(@NonNull Throwable e) {
-                    Toast.makeText(activity, activity.getResources().getString(R.string.imp_exp_backup_error,
-                            e.getMessage()), Toast.LENGTH_LONG).show();
+                    Toasts.showToast(activity, Pair.of(null, R.string.imp_exp_backup_error),
+                            e.getMessage(), Toast.LENGTH_LONG);
                 }
 
                 @Override
@@ -153,10 +138,9 @@ public class BackupActivity extends AppCompatActivity {
             try {
                 //noinspection deprecation
                 prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-            } catch (SecurityException ignored) {
-                if(SELinux.isSELinuxPermissive()) {
-                    getLegacyPrefs(activity);
-                }
+            } catch (SecurityException e) {
+                Toasts.showToast(activity, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+                activity.finish();
             }
             if(prefs != null) {
                 input = new ObjectInputStream(activity.getContentResolver().openInputStream(treeUri));
@@ -186,7 +170,7 @@ public class BackupActivity extends AppCompatActivity {
             return true;
 
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<Boolean>() {
+                .subscribe(new Observer<>() {
                 @Override
                 public void onSubscribe(@NonNull Disposable d) { }
 
@@ -195,13 +179,13 @@ public class BackupActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(@NonNull Throwable e) {
-                    Toast.makeText(activity, activity.getResources().getString(R.string.imp_exp_restore_error,
-                                e.getMessage()), Toast.LENGTH_LONG).show();
+                    Toasts.showToast(activity, Pair.of(null, R.string.imp_exp_restore_error),
+                            e.getMessage(), Toast.LENGTH_LONG);
                 }
 
                 @Override
                 public void onComplete() {
-                    MainActivity.refreshAppsAfterImport();
+                    MainActivity.refreshAppsAfterChanges(true);
                 }
             });
     }

@@ -37,7 +37,7 @@ public class PackagePermissions extends BroadcastReceiver {
 		mSettings = XposedHelpers.getObjectField(pmSvc, "mSettings");
 	}
 
-	public static void initHooks(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
+	public static void init(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
 		/* Hook to the PackageManager service in order to
 		 * - Listen for broadcasts to apply new settings and restart the app
 		 * - Intercept the permission granting function to remove disabled permissions
@@ -51,7 +51,7 @@ public class PackagePermissions extends BroadcastReceiver {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
 					String pkgName = (String) XposedHelpers.getObjectField(param.args[0], "packageName");
-					if (!XposedMod.isActive(prefs, pkgName) || !prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false))
+					if (!Core.isActive(prefs, pkgName) || !prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false))
 						return;
 
 					Set<String> disabledPermissions = prefs.getStringSet(pkgName + Common.PREF_REVOKELIST, null);
@@ -85,28 +85,58 @@ public class PackagePermissions extends BroadcastReceiver {
 					if (origRequestedPermissions != null) {
 						XposedHelpers.setObjectField(param.args[0], "requestedPermissions", origRequestedPermissions);
 					}
+
 					String pkgName = (String) XposedHelpers.getObjectField(param.args[0], "packageName");
 					if (Common.MY_PACKAGE_NAME.equals(pkgName)) {
-						grantRebootPermission(param, pkgName);
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+							Reboot.grantRebootPermission(param, pkgName);
+						} else {
+							Reboot.grantRebootPermissionS(param.thisObject, param.args[0]);
+						}
 					}
 				}
 			};
 
 			ClassLoader classLoader = lpparam.classLoader;
-			Class<?> clsPermManagerService = XposedHelpers.findClass("com.android.server.pm.permission.PermissionManagerService", classLoader);
-			Class<?> clsPkgManagerService = XposedHelpers.findClass("com.android.server.pm.PackageManagerService", classLoader);
+			Class<?> clsPermManagerService = XposedHelpers.findClass(
+					"com.android.server.pm.permission.PermissionManagerService", classLoader);
+			Class<?> clsPkgManagerService = XposedHelpers.findClass(
+					"com.android.server.pm.PackageManagerService", classLoader);
 
-			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
-				XposedHelpers.findAndHookMethod(clsPkgManagerService, "grantPermissionsLPw", "android.content.pm.PackageParser$Package", boolean.class, String.class, hookGrantPermissions);
+			String targetMethod;
+			String param1;
+			String param4;
+			if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O_MR1) {
+				targetMethod = "grantPermissionsLPw";
+				param1 = "android.content.pm.PackageParser$Package";
+				param4 = null;
 			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
-				XposedHelpers.findAndHookMethod(clsPermManagerService, "grantPermissions", "android.content.pm.PackageParser$Package", boolean.class, String.class,
-						"com.android.server.pm.permission.PermissionManagerInternal$PermissionCallback", hookGrantPermissions);
+				targetMethod = "grantPermissions";
+				param1 = "android.content.pm.PackageParser$Package";
+				param4 = "com.android.server.pm.permission.PermissionManagerInternal$PermissionCallback";
 			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-				XposedHelpers.findAndHookMethod(clsPermManagerService, "restorePermissionState", "android.content.pm.PackageParser$Package", boolean.class, String.class,
-						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
+				targetMethod = "restorePermissionState";
+				param1 = "android.content.pm.PackageParser$Package";
+				param4 = "com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback";
+			} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+				targetMethod = "restorePermissionState";
+				param1 = "com.android.server.pm.parsing.pkg.AndroidPackage";
+				param4 = "com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback";
 			} else {
-				XposedHelpers.findAndHookMethod(clsPermManagerService, "restorePermissionState", "com.android.server.pm.parsing.pkg.AndroidPackage", boolean.class, String.class,
-						"com.android.server.pm.permission.PermissionManagerServiceInternal$PermissionCallback", hookGrantPermissions);
+				targetMethod = "restorePermissionState";
+				param1 = "com.android.server.pm.parsing.pkg.AndroidPackage";
+				param4 = "com.android.server.pm.permission.PermissionManagerService$PermissionCallback";
+			}
+
+			if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O_MR1) {
+				XposedHelpers.findAndHookMethod(clsPkgManagerService, targetMethod, param1,
+						boolean.class, String.class, hookGrantPermissions);
+			} else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+				XposedHelpers.findAndHookMethod(clsPermManagerService, targetMethod,
+						param1, boolean.class, String.class, param4, hookGrantPermissions);
+			} else {
+				XposedHelpers.findAndHookMethod(clsPermManagerService, targetMethod,
+						param1, boolean.class, String.class, param4, int.class, hookGrantPermissions);
 			}
 
 			// Listen for broadcasts from the Settings part of the mod, so it's applied immediately
@@ -120,29 +150,6 @@ public class PackagePermissions extends BroadcastReceiver {
 							null);
 				}
 			});
-		} catch (Throwable e) {
-			XposedBridge.log(e);
-		}
-	}
-
-	// https://github.com/Firefds/FirefdsKit
-	private static void grantRebootPermission(XC_MethodHook.MethodHookParam param, String pkgName) {
-		try {
-			Object packageSettings;
-			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-				packageSettings = XposedHelpers.getObjectField(param.args[0], "mExtras");
-			} else {
-				Object mPackageManagerInt = XposedHelpers.getObjectField(param.thisObject,"mPackageManagerInt");
-				packageSettings = XposedHelpers.callMethod(mPackageManagerInt, "getPackageSetting", pkgName);
-			}
-
-			Object permissionsState = XposedHelpers.callMethod(packageSettings, "getPermissionsState");
-			Object mSettings = XposedHelpers.getObjectField(param.thisObject, "mSettings");
-			Object mPermissions = XposedHelpers.getObjectField(mSettings, "mPermissions");
-			if (!(Boolean) XposedHelpers.callMethod(permissionsState, "hasInstallPermission", Common.REBOOT)) {
-				Object pAccess = XposedHelpers.callMethod(mPermissions, "get", Common.REBOOT);
-				XposedHelpers.callMethod(permissionsState, "grantInstallPermission", pAccess);
-			}
 		} catch (Throwable e) {
 			XposedBridge.log(e);
 		}
@@ -164,11 +171,17 @@ public class PackagePermissions extends BroadcastReceiver {
 			synchronized (mPackages) {
 				pkgInfo = mPackages.get(pkgName);
 				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
-					XposedHelpers.callMethod(pmSvc, "grantPermissionsLPw", pkgInfo, true, pkgName);
+					XposedHelpers.callMethod(pmSvc, "grantPermissionsLPw",
+							pkgInfo, true, pkgName);
 				} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
-					XposedHelpers.callMethod(permissionSvc, "grantPermissions", pkgInfo, true, pkgName, mPermissionCallback);
+					XposedHelpers.callMethod(permissionSvc, "grantPermissions",
+							pkgInfo, true, pkgName, mPermissionCallback);
+				} else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+					XposedHelpers.callMethod(permissionSvc, "restorePermissionState",
+							pkgInfo, true, pkgName, mPermissionCallback);
 				} else {
-					XposedHelpers.callMethod(permissionSvc, "restorePermissionState", pkgInfo, true, pkgName, mPermissionCallback);
+					XposedHelpers.callMethod(permissionSvc, "restorePermissionState",
+							pkgInfo, true, pkgName, mPermissionCallback, 0);
 				}
 				XposedHelpers.callMethod(mSettings, "writeLPr");
 			}

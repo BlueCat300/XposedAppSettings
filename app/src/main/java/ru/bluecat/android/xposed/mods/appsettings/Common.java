@@ -1,10 +1,5 @@
 package ru.bluecat.android.xposed.mods.appsettings;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Notification;
-import android.content.res.Configuration;
-
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
@@ -18,6 +13,10 @@ import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.res.Configuration;
+
 public class Common {
 
 	public static String TAG = "AppSettingsReborn";
@@ -28,7 +27,6 @@ public class Common {
 
 	public static String PREFS = "ModSettings";
 
-	public static String PREF_THEME = "app-theme";
 	public static String PREF_DEFAULT = "default";
 	public static String PREF_ACTIVE = "/active";
 	public static String PREF_DPI = "/dpi";
@@ -40,10 +38,8 @@ public class Common {
 	public static String PREF_SCREENSHOT = "/screenshot";
 	public static String PREF_RESIDENT = "/resident";
 	public static String PREF_NO_FULLSCREEN_IME = "/no-fullscreen-ime";
-	public static String PREF_NO_BIG_NOTIFICATIONS = "/no-big-notifications";
 	public static String PREF_INSISTENT_NOTIF = "/insistent-notif";
 	public static String PREF_ONGOING_NOTIF = "/ongoing-notif";
-	public static String PREF_NOTIF_PRIORITY = "/notif-priority";
 	public static String PREF_REVOKEPERMS = "/revoke-perms";
 	public static String PREF_REVOKELIST = "/revoke-list";
 	public static String PREF_FULLSCREEN = "/fullscreen";
@@ -83,17 +79,6 @@ public class Common {
 		R.string.settings_ori_portrait_user, R.string.settings_ori_landscape_user,
 		R.string.settings_ori_user_4way };
 
-	@SuppressLint("InlinedApi")
-	public static int[] notifPriCodes = { Integer.MIN_VALUE,
-		Notification.PRIORITY_MAX, Notification.PRIORITY_HIGH,
-		Notification.PRIORITY_DEFAULT,
-		Notification.PRIORITY_LOW, Notification.PRIORITY_MIN };
-	public static int[] notifPriLabels = { R.string.settings_default,
-		R.string.settings_npri_max, R.string.settings_npri_high,
-		R.string.settings_npri_normal,
-		R.string.settings_npri_low,
-		R.string.settings_npri_min };
-
 	public static int FULLSCREEN_DEFAULT = 0;
 	public static int FULLSCREEN_FORCE = 1;
 	public static int FULLSCREEN_PREVENT = 2;
@@ -111,7 +96,7 @@ public class Common {
     public static int PREF_SCREENSHOT_ALLOW = 1;
     public static int PREF_SCREENSHOT_PREVENT = 2;
 
-    public static boolean isPortrait (Activity context) {
+    public static boolean isPortrait(Activity context) {
 		return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 	}
 

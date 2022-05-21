@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings.ui;
+package ru.bluecat.android.xposed.mods.appsettings;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -36,9 +36,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.BlendModeColorFilterCompat;
 import androidx.core.graphics.BlendModeCompat;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,16 +56,10 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ru.bluecat.android.xposed.mods.appsettings.Common;
-import ru.bluecat.android.xposed.mods.appsettings.LocaleList;
-import ru.bluecat.android.xposed.mods.appsettings.PrefFileManager;
-import ru.bluecat.android.xposed.mods.appsettings.R;
-import ru.bluecat.android.xposed.mods.appsettings.SELinux;
-import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
+import ru.bluecat.android.xposed.mods.appsettings.ui.LocaleList;
+import ru.bluecat.android.xposed.mods.appsettings.ui.PermissionSettings;
 
-import static ru.bluecat.android.xposed.mods.appsettings.ui.MainActivity.isSELinuxCheckerEnabled;
-
-public class ApplicationsActivity extends AppCompatActivity {
+public class AppSettingsActivity extends AppCompatActivity {
 
 	private SwitchCompat swtActive;
 
@@ -72,43 +67,11 @@ public class ApplicationsActivity extends AppCompatActivity {
 	private String pkgName;
 	private Set<String> settingKeys;
 	private Map<String, Object> initialSettings;
+	private Map<String, Object> onStartSettings;
 	private Set<String> disabledPermissions;
 	private boolean allowRevoking;
 	private Intent parentIntent;
 	private LocaleList localeList;
-	private PrefFileManager prefFileManager;
-
-	@Override
-	public void attachBaseContext(Context newBase) {
-		super.attachBaseContext(newBase);
-		if(isSELinuxCheckerEnabled) {
-			if(SELinux.isSELinuxPermissive()) {
-				prefFileManager = PrefFileManager.getInstance(this);
-			}
-		}
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		if(isSELinuxCheckerEnabled) {
-			if(SELinux.isSELinuxPermissive()) {
-				//Setting permission for reading xposed settings
-				prefFileManager.onResume();
-			}
-		}
-	}
-
-	@Override
-	protected void onStop() {
-		if(isSELinuxCheckerEnabled) {
-			if(SELinux.isSELinuxPermissive()) {
-				//Setting permission for reading xposed settings
-				prefFileManager.onPause();
-			}
-		}
-		super.onStop();
-	}
 
 	/** Called when the activity is first created. */
 	@SuppressLint({"SetTextI18n", "DefaultLocale", "WorldReadableFiles"})
@@ -117,17 +80,13 @@ public class ApplicationsActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		try {
 			//noinspection deprecation
-			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
-		} catch (SecurityException ignored) {
-			if(SELinux.isSELinuxPermissive()) {
-				//Setting permission for reading xposed settings
-				prefFileManager.fixFolderPermissionsAsync();
-				getLegacyPrefs(this);
-			} else return;
+			prefs = getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+		} catch (SecurityException e) {
+			Toasts.showToast(this, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+			finish();
 		}
-		ThemeUtil.setTheme(this, prefs);
-		setContentView(R.layout.app_settings);
-		Toolbar toolbar = findViewById(R.id.toolbar);
+		setContentView(R.layout.app_settings_activity);
+		Toolbar toolbar = findViewById(R.id.appToolbar);
 		setSupportActionBar(toolbar);
 		ActionBar bar = getSupportActionBar();
 		if (bar != null) {
@@ -355,13 +314,6 @@ public class ApplicationsActivity extends AppCompatActivity {
 		// Setting for disabling fullscreen IME
 		((CheckBox) findViewById(R.id.chkNoFullscreenIME)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_FULLSCREEN_IME, false));
 
-		// Update No Big Notifications field
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			((CheckBox) findViewById(R.id.chkNoBigNotifications)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, false));
-		} else {
-			findViewById(R.id.chkNoBigNotifications).setVisibility(View.GONE);
-		}
-
 		// Setup Ongoing Notifications settings
 		{
 			int ongoingNotifs = prefs.getInt(pkgName + Common.PREF_ONGOING_NOTIF, Common.ONGOING_NOTIF_DEFAULT);
@@ -381,40 +333,19 @@ public class ApplicationsActivity extends AppCompatActivity {
 		}
 
 		// Update Insistent Notifications field
-		((CheckBox) findViewById(R.id.chkInsistentNotifications)).setChecked(prefs.getBoolean(pkgName + Common.PREF_INSISTENT_NOTIF, false));
-
-		// Load and render notifications priority
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			int notifPriority = prefs.getInt(pkgName + Common.PREF_NOTIF_PRIORITY, 0);
-			if (notifPriority < 0 || notifPriority >= Common.notifPriCodes.length)
-				notifPriority = 0;
-			final int selectedNotifPriority = notifPriority;
-
-			Spinner spnNotifPri = findViewById(R.id.spnNotifPriority);
-			List<String> lstNotifPriorities = new ArrayList<>(Common.notifPriLabels.length);
-			for (int j = 0; j < Common.notifPriLabels.length; j++)
-				lstNotifPriorities.add(getString(Common.notifPriLabels[j]));
-			ArrayAdapter<String> notifPriAdapter = new ArrayAdapter<>(this,
-					android.R.layout.simple_spinner_item, lstNotifPriorities);
-			notifPriAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			spnNotifPri.setAdapter(notifPriAdapter);
-			spnNotifPri.setSelection(selectedNotifPriority);
-		} else {
-			findViewById(R.id.viewNotifPriority).setVisibility(View.GONE);
-		}
+		((CheckBox) findViewById(R.id.chkInsistentNotifications)).setChecked(prefs.getBoolean(
+				pkgName + Common.PREF_INSISTENT_NOTIF, false));
 
 		// Update Mute field
 		((CheckBox) findViewById(R.id.chkMute)).setChecked(prefs.getBoolean(pkgName + Common.PREF_MUTE, false));
 
 		// Update Legacy Menu field
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-			((CheckBox) findViewById(R.id.chkLegacyMenu)).setChecked(prefs.getBoolean(pkgName + Common.PREF_LEGACY_MENU, false));
-		} else {
-			findViewById(R.id.chkLegacyMenu).setVisibility(View.GONE);
-		}
+		((CheckBox) findViewById(R.id.chkLegacyMenu)).setChecked(prefs.getBoolean(
+				pkgName + Common.PREF_LEGACY_MENU, false));
 
 		// Update Recent Tasks field
-		((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName + Common.PREF_RECENT_TASKS, false));
+		((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName +
+				Common.PREF_RECENT_TASKS, false));
 
 		// Setting for permissions revoking
 		allowRevoking = prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false);
@@ -438,7 +369,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		btnPermissions.setOnClickListener(v -> {
 			// set up permissions editor
 			try {
-				final PermissionSettings permsDlg = new PermissionSettings(this, pkgName, allowRevoking, disabledPermissions, prefs);
+				PermissionSettings permsDlg = new PermissionSettings(this, pkgName, allowRevoking, disabledPermissions);
 				permsDlg.setOnOkListener(obj -> {
 					allowRevoking = permsDlg.getRevokeActive();
 					disabledPermissions.clear();
@@ -451,14 +382,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 
 		settingKeys = getSettingKeys();
 		initialSettings = getSettings();
-	}
-
-	private static void getLegacyPrefs (Activity context) {
-		Context ctx = ContextCompat.createDeviceProtectedStorageContext(context);
-		if (ctx == null) {
-			ctx = context;
-		}
-		prefs = ctx.getSharedPreferences(Common.PREFS, Context.MODE_PRIVATE);
+		onStartSettings = getSettings();
 	}
 
 	private Set<String> getSettingKeys() {
@@ -480,16 +404,11 @@ public class ApplicationsActivity extends AppCompatActivity {
 		settingKeys.add(pkgName + Common.PREF_ORIENTATION);
 		settingKeys.add(pkgName + Common.PREF_RESIDENT);
 		settingKeys.add(pkgName + Common.PREF_NO_FULLSCREEN_IME);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-		    settingKeys.add(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS);
 		settingKeys.add(pkgName + Common.PREF_INSISTENT_NOTIF);
 		settingKeys.add(pkgName + Common.PREF_ONGOING_NOTIF);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-		    settingKeys.add(pkgName + Common.PREF_NOTIF_PRIORITY);
 		settingKeys.add(pkgName + Common.PREF_RECENTS_MODE);
 		settingKeys.add(pkgName + Common.PREF_MUTE);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
-		    settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
+		settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
 		settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
 		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
 		settingKeys.add(pkgName + Common.PREF_REVOKELIST);
@@ -564,21 +483,12 @@ public class ApplicationsActivity extends AppCompatActivity {
 			if (((CheckBox) findViewById(R.id.chkNoFullscreenIME)).isChecked())
 				settings.put(pkgName + Common.PREF_NO_FULLSCREEN_IME, true);
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M && ((CheckBox) findViewById(R.id.chkNoBigNotifications)).isChecked())
-                settings.put(pkgName + Common.PREF_NO_BIG_NOTIFICATIONS, true);
-
 			if (((CheckBox) findViewById(R.id.chkInsistentNotifications)).isChecked())
 				settings.put(pkgName + Common.PREF_INSISTENT_NOTIF, true);
 
 			int ongoingNotif = ((Spinner) findViewById(R.id.spnOngoingNotifications)).getSelectedItemPosition();
 			if (ongoingNotif > 0)
 				settings.put(pkgName + Common.PREF_ONGOING_NOTIF, ongoingNotif);
-
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				int notifPriority = ((Spinner) findViewById(R.id.spnNotifPriority)).getSelectedItemPosition();
-				if (notifPriority > 0)
-					settings.put(pkgName + Common.PREF_NOTIF_PRIORITY, notifPriority);
-			}
 
 			int recentsMode = ((Spinner) findViewById(R.id.spnRecentsMode)).getSelectedItemPosition();
 			if (recentsMode > 0)
@@ -587,7 +497,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 			if (((CheckBox) findViewById(R.id.chkMute)).isChecked())
 				settings.put(pkgName + Common.PREF_MUTE, true);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
+			if (((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
 				settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
 
 			if (((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
@@ -615,9 +525,11 @@ public class ApplicationsActivity extends AppCompatActivity {
 		builder.setTitle(R.string.settings_unsaved_title);
 		builder.setIconAttribute(android.R.attr.alertDialogIcon);
 		builder.setMessage(R.string.settings_unsaved_detail);
-		builder.setPositiveButton(R.string.common_button_ok, (dialog, which) -> this.finish());
-		builder.setNegativeButton(R.string.common_button_cancel, (dialog, which) -> {
+		builder.setPositiveButton(R.string.common_button_ok, (dialog, which) -> {
+			onStartSettings = getSettings();
+			finish();
 		});
+		builder.setNegativeButton(R.string.common_button_cancel, null);
 		builder.show();
 	}
 
@@ -625,6 +537,9 @@ public class ApplicationsActivity extends AppCompatActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		setResult(RESULT_OK, parentIntent);
+		if(!getSettings().equals(onStartSettings)) {
+			MainActivity.refreshAppsAfterChanges(false);
+		}
 	}
 
 	@Override
@@ -653,7 +568,6 @@ public class ApplicationsActivity extends AppCompatActivity {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 				installer = pm.getInstallSourceInfo(pkgName).getInstallingPackageName();
 			} else {
-				//noinspection deprecation
 				installer = pm.getInstallerPackageName(pkgName);
 			}
 
@@ -669,7 +583,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 		}
 	}
 
-	private static void setItemDisabled (Menu menu, int id) {
+	private static void setItemDisabled(Menu menu, int id) {
 		MenuItem item = menu.getItem(id);
 		SpannableString spanString = new SpannableString(item.getTitle().toString());
 		spanString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, spanString.length(), 0);
@@ -695,7 +609,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 	}
 
 	@SuppressLint("MissingPermission")
-	private void confirmReboot () {
+	private void confirmReboot() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.menu_reboot_confirm);
 		builder.setMessage(R.string.menu_reboot_confirm_desc);
@@ -713,7 +627,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void saveSettings () {
+	public void saveSettings() {
 		Editor prefsEditor = prefs.edit();
 		Map<String, Object> newSettings = getSettings();
 		for (String key : settingKeys) {
@@ -739,7 +653,7 @@ public class ApplicationsActivity extends AppCompatActivity {
 				}
 			}
 		}
-		prefsEditor.commit();
+		prefsEditor.apply();
 
 		// Update saved settings to detect modifications later
 		initialSettings = newSettings;

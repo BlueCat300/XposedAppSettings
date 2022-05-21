@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import ru.bluecat.android.xposed.mods.appsettings.R;
 
 /**
  * Composite component that displays a header and a triplet of radio buttons for

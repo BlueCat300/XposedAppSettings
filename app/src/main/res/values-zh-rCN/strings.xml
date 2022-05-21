@@ -40,18 +40,17 @@ Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-develo
     <string name="app_translation">翻译: %s</string>
     <string name="app_framework_warning_title">Xposed Framework</string>
     <string name="app_framework_warning_message">模块没有激活！请确定Xposed框架已安装，并且在Xposed安装器中已经启用模块，然后重启设备。</string>
-    <string name="app_selinux_warning_message">这个模块要求SELinux为Permissive，EdXposed最低版本为 <a href="https://github.com/ElderDrivers/EdXposed/releases">0.5.1.3</a></string>
 
 
     <!-- main menu -->
 
 
     <!-- drawer -->
-    <string name="menu_backup">备份</string>
-    <string name="menu_restore">还原</string>
-    <string name="menu_filter">筛选</string>
-    <string name="menu_permission">按权限筛选</string>
-    <string name="menu_about">关于</string>
+    <string name="drawer_backup">备份</string>
+    <string name="drawer_restore">还原</string>
+    <string name="drawer_filter">筛选</string>
+    <string name="drawer_permission">按权限筛选</string>
+    <string name="drawer_about">关于</string>
 
     <!-- Restore / Backup -->
     <string name="imp_exp_backup_completed">备份成功完成</string>
@@ -87,9 +86,7 @@ Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-develo
     <string name="settings_nofullscreenime">禁用全屏输入</string>
     <string name="settings_orientation">方向</string>
     <string name="settings_insistentnotif">常驻通知</string>
-    <string name="settings_nobignotif">禁用扩展通知</string>
     <string name="settings_ongoingnotif">永久通知</string>
-    <string name="settings_notifpriority">通知优先级</string>
     <string name="settings_mute">静音</string>
     <string name="settings_legacy_menu">传统菜单按钮</string>
     <string name="settings_recent_tasks">最近任务访问权</string>    
@@ -115,12 +112,6 @@ Blue cat为模块添加了Android 8.0+支持。<a href="https://forum.xda-develo
     <string name="settings_ori_portrait_user">总是竖屏（用户设置）</string>
     <string name="settings_ori_landscape_user">总是横屏（用户设置）</string>
     <string name="settings_ori_user_4way">四向旋转（用户设置）</string>
-
-    <string name="settings_npri_max">最高</string>
-    <string name="settings_npri_high">较高</string>
-    <string name="settings_npri_normal">普通</string>
-    <string name="settings_npri_low">较低</string>
-    <string name="settings_npri_min">最低</string>
 
     <!-- Recent apps -->
     <string name="recents_title">最近应用</string>

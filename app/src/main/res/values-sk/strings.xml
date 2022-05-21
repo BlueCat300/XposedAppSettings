@@ -35,9 +35,9 @@ DPI, veľkosť písma, jazyk, načítať zdroje, zobraziť na celú obrazovku, b
 
     <!-- main menu -->
     <string name="menu_recents">Nedávne apl.</string>
-    <string name="menu_backup">Export</string>
-    <string name="menu_restore">Import</string>
-    <string name="menu_about">O aplikácii</string>
+    <string name="drawer_backup">Export</string>
+    <string name="drawer_restore">Import</string>
+    <string name="drawer_about">O aplikácii</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Nastavenia exportované do súboru</string>
@@ -71,8 +71,6 @@ DPI, veľkosť písma, jazyk, načítať zdroje, zobraziť na celú obrazovku, b
     <string name="settings_orientation">Orientácia</string>
     <string name="settings_insistentnotif">Neústupné oznámenia</string>
     <string name="settings_ongoingnotif">Prebiehajúce oznámenia</string>
-    <string name="settings_nobignotif">Nezobrazovať veľké oznámenia</string>
-    <string name="settings_notifpriority">Priorita oznámení</string>
     <string name="settings_mute">Vypnúť zvuk</string>
     <string name="settings_legacy_menu">Zobraziť tlačidlo Menu</string>
     <string name="settings_permissions">Povolenia</string>
@@ -96,12 +94,6 @@ DPI, veľkosť písma, jazyk, načítať zdroje, zobraziť na celú obrazovku, b
     <string name="settings_ori_portrait_user">Vždy na výšku (užívateľské nast.)</string>
     <string name="settings_ori_landscape_user">Vždy na šírku (užívateľské nast.)</string>
     <string name="settings_ori_user_4way">Otáčanie na všetky strany (užívateľské nast.)</string>
-
-    <string name="settings_npri_max">Maximálna</string>
-    <string name="settings_npri_high">Vysoká</string>
-    <string name="settings_npri_normal">Normálna</string>
-    <string name="settings_npri_low">Nízka</string>
-    <string name="settings_npri_min">Minimálna</string>
 
     <!-- Recent apps -->
     <string name="recents_title">Nedávne aplikácie</string>

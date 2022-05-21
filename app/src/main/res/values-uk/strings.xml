@@ -40,9 +40,9 @@ DPI; Заміна ресурсів; Мова; Повний екран;
     <string name="menu_search">Пошук</string>
     <string name="menu_refresh">Оновити</string>
     <string name="menu_recents">Останні додатки</string>
-    <string name="menu_backup">Резервне копіювання</string>
-    <string name="menu_restore">Відновлення</string>
-    <string name="menu_about">Про додаток</string>
+    <string name="drawer_backup">Резервне копіювання</string>
+    <string name="drawer_restore">Відновлення</string>
+    <string name="drawer_about">Про додаток</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Резервне копіювання виявилась успішною</string>
@@ -78,9 +78,7 @@ DPI; Заміна ресурсів; Мова; Повний екран;
     <string name="settings_nofullscreenime">Без клав. на повному екрані</string>
     <string name="settings_orientation">Орієнтація</string>
     <string name="settings_insistentnotif">Наполегливі стовіщення</string>
-    <string name="settings_nobignotif">Без великих сповіщень</string>
     <string name="settings_ongoingnotif">Постійні сповіщення</string>
-    <string name="settings_notifpriority">Приорітет сповіщень</string>
     <string name="settings_mute">Без звуку</string>
     <string name="settings_legacy_menu">Стара кнопка меню</string>
     <string name="settings_recent_tasks">Доступ до недавніх задач</string>
@@ -106,12 +104,6 @@ DPI; Заміна ресурсів; Мова; Повний екран;
     <string name="settings_ori_portrait_user">Завжди портрет (користувач)</string>
     <string name="settings_ori_landscape_user">Завжди ландшафт (користувач)</string>
     <string name="settings_ori_user_4way">Завжди обертатися (користувач)</string>
-
-    <string name="settings_npri_max">Max</string>
-    <string name="settings_npri_high">High</string>
-    <string name="settings_npri_normal">Normal</string>
-    <string name="settings_npri_low">Low</string>
-    <string name="settings_npri_min">Min</string>
 
     <!-- Recent apps -->
     <string name="recents_title">Останні додатки</string>

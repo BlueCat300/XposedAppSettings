@@ -1,49 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="control_text">#2196f3</color>
-    <color name="nav_header_main_text">#ffffff</color>
-    <color name="ic_vector">#ffffff</color>
+    <color name="options_menu">@color/white</color>
+    <color name="app_list_item">@color/black</color>
+    <color name="permission_desc">#0033cc</color>
+    <color name="package_name">#0033cc</color>
+    <color name="snackbar_background">@color/white</color>
+    <color name="spinner">@color/white</color>
+    <color name="legacy_dialog_background">@color/white</color>
+    <color name="drawer_header">@color/md_white_1000</color>
+    <color name="day_night_text">@color/black</color>
+
     <color name="filter_item">#191919</color>
-    <color name="filter_item_text">#ffffff</color>
-    <color name="toolbar_text">#ffffff</color>
-    <color name="toolbar_hint">#dddddd</color>
+    <color name="ic_vector">@color/white</color>
+    <color name="filter_item_text">@color/white</color>
+
+    <color name="gray">#fbf6f6</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
 
     <!-- Light Theme -->
-    <color name="navigation">#3f51b5</color>
-    <color name="status_bar">#324090</color>
-    <color name="options_menu">#ffffff</color>
-    <color name="options_menu_item">#000000</color>
-    <color name="snackbar_background">#ffffff</color>
-    <color name="snackbar_text">#000000</color>
-    <color name="about">#000000</color>
-    <color name="drawer_background">#ffffff</color>
-    <color name="drawer_header">#324090</color>
-    <color name="package_name">#0033cc</color>
-    <color name="app_settings">#000000</color>
-    <color name="app_list_item">#000000</color>
-    <color name="dialog_background">#ffffff</color>
-    <color name="dialog_text">#000000</color>
-    <color name="permission_desc">#0033cc</color>
-    <color name="spinner">#ffffff</color>
+    <color name="indigo_600">#ff3949ab</color>
+    <color name="indigo_800">#ff283593</color>
+    <color name="material_drawer_background">@color/md_white_1000</color>
+    <color name="material_drawer_primary_text">@color/md_light_primary_text</color>
+    <color name="material_drawer_divider">@color/md_light_dividers</color>
 
     <!-- Dark Theme -->
-    <color name="navigation_dark">#161c20</color>
-    <color name="status_bar_dark">#161c20</color>
-    <color name="options_menu_dark">#161c20</color>
-    <color name="options_menu_item_dark">#ffffff</color>
-    <color name="snackbar_background_dark">#263238</color>
-    <color name="snackbar_text_dark">#ffffff</color>
-    <color name="toolbar_dark">#263238</color>
-    <color name="background_dark">#262626</color>
-    <color name="about_dark">#ffffff</color>
-    <color name="drawer_background_dark">#263238</color>
-    <color name="drawer_header_dark">#161c20</color>
-    <color name="package_name_dark">#0099cc</color>
-    <color name="app_settings_dark">#ffffff</color>
-    <color name="app_list_item_dark">#fafafa</color>
-    <color name="dialog_background_dark">#263238</color>
-    <color name="dialog_text_dark">#ffffff</color>
-    <color name="dialog_state_dark">#80ffffff</color>
-    <color name="permission_desc_dark">#0099cc</color>
-    <color name="spinner_dark">#263238</color>
+    <color name="dark_blue">#ff3e91ff</color>
+    <color name="blue_gray_900">#ff263238</color>
+    <color name="blue_gray_940">#ff191f23</color>
+    <color name="blue_gray_950">#ff161c20</color>
 </resources>

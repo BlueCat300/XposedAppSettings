@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="options_menu">#161c20</color>
+    <color name="app_list_item">#fafafa</color>
+    <color name="permission_desc">#0099cc</color>
+    <color name="package_name">#0099cc</color>
+    <color name="snackbar_background">@color/blue_gray_950</color>
+    <color name="spinner">@color/blue_gray_900</color>
+    <color name="legacy_dialog_background">@color/blue_gray_900</color>
+    <color name="drawer_header">@color/blue_gray_940</color>
+    <color name="day_night_text">@color/white</color>
+
+    <color name="material_drawer_background">@color/blue_gray_940</color>
+    <color name="material_drawer_primary_text">@color/white</color>
+    <color name="material_drawer_divider">@color/white</color>
+</resources>

@@ -34,9 +34,9 @@ DPI; 글씨 크기; 특정 리소스만 사용; 언어;
 
 
     <!-- main menu -->
-    <string name="menu_backup">내보내기</string>
-    <string name="menu_restore">가져오기</string>
-    <string name="menu_about">어플리케이션 정보</string>
+    <string name="drawer_backup">내보내기</string>
+    <string name="drawer_restore">가져오기</string>
+    <string name="drawer_about">어플리케이션 정보</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">설정이 파일로 내보내짐</string>
@@ -68,7 +68,6 @@ DPI; 글씨 크기; 특정 리소스만 사용; 언어;
     <string name="settings_nofullscreenime">풀스크린 IME 방지</string>
     <string name="settings_orientation">화면 방향</string>
     <string name="settings_insistentnotif">집요한 알림</string>
-    <string name="settings_nobignotif">확장 알림 방지</string>
     <string name="settings_permissions">권한 수정</string>
 
     <string name="settings_default">(기본 값 사용)</string>

@@ -37,9 +37,9 @@
 
 
     <!-- main menu -->
-    <string name="menu_backup">匯出設定</string>
-    <string name="menu_restore">匯入設定</string>
-    <string name="menu_about">關於</string>
+    <string name="drawer_backup">匯出設定</string>
+    <string name="drawer_restore">匯入設定</string>
+    <string name="drawer_about">關於</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">設定已匯出至</string>
@@ -72,8 +72,6 @@
     <string name="settings_nofullscreenime">關閉全螢幕輸入</string>
     <string name="settings_orientation">方向</string>
     <string name="settings_insistentnotif">常駐通知</string>
-    <string name="settings_nobignotif">停用大型通知</string>
-    <string name="settings_notifpriority">通知優先順序</string>
     <string name="settings_mute">靜音</string>
     <string name="settings_legacy_menu">傳統選單按鈕</string>
     <string name="settings_permissions">權限設定</string>
@@ -94,12 +92,6 @@
     <string name="settings_ori_portrait_reverse">反向垂直(感應器方向)</string>
     <string name="settings_ori_landscape_reverse">反向水平(感應器方向)</string>
     <string name="settings_ori_forceauto_4way">強制四向任意旋轉</string>
-
-    <string name="settings_npri_max">最高</string>
-    <string name="settings_npri_high">較高</string>
-    <string name="settings_npri_normal">普通</string>
-    <string name="settings_npri_low">較低</string>
-    <string name="settings_npri_min">最低</string>
 
     <!-- List resources -->
     <string name="res_title">資源列表</string>

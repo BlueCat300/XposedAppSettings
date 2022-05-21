@@ -32,9 +32,9 @@ Permanecer na memória; No Fullscreen IME; Orientação; Notificações persiste
 
 
     <!-- main menu -->
-    <string name="menu_backup">Exportar</string>
-    <string name="menu_restore">Importar</string>
-    <string name="menu_about">Sobre</string>
+    <string name="drawer_backup">Exportar</string>
+    <string name="drawer_restore">Importar</string>
+    <string name="drawer_about">Sobre</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Configurações exportadas para o arquivo</string>
@@ -66,7 +66,6 @@ Permanecer na memória; No Fullscreen IME; Orientação; Notificações persiste
     <string name="settings_nofullscreenime">No Fullscreen IME</string>
     <string name="settings_orientation">Orientação</string>
     <string name="settings_insistentnotif">Notificações insistentes</string>
-    <string name="settings_nobignotif">Sem expansão de notif.</string>
     <string name="settings_permissions">Permissões</string>
 
     <string name="settings_default">(padrão)</string>

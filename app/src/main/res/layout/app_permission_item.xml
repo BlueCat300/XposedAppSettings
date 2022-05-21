@@ -14,6 +14,6 @@
         android:id="@+id/perm_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="?attr/package_name" />
+        android:textColor="@color/package_name" />
 
 </LinearLayout>

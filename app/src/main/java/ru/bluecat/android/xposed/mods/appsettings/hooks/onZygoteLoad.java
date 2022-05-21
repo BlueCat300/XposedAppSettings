@@ -1,11 +1,14 @@
 package ru.bluecat.android.xposed.mods.appsettings.hooks;
 
 import android.app.Activity;
+import android.app.AndroidAppHelper;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
+import android.content.res.XResources;
 import android.inputmethodservice.InputMethodService;
 import android.os.Build;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -14,42 +17,35 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import java.lang.reflect.Method;
-
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ru.bluecat.android.xposed.mods.appsettings.Common;
 
 
-class Activities {
+class onZygoteLoad {
 
-	private static Object processRecord;
 	private static final String PROP_FULLSCREEN = "AppSettings-Fullscreen";
 	private static final String PROP_IMMERSIVE = "AppSettings-Immersive";
 	private static final String PROP_KEEP_SCREEN_ON = "AppSettings-KeepScreenOn";
 	private static final String PROP_LEGACY_MENU = "AppSettings-LegacyMenu";
 	private static final String PROP_ORIENTATION = "AppSettings-Orientation";
 
-	private static final int FLAG_NEEDS_MENU_KEY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 ?
-			0 : XposedHelpers.getStaticIntField(WindowManager.LayoutParams.class, "FLAG_NEEDS_MENU_KEY");
-    private static final String CLASS_PHONEWINDOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ?
-			"com.android.internal.policy.PhoneWindow" : "com.android.internal.policy.impl.PhoneWindow";
+	private static final int FLAG_NEEDS_MENU_KEY = 0;
+	static final String SYSTEMUI_PACKAGE = "com.android.systemui";
+	private static final String[] SYSTEMUI_ADJUSTED_DIMENSIONS = {
+		"status_bar_height",
+		"navigation_bar_height", "navigation_bar_height_landscape",
+		"navigation_bar_width",
+		"system_bar_height"
+	};
 
-    static void hookActivitySettings(XSharedPreferences prefs) {
-        String CLASS_PHONEWINDOW_DECORVIEW;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.DecorView";
-		} else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.PhoneWindow.DecorView";
-		} else {
-			CLASS_PHONEWINDOW_DECORVIEW = "com.android.internal.policy.impl.PhoneWindow.DecorView";
-		}
+	static void activitySettings(XSharedPreferences prefs) {
 		try {
-			XposedHelpers.findAndHookMethod(CLASS_PHONEWINDOW, null, "generateLayout",
-					CLASS_PHONEWINDOW_DECORVIEW, new XC_MethodHook() {
+			XposedHelpers.findAndHookMethod("com.android.internal.policy.PhoneWindow",
+					null, "generateLayout",
+					"com.android.internal.policy.DecorView", new XC_MethodHook() {
 
 				protected void beforeHookedMethod(MethodHookParam param) {
 					Window window = (Window) param.thisObject;
@@ -61,7 +57,7 @@ class Activities {
 						controller = window.getInsetsController();
 					}
 
-					if (!XposedMod.isActive(prefs, packageName))
+					if (!Core.isActive(prefs, packageName))
 						return;
 
 					int fullscreen;
@@ -121,14 +117,8 @@ class Activities {
 					}
 
 					if (prefs.getBoolean(packageName + Common.PREF_LEGACY_MENU, false)) {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-						     // NEEDS_MENU_SET_TRUE = 1
-							XposedHelpers.callMethod(window, "setNeedsMenuKey", 1);
-						}
-						else {
-						     window.setFlags(FLAG_NEEDS_MENU_KEY, FLAG_NEEDS_MENU_KEY);
-							XposedHelpers.setAdditionalInstanceField(window, PROP_LEGACY_MENU, Boolean.TRUE);
-						}
+						// NEEDS_MENU_SET_TRUE = 1
+						XposedHelpers.callMethod(window, "setNeedsMenuKey", 1);
 					}
 
                     int screenshot = prefs.getInt(packageName + Common.PREF_SCREENSHOT,
@@ -147,15 +137,15 @@ class Activities {
 				}
 			});
 
-			XposedHelpers.findAndHookMethod(Window.class, "setFlags", int.class, int.class,
-					new XC_MethodHook() {
+			XposedHelpers.findAndHookMethod(Window.class, "setFlags", int.class, int.class, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
 					int flags = (Integer) param.args[0];
 					int mask = (Integer) param.args[1];
 					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
 						if ((mask & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
-							Boolean fullscreen = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_FULLSCREEN);
+							Boolean fullscreen = (Boolean) XposedHelpers.getAdditionalInstanceField(
+									param.thisObject, PROP_FULLSCREEN);
 							if (fullscreen != null) {
 								if (fullscreen) {    //fullscreen.booleanValue())
 									flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
@@ -168,7 +158,8 @@ class Activities {
 					}
 
 					if ((mask & WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0) {
-						Boolean keepScreenOn = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_KEEP_SCREEN_ON);
+						Boolean keepScreenOn = (Boolean) XposedHelpers.getAdditionalInstanceField(
+								param.thisObject, PROP_KEEP_SCREEN_ON);
 						if (keepScreenOn != null) {
 							if (keepScreenOn) {
 								flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
@@ -178,7 +169,8 @@ class Activities {
 					}
 
 					if ((mask & FLAG_NEEDS_MENU_KEY) != 0) {
-						Boolean menu = (Boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_LEGACY_MENU);
+						Boolean menu = (Boolean) XposedHelpers.getAdditionalInstanceField(
+								param.thisObject, PROP_LEGACY_MENU);
 						if (menu != null) {
 							if (menu) {   //menu.booleanValue())
 								flags |= FLAG_NEEDS_MENU_KEY;
@@ -191,7 +183,8 @@ class Activities {
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
 				XposedHelpers.findAndHookMethod("android.view.ViewRootImpl", null,
-						"dispatchSystemUiVisibilityChanged", int.class, int.class, int.class, int.class, new XC_MethodHook() {
+						"dispatchSystemUiVisibilityChanged", int.class, int.class,
+						int.class, int.class, new XC_MethodHook() {
 					@Override
 					protected void beforeHookedMethod(MethodHookParam param) {
 						// Has the navigation bar been shown?
@@ -201,7 +194,8 @@ class Activities {
 
 						// Should it be hidden?
 						View decorView = (View) XposedHelpers.getObjectField(param.thisObject, "mView");
-						Boolean immersive = (decorView == null) ? null : (Boolean) XposedHelpers.getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
+						Boolean immersive = (decorView == null) ? null :
+								(Boolean) XposedHelpers.getAdditionalInstanceField(decorView, PROP_IMMERSIVE);
 						if (immersive == null || !immersive) //immersive.booleanValue())
 							return;
 
@@ -216,12 +210,13 @@ class Activities {
 			}
 
 			// force orientation
-			XposedHelpers.findAndHookMethod(Activity.class, "setRequestedOrientation", int.class, new XC_MethodHook() {
+			XposedHelpers.findAndHookMethod(Activity.class, "setRequestedOrientation",
+					int.class, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) {
-					Integer orientation = (Integer) XposedHelpers.getAdditionalInstanceField(param.thisObject, PROP_ORIENTATION);
-					if (orientation != null)
-						param.args[0] = Common.orientationCodes[orientation];
+					Integer orientation = (Integer) XposedHelpers.getAdditionalInstanceField(
+							param.thisObject, PROP_ORIENTATION);
+					if (orientation != null) param.args[0] = Common.orientationCodes[orientation];
 				}
 			});
 
@@ -232,7 +227,7 @@ class Activities {
 				protected void beforeHookedMethod(MethodHookParam param) {
 					EditorInfo info = (EditorInfo) param.args[1];
 					if (info != null && info.packageName != null) {
-						if (XposedMod.isActive(prefs, info.packageName, Common.PREF_NO_FULLSCREEN_IME))
+						if (Core.isActive(prefs, info.packageName, Common.PREF_NO_FULLSCREEN_IME))
 							info.imeOptions |= EditorInfo.IME_FLAG_NO_FULLSCREEN;
 					}
 				}
@@ -242,104 +237,60 @@ class Activities {
 		}
 	}
 
-	static void hookActivitySettingsInSystemServer(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
+	static void dpiInSystem(XSharedPreferences prefs) {
+		// Hook to override DPI (globally, including resource load + rendering)
 		try {
-			// Hook one of the several variations of ActivityStack.realStartActivityLocked from different ROMs
-			ClassLoader classLoader = lpparam.classLoader;
-			Method mthRealStartActivityLocked;
-			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-				mthRealStartActivityLocked = XposedHelpers.findMethodExact("com.android.server.am.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
-						"com.android.server.am.ActivityRecord", "com.android.server.am.ProcessRecord",
-						boolean.class, boolean.class);
-			} else {
-				mthRealStartActivityLocked = XposedHelpers.findMethodExact("com.android.server.wm.ActivityStackSupervisor", classLoader, "realStartActivityLocked",
-						"com.android.server.wm.ActivityRecord", "com.android.server.wm.WindowProcessController",
-						boolean.class, boolean.class);
-			}
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-				XposedHelpers.findAndHookConstructor("com.android.server.am.ProcessRecord", classLoader, "com.android.server.am.ActivityManagerService",
-						"android.content.pm.ApplicationInfo", String.class, int.class, new XC_MethodHook() {
-					@Override
-					protected void afterHookedMethod(MethodHookParam param) {
-						processRecord = param.thisObject;
-					}
-				});
-            }
-
-            // Resident
-			XposedBridge.hookMethod(mthRealStartActivityLocked, new XC_MethodHook() {
+			XposedHelpers.findAndHookMethod(Display.class, "updateDisplayInfoLocked", new XC_MethodHook() {
 				@Override
 				protected void afterHookedMethod(MethodHookParam param) {
-					String pkgName = (String) XposedHelpers.getObjectField(param.args[0], "packageName");
-					if (XposedMod.isActive(prefs, pkgName, Common.PREF_RESIDENT)) {
-						int adj = -12;
-						Object proc = XposedHelpers.getObjectField(param.args[0], "app");
+					String packageName = AndroidAppHelper.currentPackageName();
 
-						// Override the *Adj values if meant to be resident in memory
-						if (proc != null) {
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-								proc = processRecord;
-							}
-							XposedHelpers.setIntField(proc, "maxAdj", adj);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-								XposedHelpers.setIntField(proc, "mCurRawAdj", adj);
-							} else {
-								XposedHelpers.setIntField(proc, "curRawAdj", adj);
-							}
-							XposedHelpers.setIntField(proc, "setRawAdj", adj);
-							XposedHelpers.setIntField(proc, "curAdj", adj);
-							XposedHelpers.setIntField(proc, "setAdj", adj);
-						}
-					}
-				}
-			});
-
-            // Recent Tasks
-			String activityRecordClass = "com.android.server.am.ActivityRecord";
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-				activityRecordClass = "com.android.server.wm.ActivityRecord";
-			}
-			XposedBridge.hookAllConstructors(XposedHelpers.findClass(activityRecordClass, classLoader), new XC_MethodHook() {
-				@Override
-				protected void afterHookedMethod(MethodHookParam param) {
-					ActivityInfo aInfo = (ActivityInfo) XposedHelpers.getObjectField(param.thisObject, "info");
-					if (aInfo == null)
+					if (!Core.isActive(prefs, packageName)) {
+						// No overrides for this package
 						return;
-					String pkgName = aInfo.packageName;
-					if (prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT) > 0) {
-						int recentsMode = prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT);
-						if (recentsMode == Common.PREF_RECENTS_DEFAULT)
-							return;
-						Intent intent = (Intent) XposedHelpers.getObjectField(param.thisObject, "intent");
-						if (recentsMode == Common.PREF_RECENTS_FORCE) {
-							int flags = (intent.getFlags() & ~Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-							intent.setFlags(flags);
-						}
-						else if (recentsMode == Common.PREF_RECENTS_PREVENT)
-							intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+					}
+
+					int packageDPI = prefs.getInt(packageName + Common.PREF_DPI,
+							prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
+					if (packageDPI > 0) {
+						// Density for this package is overridden, change density
+						Object mDisplayInfo = XposedHelpers.getObjectField(param.thisObject, "mDisplayInfo");
+						XposedHelpers.setIntField(mDisplayInfo, "logicalDensityDpi", packageDPI);
 					}
 				}
 			});
 
-            //Disable restricting Android API to get recent tasks in Lollipop and newer.
-            //https://github.com/pylerSM/UnrestrictedGetTasks
-			String recentTasksClass = "com.android.server.am.ActivityManagerService";
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-				recentTasksClass = "com.android.server.wm.ActivityTaskManagerService";
+		} catch (Throwable t) {
+			XposedBridge.log(t);
+		}
+	}
+
+	/** Adjust all framework dimensions that should reflect
+	 *  changes related with SystemUI, namely statusbar and navbar sizes.
+	 *  The values are adjusted and replaced system-wide by fixed px values.
+	 */
+	static void adjustSystemDimensions(XSharedPreferences prefs) {
+		if (!Core.isActive(prefs, SYSTEMUI_PACKAGE))
+			return;
+
+		int systemUiDpi = prefs.getInt(SYSTEMUI_PACKAGE + Common.PREF_DPI,
+				prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
+		if (systemUiDpi <= 0)
+			return;
+
+		// SystemUI had its DPI overridden.
+		// Adjust the relevant framework dimen resources.
+		Resources sysRes = Resources.getSystem();
+		float sysDensity = sysRes.getDisplayMetrics().density;
+		float scaleFactor = (systemUiDpi / 160f) / sysDensity;
+
+		for (String resName : SYSTEMUI_ADJUSTED_DIMENSIONS) {
+			int id = sysRes.getIdentifier(resName, "dimen", "android");
+			if (id != 0) {
+				float original = sysRes.getDimension(id);
+				XResources.setSystemWideReplacement(id,
+						new XResources.DimensionReplacement(original * scaleFactor, TypedValue.COMPLEX_UNIT_PX));
 			}
-			XposedHelpers.findAndHookMethod(recentTasksClass, classLoader, "isGetTasksAllowed",
-					String.class, int.class, int.class, new XC_MethodHook() {
-				@Override
-				protected void afterHookedMethod(MethodHookParam param) {
-					Context mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
-					String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
-					if (Common.MY_PACKAGE_NAME.equals(callingApp) || XposedMod.isActive(prefs, callingApp, Common.PREF_RECENT_TASKS)) {
-						param.setResult(true);
-					}
-				}
-			});
-		} catch (Throwable e) {
-			XposedBridge.log(e);
 		}
 	}
 }

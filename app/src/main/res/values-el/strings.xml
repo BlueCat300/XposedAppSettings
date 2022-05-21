@@ -30,9 +30,9 @@ DPI, Μέγεθος γραμματοσειράς, Αλλαγή φορτωμέν�
 
 
     <!-- main menu -->
-    <string name="menu_backup">Εξαγωγή</string>
-    <string name="menu_restore">Εισαγωγή</string>
-    <string name="menu_about">Σχετικά</string>
+    <string name="drawer_backup">Εξαγωγή</string>
+    <string name="drawer_restore">Εισαγωγή</string>
+    <string name="drawer_about">Σχετικά</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Οι ρυθμίσεις εξάχθηκαν στο αρχείο</string>
@@ -64,7 +64,6 @@ DPI, Μέγεθος γραμματοσειράς, Αλλαγή φορτωμέν�
     <string name="settings_nofullscreenime">Όχι πληρης οθόνη IME</string>
     <string name="settings_orientation">Προσανατολισμός</string>
     <string name="settings_insistentnotif">Επίμονες ειδοποιήσεις</string>
-    <string name="settings_nobignotif">Όχι μεγάλες ειδοποιήσεις</string>
     <string name="settings_permissions">Άδειες</string>
 
     <string name="settings_default">(προεπιλογή)</string>

@@ -3,7 +3,6 @@ package ru.bluecat.android.xposed.mods.appsettings.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -13,15 +12,13 @@ import android.widget.ListView;
 
 import androidx.appcompat.widget.SwitchCompat;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import ru.bluecat.android.xposed.mods.appsettings.PermissionsListAdapter;
+import ru.bluecat.android.xposed.mods.appsettings.MainActivity;
 import ru.bluecat.android.xposed.mods.appsettings.R;
-import ru.bluecat.android.xposed.mods.appsettings.ThemeUtil;
 
 
 /**
@@ -42,8 +39,8 @@ public class PermissionSettings {
 	 * Prepare a dialog for editing the permissions for the supplied package,
 	 * with the provided owner activity and initial settings
 	 */
-	PermissionSettings(Activity owner, String pkgName, boolean revoking,
-					   Set<String> disabledPermissions, SharedPreferences prefs) throws NameNotFoundException {
+	public PermissionSettings(Activity owner, String pkgName, boolean revoking,
+							  Set<String> disabledPermissions) throws NameNotFoundException {
 		dialog = new Dialog(owner, R.style.LegacyDialog);
 		dialog.setContentView(R.layout.permissions_dialog);
 		dialog.setTitle(R.string.perms_title);
@@ -62,7 +59,8 @@ public class PermissionSettings {
 		// Load the list of permissions for the package and present them
 		loadPermissionsList(pkgName);
 
-		final PermissionsListAdapter appListAdapter = new PermissionsListAdapter(owner, permsList, disabledPerms, true, prefs);
+		final PermissionsListAdapter appListAdapter = new PermissionsListAdapter(owner, permsList,
+				disabledPerms, true);
 		appListAdapter.setCanEdit(revokeActive);
 		((ListView) dialog.findViewById(R.id.lstPermissions)).setAdapter(appListAdapter);
 
@@ -70,7 +68,7 @@ public class PermissionSettings {
 		// permissions
 		int tempNotActive = Color.GRAY;
 		int tempActive = Color.WHITE;
-		if (ThemeUtil.isNightTheme(owner, prefs)) {
+		if (MainActivity.isNightTheme(owner)) {
 			tempNotActive = Color.DKGRAY;
 			tempActive = Color.BLACK;
 		}
@@ -100,7 +98,7 @@ public class PermissionSettings {
 	/**
 	 * Display the editor dialog
 	 */
-	void display() {
+	public void display() {
 		dialog.show();
 	}
 
@@ -108,29 +106,21 @@ public class PermissionSettings {
 	 * Register a listener to be invoked when the editor is dismissed with the
 	 * Ok button
 	 */
-	void setOnOkListener(OnDismissListener listener) {
+	public void setOnOkListener(OnDismissListener listener) {
 		onOkListener = listener;
-	}
-
-	/**
-	 * Register a listener to be invoked when the editor is dismissed with the
-	 * Cancel button
-	 */
-	public void setOnCancelListener(OnDismissListener listener) {
-		onCancelListener = listener;
 	}
 
 	/**
 	 * Get the state of the Active switch
 	 */
-	boolean getRevokeActive() {
+	public boolean getRevokeActive() {
 		return revokeActive;
 	}
 
 	/**
 	 * Get the list of permissions in the disabled state
 	 */
-	Set<String> getDisabledPermissions() {
+	public Set<String> getDisabledPermissions() {
 		return new HashSet<>(disabledPerms);
 	}
 
@@ -162,7 +152,7 @@ public class PermissionSettings {
 			}
 		}
 
-		Collections.sort(permsList, (lhs, rhs) -> {
+		permsList.sort((lhs, rhs) -> {
 			if (lhs.name == null) {
 				return -1;
 			} else if (rhs.name == null) {

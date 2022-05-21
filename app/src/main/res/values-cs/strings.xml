@@ -30,9 +30,9 @@ DPI, velikost písma, jazyk, načítání zdrojů, zobrazení na celou obrazovku
 
 
     <!-- main menu -->
-    <string name="menu_backup">Exportovat</string>
-    <string name="menu_restore">Importovat</string>
-    <string name="menu_about">O aplikaci</string>
+    <string name="drawer_backup">Exportovat</string>
+    <string name="drawer_restore">Importovat</string>
+    <string name="drawer_about">O aplikaci</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Nastavení byli exportované do souboru</string>
@@ -64,7 +64,6 @@ DPI, velikost písma, jazyk, načítání zdrojů, zobrazení na celou obrazovku
     <string name="settings_nofullscreenime">No Fullscreen IME</string>
     <string name="settings_orientation">Orientace</string>
     <string name="settings_insistentnotif">Neústupné oznámení</string>
-    <string name="settings_nobignotif">Nezobrazovat velké oznámení</string>
     <string name="settings_permissions">Povolení</string>
 
     <string name="settings_default">(předvolené)</string>

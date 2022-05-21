@@ -1,4 +1,4 @@
-package ru.bluecat.android.xposed.mods.appsettings;
+package ru.bluecat.android.xposed.mods.appsettings.ui;
 
 import android.content.res.Resources;
 

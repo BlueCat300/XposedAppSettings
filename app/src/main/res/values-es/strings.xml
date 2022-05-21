@@ -6,7 +6,7 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
 
 
     <!-- Main screen -->
-    <string name="app_loading">Cargando aplicaciones, por favor espere...</string>
+    <string name="app_loading">Cargando aplicaciones, por favor espere…</string>
     <string name="app_searchhint">nombre o paquete</string>
     <string name="app_about">Un módulo <a href="http://forum.xda-developers.com/showthread.php?t=1574401">Xposed</a> creado por
  <a href="http://forum.xda-developers.com/member.php?u=4419114">rovo89</a> y <a href="http://forum.xda-developers.com/member.php?u=4322181">Tungstwenty</a>.
@@ -35,9 +35,9 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
 
 
     <!-- main menu -->
-    <string name="menu_backup">Exportar</string>
-    <string name="menu_restore">Importar</string>
-    <string name="menu_about">Acerca de...</string>
+    <string name="drawer_backup">Exportar</string>
+    <string name="drawer_restore">Importar</string>
+    <string name="drawer_about">Acerca de…</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Configuración exportada al archivo</string>
@@ -70,8 +70,6 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
     <string name="settings_nofullscreenime">Sin teclado pant. completa</string>
     <string name="settings_orientation">Orientación</string>
     <string name="settings_insistentnotif">Notificaciones insistentes</string>
-    <string name="settings_nobignotif">Sin notificaciones expandidas</string>
-    <string name="settings_notifpriority">Prioridad de notificación</string>
     <string name="settings_mute">Silenciar sonidos</string>
     <string name="settings_legacy_menu">Botón de menú heredado</string>
     <string name="settings_permissions">Permisos</string>
@@ -92,12 +90,6 @@ residente en memoria; orientación; revocar permisos; &#8230;</string>
     <string name="settings_ori_portrait_reverse">Siempre retrato (inverso)</string>
     <string name="settings_ori_landscape_reverse">Siempre paisaje (inverso)</string>
     <string name="settings_ori_forceauto_4way">Forzar rotación automática (4 caras)</string>
-
-    <string name="settings_npri_max">Máx</string>
-    <string name="settings_npri_high">Alto</string>
-    <string name="settings_npri_normal">Normal</string>
-    <string name="settings_npri_low">Bajo</string>
-    <string name="settings_npri_min">Mín</string>
 
     <!-- List resources -->
     <string name="res_title">Recursos</string>

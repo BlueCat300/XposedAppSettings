@@ -32,9 +32,9 @@ Garder résident en mémoire; Pas de plein écran IME; Orientation; Notification
 
 
     <!-- main menu -->
-    <string name="menu_backup">Exporter</string>
-    <string name="menu_restore">Importer</string>
-    <string name="menu_about">A propos</string>
+    <string name="drawer_backup">Exporter</string>
+    <string name="drawer_restore">Importer</string>
+    <string name="drawer_about">A propos</string>
 
     <!-- Import / Export -->
     <string name="imp_exp_backup_completed">Réglages exportés vers</string>
@@ -65,7 +65,6 @@ Garder résident en mémoire; Pas de plein écran IME; Orientation; Notification
     <string name="settings_resident">Résident</string>
     <string name="settings_orientation">Orientation</string>
     <string name="settings_insistentnotif">Notifs persistentes</string>
-    <string name="settings_nobignotif">Pas de gds notifs</string>
     <string name="settings_permissions">Permissions</string>
 
     <string name="settings_default">(defaut)</string>

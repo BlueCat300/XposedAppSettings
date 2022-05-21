@@ -3,27 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/drawer_header"
-    android:gravity="bottom"
+    android:background="@color/drawer_header"
+    android:gravity="center"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingEnd="@dimen/nav_header_horizontal_spacing"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="@dimen/nav_header_image_size"
+        android:layout_height="@dimen/nav_header_image_size"
         android:contentDescription="@string/app_name"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:srcCompat= "@drawable/ic_launcher" />
+
     <TextView
-        android:textSize="19sp"
+        android:textSize="@dimen/nav_header_text_size"
         android:textStyle="bold"
-        android:textColor="@color/nav_header_main_text"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
+        android:textColor="@color/day_night_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/app_name"
