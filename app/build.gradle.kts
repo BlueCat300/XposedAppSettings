@@ -34,6 +34,19 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    packaging {
+        resources {
+            excludes.addAll(listOf(
+                "DebugProbesKt.bin",
+                "META-INF/**.version",
+                "kotlin-tooling-metadata.json",
+                "kotlin/**.kotlin_builtins",
+                "org/bouncycastle/pqc/**.properties",
+                "org/bouncycastle/x509/**.properties",
+            ))
+        }
+    }
+
     lint {
         disable.add("MissingTranslation")
     }

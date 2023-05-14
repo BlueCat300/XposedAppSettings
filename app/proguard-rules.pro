@@ -1,5 +1,8 @@
 -dontobfuscate
 -keep class ru.bluecat.android.xposed.mods.appsettings.hooks.Core
+-keep class ru.bluecat.android.xposed.mods.appsettings.MainActivity {
+    public static isModuleActive();
+}
 
 # Add project specific ProGuard rules here.
 # You can control the set of applied configuration files using the
