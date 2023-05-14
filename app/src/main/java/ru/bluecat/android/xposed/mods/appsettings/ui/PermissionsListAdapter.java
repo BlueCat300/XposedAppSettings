@@ -82,18 +82,11 @@ public class PermissionsListAdapter extends ArrayAdapter<PermissionInfo> impleme
 			description = context.getString(R.string.perms_nodescription);
 		vHolder.tvDescription.setText(description);
 		switch (perm.protectionLevel) {
-		case PermissionInfo.PROTECTION_DANGEROUS:
-			vHolder.tvDescription.setTextColor(Color.RED);
-			break;
-		case PermissionInfo.PROTECTION_SIGNATURE:
-			vHolder.tvDescription.setTextColor(Color.GREEN);
-			break;
-		case PermissionInfo.PROTECTION_SIGNATURE_OR_SYSTEM:
-			vHolder.tvDescription.setTextColor(Color.YELLOW);
-			break;
-		default:
-			vHolder.tvDescription.setTextColor(ContextCompat.getColor(context, R.color.permission_desc));
-			break;
+			case PermissionInfo.PROTECTION_DANGEROUS -> vHolder.tvDescription.setTextColor(Color.RED);
+			case PermissionInfo.PROTECTION_SIGNATURE -> vHolder.tvDescription.setTextColor(Color.GREEN);
+			//noinspection deprecation
+			case PermissionInfo.PROTECTION_SIGNATURE_OR_SYSTEM -> vHolder.tvDescription.setTextColor(Color.YELLOW);
+			default -> vHolder.tvDescription.setTextColor(ContextCompat.getColor(context, R.color.permission_desc));
 		}
 
 		vHolder.tvName.setTag(perm.name);

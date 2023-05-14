@@ -118,15 +118,9 @@ public class FilterItemComponent extends LinearLayout {
 			state = FilterState.ALL;
 
 		switch (state) {
-		case OVERRIDDEN:
-			((RadioGroup) findViewById(R.id.radOptions)).check(R.id.radOverridden);
-			break;
-		case UNCHANGED:
-			((RadioGroup) findViewById(R.id.radOptions)).check(R.id.radUnchanged);
-			break;
-		default:
-			((RadioGroup) findViewById(R.id.radOptions)).check(R.id.radAll);
-			break;
+			case OVERRIDDEN -> ((RadioGroup) findViewById(R.id.radOptions)).check(R.id.radOverridden);
+			case UNCHANGED -> ((RadioGroup) findViewById(R.id.radOptions)).check(R.id.radUnchanged);
+			default -> ((RadioGroup) findViewById(R.id.radOptions)).check(R.id.radAll);
 		}
 	}
 

@@ -119,9 +119,9 @@ public class MainActivity extends AppCompatActivity {
 		}
 		try {
 			//noinspection deprecation
-			prefs = this.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			prefs = this.getSharedPreferences(Constants.PREFS, Context.MODE_WORLD_READABLE);
 		} catch (SecurityException e) {
-			Toasts.showToast(this, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+			Utils.showToast(this, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
 			finish();
 		}
 		activityContext = this;
@@ -290,20 +290,22 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-		String pkgName = filteredAppList.get(info.position).packageName;
-		if (item.getItemId() == R.id.menu_app_launch) {
-			Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(pkgName);
-			startActivity(LaunchIntent);
-			return true;
-		} else if (item.getItemId() == R.id.menu_app_settings) {
-			startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-					Uri.parse("package:" + pkgName)));
-			return true;
-		} else if (item.getItemId() == R.id.menu_app_store) {
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
-			return true;
+		if (info != null) {
+			String pkgName = filteredAppList.get(info.position).packageName;
+			if (item.getItemId() == R.id.menu_app_launch) {
+				Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(pkgName);
+				startActivity(LaunchIntent);
+				return true;
+			} else if (item.getItemId() == R.id.menu_app_settings) {
+				startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+						Uri.parse("package:" + pkgName)));
+				return true;
+			} else if (item.getItemId() == R.id.menu_app_store) {
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkgName)));
+				return true;
+			}
 		}
-		return super.onContextItemSelected(item);
+		return false;
 	}
 
 	@Override
@@ -329,9 +331,9 @@ public class MainActivity extends AppCompatActivity {
 		// Refresh preferences
 		try {
 			//noinspection deprecation
-			prefs = activityContext.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			prefs = activityContext.getSharedPreferences(Constants.PREFS, Context.MODE_WORLD_READABLE);
 		} catch (SecurityException e) {
-			Toasts.showToast(activityContext, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+			Utils.showToast(activityContext, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
 			activityContext.finish();
 		}
 		// Refresh listed apps (account for filters)
@@ -354,29 +356,29 @@ public class MainActivity extends AppCompatActivity {
 	private void loadSettings() {
 		settings = new ArrayList<>();
 
-		settings.add(new SettingInfo(Common.PREF_DPI, getString(R.string.settings_dpi)));
-		settings.add(new SettingInfo(Common.PREF_FONT_SCALE, getString(R.string.settings_fontscale)));
-		settings.add(new SettingInfo(Common.PREF_SCREEN, getString(R.string.settings_screen)));
-		settings.add(new SettingInfo(Common.PREF_XLARGE, getString(R.string.settings_xlargeres)));
-		settings.add(new SettingInfo(Common.PREF_LTR, getString(R.string.settings_ltr)));
-		settings.add(new SettingInfo(Common.PREF_SCREENSHOT, getString(R.string.settings_screenshot)));
-		settings.add(new SettingInfo(Common.PREF_LOCALE, getString(R.string.settings_locale)));
-		settings.add(new SettingInfo(Common.PREF_FULLSCREEN, getString(R.string.settings_fullscreen)));
+		settings.add(new SettingInfo(Constants.PREF_DPI, getString(R.string.settings_dpi)));
+		settings.add(new SettingInfo(Constants.PREF_FONT_SCALE, getString(R.string.settings_fontscale)));
+		settings.add(new SettingInfo(Constants.PREF_SCREEN, getString(R.string.settings_screen)));
+		settings.add(new SettingInfo(Constants.PREF_XLARGE, getString(R.string.settings_xlargeres)));
+		settings.add(new SettingInfo(Constants.PREF_LTR, getString(R.string.settings_ltr)));
+		settings.add(new SettingInfo(Constants.PREF_SCREENSHOT, getString(R.string.settings_screenshot)));
+		settings.add(new SettingInfo(Constants.PREF_LOCALE, getString(R.string.settings_locale)));
+		settings.add(new SettingInfo(Constants.PREF_FULLSCREEN, getString(R.string.settings_fullscreen)));
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-			settings.add(new SettingInfo(Common.PREF_AUTO_HIDE_FULLSCREEN, getString(R.string.settings_autofullscreen)));
-		settings.add(new SettingInfo(Common.PREF_NO_TITLE, getString(R.string.settings_notitle)));
-		settings.add(new SettingInfo(Common.PREF_SCREEN_ON, getString(R.string.settings_screenon)));
-		settings.add(new SettingInfo(Common.PREF_ALLOW_ON_LOCKSCREEN, getString(R.string.settings_showwhenlocked)));
-		settings.add(new SettingInfo(Common.PREF_RESIDENT, getString(R.string.settings_resident)));
-		settings.add(new SettingInfo(Common.PREF_NO_FULLSCREEN_IME, getString(R.string.settings_nofullscreenime)));
-		settings.add(new SettingInfo(Common.PREF_ORIENTATION, getString(R.string.settings_orientation)));
-		settings.add(new SettingInfo(Common.PREF_INSISTENT_NOTIF, getString(R.string.settings_insistentnotif)));
-		settings.add(new SettingInfo(Common.PREF_ONGOING_NOTIF, getString(R.string.settings_ongoingnotif)));
-		settings.add(new SettingInfo(Common.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
-		settings.add(new SettingInfo(Common.PREF_MUTE, getString(R.string.settings_mute)));
-		settings.add(new SettingInfo(Common.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
-		settings.add(new SettingInfo(Common.PREF_RECENT_TASKS, getString(R.string.settings_recent_tasks)));
-		settings.add(new SettingInfo(Common.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
+			settings.add(new SettingInfo(Constants.PREF_AUTO_HIDE_FULLSCREEN, getString(R.string.settings_autofullscreen)));
+		settings.add(new SettingInfo(Constants.PREF_NO_TITLE, getString(R.string.settings_notitle)));
+		settings.add(new SettingInfo(Constants.PREF_SCREEN_ON, getString(R.string.settings_screenon)));
+		settings.add(new SettingInfo(Constants.PREF_ALLOW_ON_LOCKSCREEN, getString(R.string.settings_showwhenlocked)));
+		settings.add(new SettingInfo(Constants.PREF_RESIDENT, getString(R.string.settings_resident)));
+		settings.add(new SettingInfo(Constants.PREF_NO_FULLSCREEN_IME, getString(R.string.settings_nofullscreenime)));
+		settings.add(new SettingInfo(Constants.PREF_ORIENTATION, getString(R.string.settings_orientation)));
+		settings.add(new SettingInfo(Constants.PREF_INSISTENT_NOTIF, getString(R.string.settings_insistentnotif)));
+		settings.add(new SettingInfo(Constants.PREF_ONGOING_NOTIF, getString(R.string.settings_ongoingnotif)));
+		settings.add(new SettingInfo(Constants.PREF_RECENTS_MODE, getString(R.string.settings_recents_mode)));
+		settings.add(new SettingInfo(Constants.PREF_MUTE, getString(R.string.settings_mute)));
+		settings.add(new SettingInfo(Constants.PREF_LEGACY_MENU, getString(R.string.settings_legacy_menu)));
+		settings.add(new SettingInfo(Constants.PREF_RECENT_TASKS, getString(R.string.settings_recent_tasks)));
+		settings.add(new SettingInfo(Constants.PREF_REVOKEPERMS, getString(R.string.settings_permissions)));
 	}
 
 	private void showRecents() {
@@ -520,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
 		((ListView) activity.findViewById(R.id.lstApps)).setAdapter(appListAdapter);
 		appListAdapter.getFilter().filter(nameFilter);
 
-		SearchView search = optionsMenu.findItem(R.id.menu_searchApp).getActionView()
+		SearchView search = Objects.requireNonNull(optionsMenu.findItem(R.id.menu_searchApp).getActionView())
 				.findViewById(R.id.menu_searchApp);
 
 		search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -740,9 +742,9 @@ public class MainActivity extends AppCompatActivity {
 			}
 			try {
 				//noinspection deprecation
-				prefs = activityReference.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+				prefs = activityReference.getSharedPreferences(Constants.PREFS, Context.MODE_WORLD_READABLE);
 			} catch (SecurityException e) {
-				Toasts.showToast(activityReference, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+				Utils.showToast(activityReference, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
 				activityReference.finish();
 			}
 
@@ -772,7 +774,7 @@ public class MainActivity extends AppCompatActivity {
 			if (filteredOut(app.enabled, filterAppState))
 				return true;
 
-			if (filteredOut(prefs.getBoolean(packageName + Common.PREF_ACTIVE, false), filterActive))
+			if (filteredOut(prefs.getBoolean(packageName + Constants.PREF_ACTIVE, false), filterActive))
 				return true;
 
 			if (FilterState.UNCHANGED.equals(filterActive))
@@ -795,14 +797,11 @@ public class MainActivity extends AppCompatActivity {
 			if (state == null)
 				return false;
 
-			switch (state) {
-			case UNCHANGED:
-				return set;
-			case OVERRIDDEN:
-				return !set;
-			default:
-				return false;
-			}
+			return switch (state) {
+				case UNCHANGED -> set;
+				case OVERRIDDEN -> !set;
+				default -> false;
+			};
 		}
 
 		@SuppressWarnings("unchecked")
@@ -893,7 +892,7 @@ public class MainActivity extends AppCompatActivity {
 			ApplicationInfo app = filteredAppList.get(position);
 
 			holder.app_name.setText(app.name == null ? "" : app.name);
-			holder.app_package.setTextColor(prefs.getBoolean(app.packageName + Common.PREF_ACTIVE, false)
+			holder.app_package.setTextColor(prefs.getBoolean(app.packageName + Constants.PREF_ACTIVE, false)
 					? Color.RED : ContextCompat.getColor(mContext, R.color.package_name));
 			holder.app_package.setText(app.packageName);
 			holder.app_icon.setImageDrawable(defaultIcon);

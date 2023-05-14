@@ -77,7 +77,7 @@ public class BackupActivity extends AppCompatActivity {
             if(!job) intent.putExtra(Intent.EXTRA_TITLE, createUniqueBackupName());
             onActivityResult.launch(intent);
         } catch(ActivityNotFoundException e) {
-            Toasts.showToast(this, Pair.of(null,
+            Utils.showToast(this, Pair.of(null,
                     R.string.imp_exp_file_picker_error), null, Toast.LENGTH_LONG);
             finish();
         }
@@ -95,9 +95,9 @@ public class BackupActivity extends AppCompatActivity {
             ObjectOutputStream output;
             try {
                 //noinspection deprecation
-                prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+                prefs = activity.getSharedPreferences(Constants.PREFS, Context.MODE_WORLD_READABLE);
             } catch (SecurityException e) {
-                Toasts.showToast(activity, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+                Utils.showToast(activity, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
                 activity.finish();
             }
             if(prefs != null) {
@@ -120,7 +120,7 @@ public class BackupActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(@NonNull Throwable e) {
-                    Toasts.showToast(activity, Pair.of(null, R.string.imp_exp_backup_error),
+                    Utils.showToast(activity, Pair.of(null, R.string.imp_exp_backup_error),
                             e.getMessage(), Toast.LENGTH_LONG);
                 }
 
@@ -137,9 +137,9 @@ public class BackupActivity extends AppCompatActivity {
             ObjectInputStream input;
             try {
                 //noinspection deprecation
-                prefs = activity.getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+                prefs = activity.getSharedPreferences(Constants.PREFS, Context.MODE_WORLD_READABLE);
             } catch (SecurityException e) {
-                Toasts.showToast(activity, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+                Utils.showToast(activity, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
                 activity.finish();
             }
             if(prefs != null) {
@@ -179,7 +179,7 @@ public class BackupActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(@NonNull Throwable e) {
-                    Toasts.showToast(activity, Pair.of(null, R.string.imp_exp_restore_error),
+                    Utils.showToast(activity, Pair.of(null, R.string.imp_exp_restore_error),
                             e.getMessage(), Toast.LENGTH_LONG);
                 }
 

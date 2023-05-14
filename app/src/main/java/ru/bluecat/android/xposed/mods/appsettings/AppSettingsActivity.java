@@ -80,9 +80,9 @@ public class AppSettingsActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		try {
 			//noinspection deprecation
-			prefs = getSharedPreferences(Common.PREFS, Context.MODE_WORLD_READABLE);
+			prefs = getSharedPreferences(Constants.PREFS, Context.MODE_WORLD_READABLE);
 		} catch (SecurityException e) {
-			Toasts.showToast(this, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
+			Utils.showToast(this, Pair.of(e.getMessage(), 0), null, Toast.LENGTH_LONG);
 			finish();
 		}
 		setContentView(R.layout.app_settings_activity);
@@ -116,7 +116,7 @@ public class AppSettingsActivity extends AppCompatActivity {
 		((ImageView) findViewById(R.id.app_icon)).setImageDrawable(app.loadIcon(getPackageManager()));
 
 		// Update switch of active/inactive tweaks
-		if (prefs.getBoolean(pkgName + Common.PREF_ACTIVE, false)) {
+		if (prefs.getBoolean(pkgName + Constants.PREF_ACTIVE, false)) {
 			swtActive.setChecked(true);
 			findViewById(R.id.viewTweaks).setVisibility(View.VISIBLE);
 		} else {
@@ -128,31 +128,31 @@ public class AppSettingsActivity extends AppCompatActivity {
 				findViewById(R.id.viewTweaks).setVisibility(isChecked ? View.VISIBLE : View.GONE));
 
 		// Update DPI field
-		if (prefs.getBoolean(pkgName + Common.PREF_ACTIVE, false)) {
+		if (prefs.getBoolean(pkgName + Constants.PREF_ACTIVE, false)) {
 			((EditText) findViewById(R.id.txtDPI)).setText(String.valueOf(
-				prefs.getInt(pkgName + Common.PREF_DPI, 0)));
+				prefs.getInt(pkgName + Constants.PREF_DPI, 0)));
 		} else {
 			((EditText) findViewById(R.id.txtDPI)).setText("0");
 		}
 
 		// Update Font Scaling field
-		if (prefs.getBoolean(pkgName + Common.PREF_ACTIVE, false)) {
-			((EditText) findViewById(R.id.txtFontScale)).setText(String.valueOf(prefs.getInt(pkgName + Common.PREF_FONT_SCALE, 100)));
+		if (prefs.getBoolean(pkgName + Constants.PREF_ACTIVE, false)) {
+			((EditText) findViewById(R.id.txtFontScale)).setText(String.valueOf(prefs.getInt(pkgName + Constants.PREF_FONT_SCALE, 100)));
 		} else {
 			((EditText) findViewById(R.id.txtFontScale)).setText("100");
 		}
 
 		// Load and render current screen setting + possible options
-		int screen = prefs.getInt(pkgName + Common.PREF_SCREEN, 0);
-		if (screen < 0 || screen >= Common.swdp.length)
+		int screen = prefs.getInt(pkgName + Constants.PREF_SCREEN, 0);
+		if (screen < 0 || screen >= Constants.swdp.length)
 			screen = 0;
 		final int selectedScreen = screen;
 
 		Spinner spnScreen = findViewById(R.id.spnScreen);
-		List<String> lstScreens = new ArrayList<>(Common.swdp.length);
+		List<String> lstScreens = new ArrayList<>(Constants.swdp.length);
 		lstScreens.add(getString(R.string.settings_default));
-		for (int j = 1; j < Common.swdp.length; j++)
-			lstScreens.add(String.format("%dx%d", Common.wdp[j], Common.hdp[j]));
+		for (int j = 1; j < Constants.swdp.length; j++)
+			lstScreens.add(String.format("%dx%d", Constants.wdp[j], Constants.hdp[j]));
 		ArrayAdapter<String> screenAdapter = new ArrayAdapter<>(this,
 				android.R.layout.simple_spinner_item, lstScreens);
 		screenAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -160,14 +160,14 @@ public class AppSettingsActivity extends AppCompatActivity {
 		spnScreen.setSelection(selectedScreen);
 
 		// Update Tablet field
-		((CheckBox) findViewById(R.id.chkXlarge)).setChecked(prefs.getBoolean(pkgName + Common.PREF_XLARGE, false));
+		((CheckBox) findViewById(R.id.chkXlarge)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_XLARGE, false));
 
 		// Update Layout field
-		((CheckBox) findViewById(R.id.chkLTR)).setChecked(prefs.getBoolean(pkgName + Common.PREF_LTR, false));
+		((CheckBox) findViewById(R.id.chkLTR)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_LTR, false));
 
 		// Update Screenshot field
 		{
-			int screenshot = prefs.getInt(pkgName + Common.PREF_SCREENSHOT, Common.PREF_SCREENSHOT_DEFAULT);
+			int screenshot = prefs.getInt(pkgName + Constants.PREF_SCREENSHOT, Constants.PREF_SCREENSHOT_DEFAULT);
 			Spinner spnScreenshot = findViewById(R.id.spnScreenshot);
 			// Note: the order of these items must match the Common.PREF_SCREENSHOT... constants
 			String[] screenshotArray = new String[] {
@@ -192,7 +192,7 @@ public class AppSettingsActivity extends AppCompatActivity {
 				android.R.layout.simple_spinner_item, localeList.getDescriptionList());
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spnLanguage.setAdapter(dataAdapter);
-		int selectedLocalePos = localeList.getLocalePos(prefs.getString(pkgName + Common.PREF_LOCALE, null));
+		int selectedLocalePos = localeList.getLocalePos(prefs.getString(pkgName + Constants.PREF_LOCALE, null));
 		spnLanguage.setSelection(selectedLocalePos);
 		spnLanguage.setLongClickable(true);
 		spnLanguage.setOnLongClickListener(arg0 -> {
@@ -251,11 +251,11 @@ public class AppSettingsActivity extends AppCompatActivity {
 		{
 			int fullscreen;
 			try {
-				fullscreen = prefs.getInt(pkgName + Common.PREF_FULLSCREEN, Common.FULLSCREEN_DEFAULT);
+				fullscreen = prefs.getInt(pkgName + Constants.PREF_FULLSCREEN, Constants.FULLSCREEN_DEFAULT);
 			} catch (ClassCastException ex) {
 				// Legacy boolean setting
-				fullscreen = prefs.getBoolean(pkgName + Common.PREF_FULLSCREEN, false)
-						? Common.FULLSCREEN_FORCE : Common.FULLSCREEN_DEFAULT;
+				fullscreen = prefs.getBoolean(pkgName + Constants.PREF_FULLSCREEN, false)
+						? Constants.FULLSCREEN_FORCE : Constants.FULLSCREEN_DEFAULT;
 			}
 			final int fullscreenSelection = fullscreen;
 			Spinner spnFullscreen = findViewById(R.id.spnFullscreen);
@@ -278,30 +278,30 @@ public class AppSettingsActivity extends AppCompatActivity {
 
         // Update Auto Hide field
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ((CheckBox) findViewById(R.id.chkAutoHide)).setChecked(prefs.getBoolean(pkgName + Common.PREF_AUTO_HIDE_FULLSCREEN, false));
+            ((CheckBox) findViewById(R.id.chkAutoHide)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_AUTO_HIDE_FULLSCREEN, false));
         } else {
             findViewById(R.id.chkAutoHide).setVisibility(View.GONE);
         }
 
 		// Update No Title field
-		((CheckBox) findViewById(R.id.chkNoTitle)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_TITLE, false));
+		((CheckBox) findViewById(R.id.chkNoTitle)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_NO_TITLE, false));
 
 		// Update Allow On Lockscreen field
-		((CheckBox) findViewById(R.id.chkAllowOnLockscreen)).setChecked(prefs.getBoolean(pkgName + Common.PREF_ALLOW_ON_LOCKSCREEN, false));
+		((CheckBox) findViewById(R.id.chkAllowOnLockscreen)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_ALLOW_ON_LOCKSCREEN, false));
 
 		// Update Screen On field
-		((CheckBox) findViewById(R.id.chkScreenOn)).setChecked(prefs.getBoolean(pkgName + Common.PREF_SCREEN_ON, false));
+		((CheckBox) findViewById(R.id.chkScreenOn)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_SCREEN_ON, false));
 
 		// Load and render current screen setting + possible options
-		int orientation = prefs.getInt(pkgName + Common.PREF_ORIENTATION, 0);
-		if (orientation < 0 || orientation >= Common.orientationCodes.length)
+		int orientation = prefs.getInt(pkgName + Constants.PREF_ORIENTATION, 0);
+		if (orientation < 0 || orientation >= Constants.orientationCodes.length)
 			orientation = 0;
 		final int selectedOrientation = orientation;
 
 		Spinner spnOrientation = findViewById(R.id.spnOrientation);
-		List<String> lstOrientations = new ArrayList<>(Common.orientationLabels.length);
-		for (int j = 0; j < Common.orientationLabels.length; j++)
-			lstOrientations.add(getString(Common.orientationLabels[j]));
+		List<String> lstOrientations = new ArrayList<>(Constants.orientationLabels.length);
+		for (int j = 0; j < Constants.orientationLabels.length; j++)
+			lstOrientations.add(getString(Constants.orientationLabels[j]));
 		ArrayAdapter<String> orientationAdapter = new ArrayAdapter<>(this,
 				android.R.layout.simple_spinner_item, lstOrientations);
 		orientationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -309,14 +309,14 @@ public class AppSettingsActivity extends AppCompatActivity {
 		spnOrientation.setSelection(selectedOrientation);
 
 		// Setting for making the app resident in memory
-		((CheckBox) findViewById(R.id.chkResident)).setChecked(prefs.getBoolean(pkgName + Common.PREF_RESIDENT, false));
+		((CheckBox) findViewById(R.id.chkResident)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_RESIDENT, false));
 
 		// Setting for disabling fullscreen IME
-		((CheckBox) findViewById(R.id.chkNoFullscreenIME)).setChecked(prefs.getBoolean(pkgName + Common.PREF_NO_FULLSCREEN_IME, false));
+		((CheckBox) findViewById(R.id.chkNoFullscreenIME)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_NO_FULLSCREEN_IME, false));
 
 		// Setup Ongoing Notifications settings
 		{
-			int ongoingNotifs = prefs.getInt(pkgName + Common.PREF_ONGOING_NOTIF, Common.ONGOING_NOTIF_DEFAULT);
+			int ongoingNotifs = prefs.getInt(pkgName + Constants.PREF_ONGOING_NOTIF, Constants.ONGOING_NOTIF_DEFAULT);
 			Spinner spnOngoingNotif = findViewById(R.id.spnOngoingNotifications);
 			// Note: the order of these items must match the Common.ONGOING_NOTIF_... constants
 			String[] ongoingNotifArray = new String[] {
@@ -334,25 +334,25 @@ public class AppSettingsActivity extends AppCompatActivity {
 
 		// Update Insistent Notifications field
 		((CheckBox) findViewById(R.id.chkInsistentNotifications)).setChecked(prefs.getBoolean(
-				pkgName + Common.PREF_INSISTENT_NOTIF, false));
+				pkgName + Constants.PREF_INSISTENT_NOTIF, false));
 
 		// Update Mute field
-		((CheckBox) findViewById(R.id.chkMute)).setChecked(prefs.getBoolean(pkgName + Common.PREF_MUTE, false));
+		((CheckBox) findViewById(R.id.chkMute)).setChecked(prefs.getBoolean(pkgName + Constants.PREF_MUTE, false));
 
 		// Update Legacy Menu field
 		((CheckBox) findViewById(R.id.chkLegacyMenu)).setChecked(prefs.getBoolean(
-				pkgName + Common.PREF_LEGACY_MENU, false));
+				pkgName + Constants.PREF_LEGACY_MENU, false));
 
 		// Update Recent Tasks field
 		((CheckBox) findViewById(R.id.chkRecentTasks)).setChecked(prefs.getBoolean(pkgName +
-				Common.PREF_RECENT_TASKS, false));
+				Constants.PREF_RECENT_TASKS, false));
 
 		// Setting for permissions revoking
-		allowRevoking = prefs.getBoolean(pkgName + Common.PREF_REVOKEPERMS, false);
-		disabledPermissions = prefs.getStringSet(pkgName + Common.PREF_REVOKELIST, new HashSet<>());
+		allowRevoking = prefs.getBoolean(pkgName + Constants.PREF_REVOKEPERMS, false);
+		disabledPermissions = prefs.getStringSet(pkgName + Constants.PREF_REVOKELIST, new HashSet<>());
 
 		// Setup recents mode options
-		final int selectedRecentsMode = prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT);
+		final int selectedRecentsMode = prefs.getInt(pkgName + Constants.PREF_RECENTS_MODE, Constants.PREF_RECENTS_DEFAULT);
 		// Note: the order of these items must match the Common.RECENTS_... constants
 		String[] recentsModeArray = new String[] { getString(R.string.settings_default),
 				getString(R.string.settings_force), getString(R.string.settings_prevent) };
@@ -387,31 +387,32 @@ public class AppSettingsActivity extends AppCompatActivity {
 
 	private Set<String> getSettingKeys() {
 		HashSet<String> settingKeys = new HashSet<>();
-		settingKeys.add(pkgName + Common.PREF_ACTIVE);
-		settingKeys.add(pkgName + Common.PREF_DPI);
-		settingKeys.add(pkgName + Common.PREF_FONT_SCALE);
-		settingKeys.add(pkgName + Common.PREF_SCREEN);
-		settingKeys.add(pkgName + Common.PREF_XLARGE);
-		settingKeys.add(pkgName + Common.PREF_LTR);
-		settingKeys.add(pkgName + Common.PREF_SCREENSHOT);
-		settingKeys.add(pkgName + Common.PREF_LOCALE);
-		settingKeys.add(pkgName + Common.PREF_FULLSCREEN);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-            settingKeys.add(pkgName + Common.PREF_AUTO_HIDE_FULLSCREEN);
-		settingKeys.add(pkgName + Common.PREF_NO_TITLE);
-		settingKeys.add(pkgName + Common.PREF_ALLOW_ON_LOCKSCREEN);
-		settingKeys.add(pkgName + Common.PREF_SCREEN_ON);
-		settingKeys.add(pkgName + Common.PREF_ORIENTATION);
-		settingKeys.add(pkgName + Common.PREF_RESIDENT);
-		settingKeys.add(pkgName + Common.PREF_NO_FULLSCREEN_IME);
-		settingKeys.add(pkgName + Common.PREF_INSISTENT_NOTIF);
-		settingKeys.add(pkgName + Common.PREF_ONGOING_NOTIF);
-		settingKeys.add(pkgName + Common.PREF_RECENTS_MODE);
-		settingKeys.add(pkgName + Common.PREF_MUTE);
-		settingKeys.add(pkgName + Common.PREF_LEGACY_MENU);
-		settingKeys.add(pkgName + Common.PREF_RECENT_TASKS);
-		settingKeys.add(pkgName + Common.PREF_REVOKEPERMS);
-		settingKeys.add(pkgName + Common.PREF_REVOKELIST);
+		settingKeys.add(pkgName + Constants.PREF_ACTIVE);
+		settingKeys.add(pkgName + Constants.PREF_DPI);
+		settingKeys.add(pkgName + Constants.PREF_FONT_SCALE);
+		settingKeys.add(pkgName + Constants.PREF_SCREEN);
+		settingKeys.add(pkgName + Constants.PREF_XLARGE);
+		settingKeys.add(pkgName + Constants.PREF_LTR);
+		settingKeys.add(pkgName + Constants.PREF_SCREENSHOT);
+		settingKeys.add(pkgName + Constants.PREF_LOCALE);
+		settingKeys.add(pkgName + Constants.PREF_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			settingKeys.add(pkgName + Constants.PREF_AUTO_HIDE_FULLSCREEN);
+		}
+		settingKeys.add(pkgName + Constants.PREF_NO_TITLE);
+		settingKeys.add(pkgName + Constants.PREF_ALLOW_ON_LOCKSCREEN);
+		settingKeys.add(pkgName + Constants.PREF_SCREEN_ON);
+		settingKeys.add(pkgName + Constants.PREF_ORIENTATION);
+		settingKeys.add(pkgName + Constants.PREF_RESIDENT);
+		settingKeys.add(pkgName + Constants.PREF_NO_FULLSCREEN_IME);
+		settingKeys.add(pkgName + Constants.PREF_INSISTENT_NOTIF);
+		settingKeys.add(pkgName + Constants.PREF_ONGOING_NOTIF);
+		settingKeys.add(pkgName + Constants.PREF_RECENTS_MODE);
+		settingKeys.add(pkgName + Constants.PREF_MUTE);
+		settingKeys.add(pkgName + Constants.PREF_LEGACY_MENU);
+		settingKeys.add(pkgName + Constants.PREF_RECENT_TASKS);
+		settingKeys.add(pkgName + Constants.PREF_REVOKEPERMS);
+		settingKeys.add(pkgName + Constants.PREF_REVOKELIST);
 		return settingKeys;
 	}
 
@@ -419,7 +420,7 @@ public class AppSettingsActivity extends AppCompatActivity {
 
 		Map<String, Object> settings = new HashMap<>();
 		if (swtActive.isChecked()) {
-			settings.put(pkgName + Common.PREF_ACTIVE, true);
+			settings.put(pkgName + Constants.PREF_ACTIVE, true);
 
 			int dpi;
 			try {
@@ -428,7 +429,7 @@ public class AppSettingsActivity extends AppCompatActivity {
 				dpi = 0;
 			}
 			if (dpi != 0)
-				settings.put(pkgName + Common.PREF_DPI, dpi);
+				settings.put(pkgName + Constants.PREF_DPI, dpi);
 
 			int fontScale;
 			try {
@@ -437,77 +438,78 @@ public class AppSettingsActivity extends AppCompatActivity {
 				fontScale = 0;
 			}
 			if (fontScale != 0 && fontScale != 100)
-				settings.put(pkgName + Common.PREF_FONT_SCALE, fontScale);
+				settings.put(pkgName + Constants.PREF_FONT_SCALE, fontScale);
 
 			int screen = ((Spinner) findViewById(R.id.spnScreen)).getSelectedItemPosition();
 			if (screen > 0)
-				settings.put(pkgName + Common.PREF_SCREEN, screen);
+				settings.put(pkgName + Constants.PREF_SCREEN, screen);
 
 			if (((CheckBox) findViewById(R.id.chkXlarge)).isChecked())
-				settings.put(pkgName + Common.PREF_XLARGE, true);
+				settings.put(pkgName + Constants.PREF_XLARGE, true);
 
 			if (((CheckBox) findViewById(R.id.chkLTR)).isChecked())
-				settings.put(pkgName + Common.PREF_LTR, true);
+				settings.put(pkgName + Constants.PREF_LTR, true);
 
 			int screenshot = ((Spinner) findViewById(R.id.spnScreenshot)).getSelectedItemPosition();
 			if (screenshot > 0)
-				settings.put(pkgName + Common.PREF_SCREENSHOT, screenshot);
+				settings.put(pkgName + Constants.PREF_SCREENSHOT, screenshot);
 
 			int selectedLocalePos = ((Spinner) findViewById(R.id.spnLocale)).getSelectedItemPosition();
 			if (selectedLocalePos > 0)
-				settings.put(pkgName + Common.PREF_LOCALE, localeList.getLocale(selectedLocalePos));
+				settings.put(pkgName + Constants.PREF_LOCALE, localeList.getLocale(selectedLocalePos));
 
 			int fullscreen = ((Spinner) findViewById(R.id.spnFullscreen)).getSelectedItemPosition();
-			if (fullscreen > 0)
-				settings.put(pkgName + Common.PREF_FULLSCREEN, fullscreen);
+			if (fullscreen > 0) {
+				settings.put(pkgName + Constants.PREF_FULLSCREEN, fullscreen);
+			}
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ((CheckBox) findViewById(R.id.chkAutoHide)).isChecked())
-                settings.put(pkgName + Common.PREF_AUTO_HIDE_FULLSCREEN, true);
+				settings.put(pkgName + Constants.PREF_AUTO_HIDE_FULLSCREEN, true);
 
 			if (((CheckBox) findViewById(R.id.chkNoTitle)).isChecked())
-				settings.put(pkgName + Common.PREF_NO_TITLE, true);
+				settings.put(pkgName + Constants.PREF_NO_TITLE, true);
 
 			if (((CheckBox) findViewById(R.id.chkAllowOnLockscreen)).isChecked())
-				settings.put(pkgName + Common.PREF_ALLOW_ON_LOCKSCREEN, true);
+				settings.put(pkgName + Constants.PREF_ALLOW_ON_LOCKSCREEN, true);
 
 			if (((CheckBox) findViewById(R.id.chkScreenOn)).isChecked())
-				settings.put(pkgName + Common.PREF_SCREEN_ON, true);
+				settings.put(pkgName + Constants.PREF_SCREEN_ON, true);
 
 			int orientation = ((Spinner) findViewById(R.id.spnOrientation)).getSelectedItemPosition();
 			if (orientation > 0)
-				settings.put(pkgName + Common.PREF_ORIENTATION, orientation);
+				settings.put(pkgName + Constants.PREF_ORIENTATION, orientation);
 
 			if (((CheckBox) findViewById(R.id.chkResident)).isChecked())
-				settings.put(pkgName + Common.PREF_RESIDENT, true);
+				settings.put(pkgName + Constants.PREF_RESIDENT, true);
 
 			if (((CheckBox) findViewById(R.id.chkNoFullscreenIME)).isChecked())
-				settings.put(pkgName + Common.PREF_NO_FULLSCREEN_IME, true);
+				settings.put(pkgName + Constants.PREF_NO_FULLSCREEN_IME, true);
 
 			if (((CheckBox) findViewById(R.id.chkInsistentNotifications)).isChecked())
-				settings.put(pkgName + Common.PREF_INSISTENT_NOTIF, true);
+				settings.put(pkgName + Constants.PREF_INSISTENT_NOTIF, true);
 
 			int ongoingNotif = ((Spinner) findViewById(R.id.spnOngoingNotifications)).getSelectedItemPosition();
 			if (ongoingNotif > 0)
-				settings.put(pkgName + Common.PREF_ONGOING_NOTIF, ongoingNotif);
+				settings.put(pkgName + Constants.PREF_ONGOING_NOTIF, ongoingNotif);
 
 			int recentsMode = ((Spinner) findViewById(R.id.spnRecentsMode)).getSelectedItemPosition();
 			if (recentsMode > 0)
-				settings.put(pkgName + Common.PREF_RECENTS_MODE, recentsMode);
+				settings.put(pkgName + Constants.PREF_RECENTS_MODE, recentsMode);
 
 			if (((CheckBox) findViewById(R.id.chkMute)).isChecked())
-				settings.put(pkgName + Common.PREF_MUTE, true);
+				settings.put(pkgName + Constants.PREF_MUTE, true);
 
 			if (((CheckBox) findViewById(R.id.chkLegacyMenu)).isChecked())
-				settings.put(pkgName + Common.PREF_LEGACY_MENU, true);
+				settings.put(pkgName + Constants.PREF_LEGACY_MENU, true);
 
 			if (((CheckBox) findViewById(R.id.chkRecentTasks)).isChecked())
-				settings.put(pkgName + Common.PREF_RECENT_TASKS, true);
+				settings.put(pkgName + Constants.PREF_RECENT_TASKS, true);
 
 			if (allowRevoking)
-				settings.put(pkgName + Common.PREF_REVOKEPERMS, true);
+				settings.put(pkgName + Constants.PREF_REVOKEPERMS, true);
 
 			if (disabledPermissions.size() > 0)
-				settings.put(pkgName + Common.PREF_REVOKELIST, new HashSet<>(disabledPermissions));
+				settings.put(pkgName + Constants.PREF_REVOKELIST, new HashSet<>(disabledPermissions));
 		}
 		return settings;
 	}
@@ -552,10 +554,10 @@ public class AppSettingsActivity extends AppCompatActivity {
 	public static void updateMenuEntries(Activity context, Menu menu, String pkgName) {
 		if (context.getPackageManager().getLaunchIntentForPackage(pkgName) == null) {
 			menu.findItem(R.id.menu_app_launch).setEnabled(false);
-			if (Common.isPortrait(context)) {
+			if (Utils.isPortrait(context)) {
 				setItemDisabled(menu, 1);
 			} else {
-				Drawable icon = menu.findItem(R.id.menu_app_launch).getIcon().mutate();
+				Drawable icon = Objects.requireNonNull(menu.findItem(R.id.menu_app_launch).getIcon()).mutate();
 				icon.setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GRAY, BlendModeCompat.SRC_IN));
 				menu.findItem(R.id.menu_app_launch).setIcon(icon);
 			}
@@ -585,7 +587,7 @@ public class AppSettingsActivity extends AppCompatActivity {
 
 	private static void setItemDisabled(Menu menu, int id) {
 		MenuItem item = menu.getItem(id);
-		SpannableString spanString = new SpannableString(item.getTitle().toString());
+		SpannableString spanString = new SpannableString(Objects.requireNonNull(item.getTitle()).toString());
 		spanString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, spanString.length(), 0);
 		item.setTitle(spanString);
 	}
@@ -618,7 +620,7 @@ public class AppSettingsActivity extends AppCompatActivity {
 				((PowerManager) Objects.requireNonNull(this.
 						getSystemService(Context.POWER_SERVICE))).reboot(null);
 			} catch (Exception e) {
-				Log.e(Common.TAG, e.toString());
+				Log.e(Constants.TAG, e.toString());
 				e.printStackTrace();
 			}
 		});
@@ -664,20 +666,20 @@ public class AppSettingsActivity extends AppCompatActivity {
 		builder.setMessage(R.string.settings_apply_detail);
 		builder.setPositiveButton(R.string.common_button_ok, (dialog, which) -> {
 			// Send the broadcast requesting to kill the app
-			Intent applyIntent = new Intent(Common.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS");
-			applyIntent.putExtra("action", Common.ACTION_PERMISSIONS);
+			Intent applyIntent = new Intent(Constants.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS");
+			applyIntent.putExtra("action", Constants.ACTION_PERMISSIONS);
 			applyIntent.putExtra("Package", pkgName);
 			applyIntent.putExtra("Kill", true);
-			sendBroadcast(applyIntent, Common.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION");
+			sendBroadcast(applyIntent, Constants.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION");
 			dialog.dismiss();
 		});
 		builder.setNegativeButton(R.string.common_button_cancel, (dialog, which) -> {
 			// Send the broadcast but not requesting kill
-			Intent applyIntent = new Intent(Common.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS");
-			applyIntent.putExtra("action", Common.ACTION_PERMISSIONS);
+			Intent applyIntent = new Intent(Constants.MY_PACKAGE_NAME + ".UPDATE_PERMISSIONS");
+			applyIntent.putExtra("action", Constants.ACTION_PERMISSIONS);
 			applyIntent.putExtra("Package", pkgName);
 			applyIntent.putExtra("Kill", false);
-			sendBroadcast(applyIntent, Common.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION");
+			sendBroadcast(applyIntent, Constants.MY_PACKAGE_NAME + ".BROADCAST_PERMISSION");
 			dialog.dismiss();
 		});
 		builder.create().show();
