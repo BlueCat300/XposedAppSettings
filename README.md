@@ -3,12 +3,12 @@ App Settings Reborn
 
 Fork of the original App Settings by Rovo89. Supporting Android 8.0+
 
-### Download: [EdXposed Repository](https://repo.xposed.info/module/ru.bluecat.android.xposed.mods.appsettings) | [LSPosed Repository](https://github.com/Xposed-Modules-Repo/ru.bluecat.android.xposed.mods.appsettings/releases)
+### Download: [LSPosed Repository](https://github.com/Xposed-Modules-Repo/ru.bluecat.android.xposed.mods.appsettings/releases)
 
 **Discussion/Support:** [XDA thread](https://forum.xda-developers.com/t/mod-xposed-app-settings-reborn.4141339)
 
 **Compatibility:**
-The application is tested only on Android 10/11/12 (Samsung firmware), but has theoretical support for earlier versions of the OS. I do not guarantee work on other firmware. I also note that not all applications will work with all functions.
+The application is tested only on Android 10/11/12/13 (Samsung firmware), but has theoretical support for earlier versions of the OS. I do not guarantee work on other firmware. I also note that not all applications will work with all functions.
 If you do not see errors in LSPosed logs from this module, then your firmware requires additional hooks. I cannot provide development for such devices.
 
 **Information:**
