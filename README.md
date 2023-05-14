@@ -1,6 +1,8 @@
 App Settings Reborn
 ===========
 
+### Development discontinued
+
 Fork of the original App Settings by Rovo89. Supporting Android 8.0+
 
 ### Download: [LSPosed Repository](https://github.com/Xposed-Modules-Repo/ru.bluecat.android.xposed.mods.appsettings/releases)
