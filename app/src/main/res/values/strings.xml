@@ -161,5 +161,6 @@ Really go back and discard changes?</string>
     <string name="filter_clear">Clear</string>
     <string name="filter_apply">Apply</string>
 
+    <string name="module_force_stop">Successfully</string>
     <string name="translator"> </string>
 </resources>

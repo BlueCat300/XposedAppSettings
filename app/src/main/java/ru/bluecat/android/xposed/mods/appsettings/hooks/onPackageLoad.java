@@ -21,7 +21,7 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.Constants;
 
 public class onPackageLoad {
 
@@ -57,22 +57,22 @@ public class onPackageLoad {
 
                             // settings related to the density etc. are calculated for the running app...
                             if (packageName != null) {
-                                int screen = prefs.getInt(packageName + Common.PREF_SCREEN,
-                                        prefs.getInt(Common.PREF_DEFAULT + Common.PREF_SCREEN, 0));
-                                if (screen < 0 || screen >= Common.swdp.length) {
+                                int screen = prefs.getInt(packageName + Constants.PREF_SCREEN,
+                                        prefs.getInt(Constants.PREF_DEFAULT + Constants.PREF_SCREEN, 0));
+                                if (screen < 0 || screen >= Constants.swdp.length) {
                                     screen = 0;
                                 }
 
-                                int dpi = prefs.getInt(packageName + Common.PREF_DPI,
-                                        prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
-                                int fontScale = prefs.getInt(packageName + Common.PREF_FONT_SCALE,
-                                        prefs.getInt(Common.PREF_DEFAULT + Common.PREF_FONT_SCALE, 0));
-                                int swdp = Common.swdp[screen];
-                                int wdp = Common.wdp[screen];
-                                int hdp = Common.hdp[screen];
+                                int dpi = prefs.getInt(packageName + Constants.PREF_DPI,
+                                        prefs.getInt(Constants.PREF_DEFAULT + Constants.PREF_DPI, 0));
+                                int fontScale = prefs.getInt(packageName + Constants.PREF_FONT_SCALE,
+                                        prefs.getInt(Constants.PREF_DEFAULT + Constants.PREF_FONT_SCALE, 0));
+                                int swdp = Constants.swdp[screen];
+                                int wdp = Constants.wdp[screen];
+                                int hdp = Constants.hdp[screen];
 
-                                boolean xlarge = prefs.getBoolean(packageName + Common.PREF_XLARGE, false);
-                                boolean ltr = prefs.getBoolean(packageName + Common.PREF_LTR, false);
+                                boolean xlarge = prefs.getBoolean(packageName + Constants.PREF_XLARGE, false);
+                                boolean ltr = prefs.getBoolean(packageName + Constants.PREF_LTR, false);
 
                                 if (swdp > 0) {
                                     config.smallestScreenWidthDp = swdp;
@@ -121,7 +121,7 @@ public class onPackageLoad {
     }
 
     static void soundPool(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
-        if (Core.isActive(prefs, lpparam.packageName, Common.PREF_MUTE)) {
+        if (Core.isActive(prefs, lpparam.packageName, Constants.PREF_MUTE)) {
             try {
                 // Hook the AudioTrack API
                 XposedHelpers.findAndHookMethod(AudioTrack.class, "play",
@@ -171,7 +171,7 @@ public class onPackageLoad {
     }
 
     static void legacyMenu(XC_LoadPackage.LoadPackageParam lpparam, XSharedPreferences prefs) {
-        if (Core.isActive(prefs, lpparam.packageName, Common.PREF_LEGACY_MENU)) {
+        if (Core.isActive(prefs, lpparam.packageName, Constants.PREF_LEGACY_MENU)) {
             try {
                 XposedHelpers.findAndHookMethod(ViewConfiguration.class, "hasPermanentMenuKey",
                         XC_MethodReplacement.returnConstant(true));
@@ -182,7 +182,7 @@ public class onPackageLoad {
     }
 
     private static Locale getPackageSpecificLocale(XSharedPreferences prefs, String packageName) {
-        String locale = prefs.getString(packageName + Common.PREF_LOCALE, null);
+        String locale = prefs.getString(packageName + Constants.PREF_LOCALE, null);
         if (locale == null || locale.isEmpty())
             return null;
 

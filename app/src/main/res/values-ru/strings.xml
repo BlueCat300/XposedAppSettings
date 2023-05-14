@@ -155,5 +155,6 @@ DPI; Замена ресурсов; Язык; Полный экран;
     <string name="filter_clear">Очистить</string>
     <string name="filter_apply">Применить</string>
 
+    <string name="module_force_stop">Успешно</string>
     <string name="translator">webserfer / Blue cat (4pda.ru)</string>
 </resources>

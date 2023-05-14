@@ -13,7 +13,7 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.Constants;
 
 public class AndroidServer {
 
@@ -67,7 +67,7 @@ public class AndroidServer {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     String pkgName = (String) XposedHelpers.getObjectField(param.args[0], "packageName");
-                    if (Core.isActive(prefs, pkgName, Common.PREF_RESIDENT)) {
+                    if (Core.isActive(prefs, pkgName, Constants.PREF_RESIDENT)) {
                         int adj = -12;
                         Object proc = XposedHelpers.getObjectField(param.args[0], "app");
 
@@ -116,14 +116,14 @@ public class AndroidServer {
                     ActivityInfo aInfo = (ActivityInfo) XposedHelpers.getObjectField(param.thisObject, "info");
                     if (aInfo == null) return;
                     String pkgName = aInfo.packageName;
-                    if (prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT) > 0) {
-                        int recentsMode = prefs.getInt(pkgName + Common.PREF_RECENTS_MODE, Common.PREF_RECENTS_DEFAULT);
-                        if (recentsMode == Common.PREF_RECENTS_DEFAULT) return;
+                    if (prefs.getInt(pkgName + Constants.PREF_RECENTS_MODE, Constants.PREF_RECENTS_DEFAULT) > 0) {
+                        int recentsMode = prefs.getInt(pkgName + Constants.PREF_RECENTS_MODE, Constants.PREF_RECENTS_DEFAULT);
+                        if (recentsMode == Constants.PREF_RECENTS_DEFAULT) return;
                         Intent intent = (Intent) XposedHelpers.getObjectField(param.thisObject, "intent");
-                        if (recentsMode == Common.PREF_RECENTS_FORCE) {
+                        if (recentsMode == Constants.PREF_RECENTS_FORCE) {
                             int flags = (intent.getFlags() & ~Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                             intent.setFlags(flags);
-                        } else if (recentsMode == Common.PREF_RECENTS_PREVENT) {
+                        } else if (recentsMode == Constants.PREF_RECENTS_PREVENT) {
                             intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                         }
                     }
@@ -148,7 +148,7 @@ public class AndroidServer {
                 protected void afterHookedMethod(MethodHookParam param) {
                     Context mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
                     String callingApp = mContext.getPackageManager().getNameForUid((Integer) param.args[2]);
-                    if (Common.MY_PACKAGE_NAME.equals(callingApp) || Core.isActive(prefs, callingApp, Common.PREF_RECENT_TASKS)) {
+                    if (Constants.MY_PACKAGE_NAME.equals(callingApp) || Core.isActive(prefs, callingApp, Constants.PREF_RECENT_TASKS)) {
                         param.setResult(true);
                     }
                 }
@@ -172,18 +172,18 @@ public class AndroidServer {
                         return;
                     }
 
-                    if (Core.isActive(prefs, packageName, Common.PREF_INSISTENT_NOTIF)) {
+                    if (Core.isActive(prefs, packageName, Constants.PREF_INSISTENT_NOTIF)) {
                         n.flags |= Notification.FLAG_INSISTENT;
                     }
-                    int ongoingNotif = prefs.getInt(packageName + Common.PREF_ONGOING_NOTIF,
-                            Common.ONGOING_NOTIF_DEFAULT);
-                    if (ongoingNotif == Common.ONGOING_NOTIF_FORCE) {
+                    int ongoingNotif = prefs.getInt(packageName + Constants.PREF_ONGOING_NOTIF,
+                            Constants.ONGOING_NOTIF_DEFAULT);
+                    if (ongoingNotif == Constants.ONGOING_NOTIF_FORCE) {
                         n.flags |= Notification.FLAG_ONGOING_EVENT;
-                    } else if (ongoingNotif == Common.ONGOING_NOTIF_PREVENT) {
+                    } else if (ongoingNotif == Constants.ONGOING_NOTIF_PREVENT) {
                         n.flags &= ~Notification.FLAG_ONGOING_EVENT & ~Notification.FLAG_FOREGROUND_SERVICE;
                     }
 
-                    if (Core.isActive(prefs, packageName, Common.PREF_MUTE)) {
+                    if (Core.isActive(prefs, packageName, Constants.PREF_MUTE)) {
                         n.sound = null;
                         n.flags &= ~Notification.DEFAULT_SOUND;
                     }

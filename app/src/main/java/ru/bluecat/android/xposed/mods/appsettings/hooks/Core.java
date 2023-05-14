@@ -1,21 +1,25 @@
 package ru.bluecat.android.xposed.mods.appsettings.hooks;
 
 
+import android.content.res.XModuleResources;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
-import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.Constants;
 
 public class Core implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
 	private static XSharedPreferences prefs;
+	public static XModuleResources mResources;
 
 	@Override
 	public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) {
 
+		mResources = XModuleResources.createInstance(startupParam.modulePath, null);
 		if(prefs == null) prefs = getModulePrefs();
 
 		if(prefs != null) {
@@ -27,14 +31,14 @@ public class Core implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	}
 
 	public static XSharedPreferences getModulePrefs() {
-		XSharedPreferences pref = new XSharedPreferences(Common.MY_PACKAGE_NAME, Common.PREFS);
+		XSharedPreferences pref = new XSharedPreferences(Constants.MY_PACKAGE_NAME, Constants.PREFS);
 		return pref.getFile().canRead() ? pref : null;
 	}
 
 	@Override
 	public void handleLoadPackage(LoadPackageParam lpparam) {
-		if (lpparam.packageName.equals(Common.MY_PACKAGE_NAME)) {
-			XposedHelpers.findAndHookMethod(Common.MY_PACKAGE_NAME + ".MainActivity",
+		if (lpparam.packageName.equals(Constants.MY_PACKAGE_NAME)) {
+			XposedHelpers.findAndHookMethod(Constants.MY_PACKAGE_NAME + ".MainActivity",
 					lpparam.classLoader,
 					"isModuleActive",
 					XC_MethodReplacement.returnConstant(true));
@@ -55,11 +59,11 @@ public class Core implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	}
 
 	static boolean isActive(XSharedPreferences prefs, String packageName) {
-		return prefs.getBoolean(packageName + Common.PREF_ACTIVE, false);
+		return prefs.getBoolean(packageName + Constants.PREF_ACTIVE, false);
 	}
 
 	static boolean isActive(XSharedPreferences prefs, String packageName, String sub) {
-		return prefs.getBoolean(packageName + Common.PREF_ACTIVE, false) &&
+		return prefs.getBoolean(packageName + Constants.PREF_ACTIVE, false) &&
 				prefs.getBoolean(packageName + sub, false);
 	}
 }

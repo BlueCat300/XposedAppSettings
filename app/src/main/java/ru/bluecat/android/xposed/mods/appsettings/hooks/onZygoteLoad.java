@@ -21,7 +21,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
-import ru.bluecat.android.xposed.mods.appsettings.Common;
+import ru.bluecat.android.xposed.mods.appsettings.Constants;
 
 
 class onZygoteLoad {
@@ -62,15 +62,15 @@ class onZygoteLoad {
 
 					int fullscreen;
 					try {
-						fullscreen = prefs.getInt(packageName + Common.PREF_FULLSCREEN,
-								Common.FULLSCREEN_DEFAULT);
+						fullscreen = prefs.getInt(packageName + Constants.PREF_FULLSCREEN,
+								Constants.FULLSCREEN_DEFAULT);
 					} catch (ClassCastException ex) {
 						// Legacy boolean setting
-						fullscreen = prefs.getBoolean(packageName + Common.PREF_FULLSCREEN, false)
-                                ? Common.FULLSCREEN_FORCE : Common.FULLSCREEN_DEFAULT;
+						fullscreen = prefs.getBoolean(packageName + Constants.PREF_FULLSCREEN, false)
+                                ? Constants.FULLSCREEN_FORCE : Constants.FULLSCREEN_DEFAULT;
 					}
-					boolean autoHideFullscreen = prefs.getBoolean(packageName + Common.PREF_AUTO_HIDE_FULLSCREEN, false);
-					if (fullscreen == Common.FULLSCREEN_FORCE) {
+					boolean autoHideFullscreen = prefs.getBoolean(packageName + Constants.PREF_AUTO_HIDE_FULLSCREEN, false);
+					if (fullscreen == Constants.FULLSCREEN_FORCE) {
 						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 							if(autoHideFullscreen)
@@ -80,14 +80,14 @@ class onZygoteLoad {
 						} else {
 							window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						}
-					} else if (fullscreen == Common.FULLSCREEN_PREVENT) {
+					} else if (fullscreen == Constants.FULLSCREEN_PREVENT) {
 						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.FALSE);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 							controller.show(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
 						} else {
 							window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 						}
-					} else if (fullscreen == Common.FULLSCREEN_IMMERSIVE) {
+					} else if (fullscreen == Constants.FULLSCREEN_IMMERSIVE) {
 						XposedHelpers.setAdditionalInstanceField(window, PROP_FULLSCREEN, Boolean.TRUE);
 						XposedHelpers.setAdditionalInstanceField(decorView, PROP_IMMERSIVE, Boolean.TRUE);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -103,35 +103,35 @@ class onZygoteLoad {
 						}
 					}
 
-					if (prefs.getBoolean(packageName + Common.PREF_NO_TITLE, false))
+					if (prefs.getBoolean(packageName + Constants.PREF_NO_TITLE, false))
 						window.requestFeature(Window.FEATURE_NO_TITLE);
 
-					if (prefs.getBoolean(packageName + Common.PREF_ALLOW_ON_LOCKSCREEN, false))
+					if (prefs.getBoolean(packageName + Constants.PREF_ALLOW_ON_LOCKSCREEN, false))
 							window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
 								WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
 								WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-					if (prefs.getBoolean(packageName + Common.PREF_SCREEN_ON, false)) {
+					if (prefs.getBoolean(packageName + Constants.PREF_SCREEN_ON, false)) {
 						window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 						XposedHelpers.setAdditionalInstanceField(window, PROP_KEEP_SCREEN_ON, Boolean.TRUE);
 					}
 
-					if (prefs.getBoolean(packageName + Common.PREF_LEGACY_MENU, false)) {
+					if (prefs.getBoolean(packageName + Constants.PREF_LEGACY_MENU, false)) {
 						// NEEDS_MENU_SET_TRUE = 1
 						XposedHelpers.callMethod(window, "setNeedsMenuKey", 1);
 					}
 
-                    int screenshot = prefs.getInt(packageName + Common.PREF_SCREENSHOT,
-                            Common.PREF_SCREENSHOT_DEFAULT);
-                    if (screenshot == Common.PREF_SCREENSHOT_ALLOW) {
+                    int screenshot = prefs.getInt(packageName + Constants.PREF_SCREENSHOT,
+                            Constants.PREF_SCREENSHOT_DEFAULT);
+                    if (screenshot == Constants.PREF_SCREENSHOT_ALLOW) {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                    } else if (screenshot == Common.PREF_SCREENSHOT_PREVENT) {
+                    } else if (screenshot == Constants.PREF_SCREENSHOT_PREVENT) {
                         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
                     }
 
-					int orientation = prefs.getInt(packageName + Common.PREF_ORIENTATION, prefs.getInt(Common.PREF_DEFAULT + Common.PREF_ORIENTATION, 0));
-					if (orientation > 0 && orientation < Common.orientationCodes.length && context instanceof Activity) {
-						((Activity) context).setRequestedOrientation(Common.orientationCodes[orientation]);
+					int orientation = prefs.getInt(packageName + Constants.PREF_ORIENTATION, prefs.getInt(Constants.PREF_DEFAULT + Constants.PREF_ORIENTATION, 0));
+					if (orientation > 0 && orientation < Constants.orientationCodes.length && context instanceof Activity) {
+						((Activity) context).setRequestedOrientation(Constants.orientationCodes[orientation]);
 						XposedHelpers.setAdditionalInstanceField(context, PROP_ORIENTATION, orientation);
 					}
 				}
@@ -216,7 +216,7 @@ class onZygoteLoad {
 				protected void beforeHookedMethod(MethodHookParam param) {
 					Integer orientation = (Integer) XposedHelpers.getAdditionalInstanceField(
 							param.thisObject, PROP_ORIENTATION);
-					if (orientation != null) param.args[0] = Common.orientationCodes[orientation];
+					if (orientation != null) param.args[0] = Constants.orientationCodes[orientation];
 				}
 			});
 
@@ -227,7 +227,7 @@ class onZygoteLoad {
 				protected void beforeHookedMethod(MethodHookParam param) {
 					EditorInfo info = (EditorInfo) param.args[1];
 					if (info != null && info.packageName != null) {
-						if (Core.isActive(prefs, info.packageName, Common.PREF_NO_FULLSCREEN_IME))
+						if (Core.isActive(prefs, info.packageName, Constants.PREF_NO_FULLSCREEN_IME))
 							info.imeOptions |= EditorInfo.IME_FLAG_NO_FULLSCREEN;
 					}
 				}
@@ -250,8 +250,8 @@ class onZygoteLoad {
 						return;
 					}
 
-					int packageDPI = prefs.getInt(packageName + Common.PREF_DPI,
-							prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
+					int packageDPI = prefs.getInt(packageName + Constants.PREF_DPI,
+							prefs.getInt(Constants.PREF_DEFAULT + Constants.PREF_DPI, 0));
 					if (packageDPI > 0) {
 						// Density for this package is overridden, change density
 						Object mDisplayInfo = XposedHelpers.getObjectField(param.thisObject, "mDisplayInfo");
@@ -273,8 +273,8 @@ class onZygoteLoad {
 		if (!Core.isActive(prefs, SYSTEMUI_PACKAGE))
 			return;
 
-		int systemUiDpi = prefs.getInt(SYSTEMUI_PACKAGE + Common.PREF_DPI,
-				prefs.getInt(Common.PREF_DEFAULT + Common.PREF_DPI, 0));
+		int systemUiDpi = prefs.getInt(SYSTEMUI_PACKAGE + Constants.PREF_DPI,
+				prefs.getInt(Constants.PREF_DEFAULT + Constants.PREF_DPI, 0));
 		if (systemUiDpi <= 0)
 			return;
 

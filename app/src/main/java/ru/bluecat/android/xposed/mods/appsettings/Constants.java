@@ -14,10 +14,8 @@ import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.res.Configuration;
 
-public class Common {
+public class Constants {
 
 	public static String TAG = "AppSettingsReborn";
 	public static String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
@@ -95,9 +93,5 @@ public class Common {
     public static int PREF_SCREENSHOT_DEFAULT = 0;
     public static int PREF_SCREENSHOT_ALLOW = 1;
     public static int PREF_SCREENSHOT_PREVENT = 2;
-
-    public static boolean isPortrait(Activity context) {
-		return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-	}
 
 }
